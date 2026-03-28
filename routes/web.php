@@ -24,6 +24,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
         Route::resource('kelas', \App\Http\Controllers\Admin\KelasController::class);
+        
+        // Ujian Monitoring
+        Route::get('/exams', [\App\Http\Controllers\Admin\ExamMonitorController::class, 'index'])->name('exams.index');
+        
+        // Cheat Logs Monitoring
+        Route::get('/cheat-logs', [\App\Http\Controllers\Admin\CheatLogController::class, 'index'])->name('cheat-logs.index');
+        Route::post('/cheat-logs/{cheatLog}/approve', [\App\Http\Controllers\Admin\CheatLogController::class, 'approve'])->name('cheat-logs.approve');
+        
+        // Audio Explorer
+        Route::get('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'index'])->name('audio.index');
+        Route::post('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'store'])->name('audio.store');
+        Route::delete('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'destroy'])->name('audio.destroy');
     });
 
     // Guru Routes

@@ -29,7 +29,13 @@
                 
                 <a href="{{ route('admin.kelas.index') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('admin.kelas.*') ? 'bg-primary-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">Kelola Kelas</a>
                 
-                <a href="#" class="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">Cheat Logs</a>
+                <a href="{{ route('admin.exams.index') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('admin.exams.*') ? 'bg-primary-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">Monitor Ujian</a>
+
+                <a href="{{ route('admin.audio.index') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('admin.audio.*') ? 'bg-primary-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">Audio Explorer</a>
+
+                <a href="{{ route('admin.cheat-logs.index') }}" class="block px-4 py-2 rounded transition-colors flex justify-between items-center {{ request()->routeIs('admin.cheat-logs.*') ? 'bg-primary-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                    <span>Anti-Cheat Logs</span>
+                </a>
                 <form method="POST" action="{{ route('logout') }}" class="pt-4 border-t border-slate-700 mt-4">
                     @csrf
                     <button type="submit" class="w-full text-left block px-4 py-2 text-red-400 hover:bg-slate-800 rounded transition-colors">Logout</button>
