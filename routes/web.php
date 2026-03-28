@@ -43,6 +43,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', function () {
             return view('guru.dashboard');
         })->name('dashboard');
+        
+        // Bank Soal
+        Route::resource('soal', \App\Http\Controllers\Guru\SoalController::class);
+        
+        // Manajemen Ujian
+        Route::resource('ujian', \App\Http\Controllers\Guru\UjianController::class);
+        
+        // Import Soal
+        Route::get('/import-soal', [\App\Http\Controllers\Guru\ImportSoalController::class, 'index'])->name('import.index');
+        Route::post('/import-soal', [\App\Http\Controllers\Guru\ImportSoalController::class, 'store'])->name('import.store');
+        
+        // Endpoint download template
+        Route::get('/import-soal/template', [\App\Http\Controllers\Guru\ImportSoalController::class, 'downloadTemplate'])->name('import.template');
     });
 
     // Profile Routes (All Authenticated Users)

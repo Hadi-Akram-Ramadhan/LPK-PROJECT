@@ -24,8 +24,13 @@
             </div>
             <nav class="p-4 space-y-2">
                 <a href="{{ route('guru.dashboard') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('guru.dashboard') ? 'bg-accent-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">Dashboard</a>
-                <a href="#" class="block px-4 py-2 rounded text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">Bank Soal</a>
-                <a href="#" class="block px-4 py-2 rounded text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">Manajemen Ujian</a>
+                
+                <a href="{{ route('guru.soal.index') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('guru.soal.*') ? 'bg-accent-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">Bank Soal</a>
+                
+                <a href="{{ route('guru.ujian.index') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('guru.ujian.*') ? 'bg-accent-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">Manajemen Ujian</a>
+                
+                <a href="{{ route('guru.import.index') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('guru.import.*') ? 'bg-accent-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">Import Excel</a>
+
                 <a href="#" class="block px-4 py-2 rounded text-slate-300 hover:bg-slate-700 hover:text-white transition-colors flex justify-between items-center">
                     <span>Monitor Ujian</span>
                     <span class="bg-red-500 text-xs px-2 py-1 rounded-full text-white">Live</span>
