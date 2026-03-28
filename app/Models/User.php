@@ -22,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'kelas_id',
     ];
 
     /**
@@ -45,5 +47,40 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    public function soals()
+    {
+        return $this->hasMany(Soal::class, 'guru_id');
+    }
+
+    public function ujiansDibuat()
+    {
+        return $this->hasMany(Ujian::class, 'guru_id');
+    }
+
+    public function ujianDiikuti()
+    {
+        return $this->hasMany(UjianPeserta::class, 'user_id');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isGuru()
+    {
+        return $this->role === 'guru';
+    }
+
+    public function isMurid()
+    {
+        return $this->role === 'murid';
     }
 }
