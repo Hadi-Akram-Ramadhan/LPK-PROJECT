@@ -31,8 +31,13 @@ class CheatLogController extends Controller
             'notes' => $request->notes,
         ]);
         
-        // If approved, you might want to reset the blocked status of the student here
-        // (Depends on the frontend implementation, usually sending a broadcast event via Reverb)
+        if ($request->status === 'approved') {
+            $peserta = $cheatLog->ujianPeserta;
+            if ($peserta->status === 'diblokir') {
+                $peserta->update(['status' => 'mengerjakan']);
+                event(new \App\Events\CheatLogApproved($peserta));
+            }
+        }
         
         return back()->with('success', 'Status pelanggaran berhasil diperbarui.');
     }

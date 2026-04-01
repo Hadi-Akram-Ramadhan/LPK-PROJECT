@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\SoalImport;
+use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class ImportSoalController extends Controller
 {
@@ -17,81 +17,125 @@ class ImportSoalController extends Controller
         return view('guru.import.index');
     }
 
+    // ── Download Template ─────────────────────────────────────
     public function downloadTemplate()
     {
         $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        $sheet       = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template Soal');
 
-        // Header
-        $sheet->setCellValue('A1', 'Tipe Soal (Pilihan Ganda/Multiple Choice/Essay/Audio)');
-        $sheet->setCellValue('B1', 'Teks Pertanyaan');
-        $sheet->setCellValue('C1', 'Opsi A');
-        $sheet->setCellValue('D1', 'Opsi B');
-        $sheet->setCellValue('E1', 'Opsi C');
-        $sheet->setCellValue('F1', 'Opsi D');
-        $sheet->setCellValue('G1', 'Opsi E (Opsional)');
-        $sheet->setCellValue('H1', 'Jawaban Benar (A/B/C/D/E, Pisahkan koma jika Multiple Choice)');
-        $sheet->setCellValue('I1', 'File Audio (Cth: choukai_part1.mp3, kosongkan jika bukan Audio)');
-        $sheet->setCellValue('J1', 'Poin / Bobot Nilai');
-
-        // Style
-        $headerStyle = [
-            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F46E5']],
-            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        // Header row
+        $headers = [
+            'A1' => 'Tipe Soal (Pilihan Ganda / Multiple Choice / Essay / Audio)',
+            'B1' => 'Teks Pertanyaan',
+            'C1' => 'Opsi A',
+            'D1' => 'Opsi B',
+            'E1' => 'Opsi C',
+            'F1' => 'Opsi D',
+            'G1' => 'Opsi E (Opsional)',
+            'H1' => 'Jawaban Benar (A / B / C / pisah koma jika Multiple)',
+            'I1' => 'File Audio (nama.mp3 — kosongkan jika bukan Choukai)',
+            'J1' => 'Poin / Bobot',
         ];
-        $sheet->getStyle('A1:J1')->applyFromArray($headerStyle);
-        foreach(range('A','J') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        foreach ($headers as $cell => $value) {
+            $sheet->setCellValue($cell, $value);
         }
 
-        // Contoh Data 1 (Pilihan Ganda)
-        $sheet->setCellValue('A2', 'Pilihan Ganda');
-        $sheet->setCellValue('B2', 'Apa arti kosa kata "Gakkou"?');
-        $sheet->setCellValue('C2', 'Rumah Tangga');
-        $sheet->setCellValue('D2', 'Sekolah');
-        $sheet->setCellValue('E2', 'Stasiun');
-        $sheet->setCellValue('F2', 'Kantor');
-        $sheet->setCellValue('H2', 'B');
-        $sheet->setCellValue('J2', '10');
+        // Header style
+        $sheet->getStyle('A1:J1')->applyFromArray([
+            'font' => [
+                'bold'  => true,
+                'color' => ['rgb' => 'FFFFFF'],
+            ],
+            'fill' => [
+                'fillType'   => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '4F46E5'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'wrapText'   => true,
+            ],
+        ]);
+        $sheet->getRowDimension(1)->setRowHeight(40);
 
-        // Contoh Data 2 (Essay)
-        $sheet->setCellValue('A3', 'Essay');
-        $sheet->setCellValue('B3', 'Sebutkan 3 macam alat transportasi dalam bahasa Jepang!');
-        $sheet->setCellValue('J3', '20');
+        foreach (range('A', 'J') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
 
-        $writer = new Xlsx($spreadsheet);
+        // Contoh baris 2 — Pilihan Ganda
+        $sheet->fromArray([
+            'Pilihan Ganda', 'Apa arti kata "Gakkou"?',
+            'Rumah Tangga', 'Sekolah', 'Stasiun', 'Kantor', '',
+            'B', '', '10',
+        ], null, 'A2');
+
+        // Contoh baris 3 — Multiple Choice
+        $sheet->fromArray([
+            'Multiple Choice', 'Manakah yang termasuk kata benda dalam bahasa Jepang?',
+            'Nomi (飲む)', 'Hon (本)', 'Enpitsu (鉛筆)', 'Taberu (食べる)', '',
+            'B,C', '', '15',
+        ], null, 'A3');
+
+        // Contoh baris 4 — Essay
+        $sheet->fromArray([
+            'Essay', 'Sebutkan 3 alat transportasi dalam bahasa Jepang!',
+            '', '', '', '', '', '', '', '20',
+        ], null, 'A4');
+
+        // Contoh baris 5 — Audio/Choukai
+        $sheet->fromArray([
+            'Audio', 'Dengarkan audio dan pilih jawaban yang tepat.',
+            'Pilih A', 'Pilih B', 'Pilih C', 'Pilih D', '',
+            'C', 'choukai-n4-part1.mp3', '10',
+        ], null, 'A5');
+
+        // Zebra row styling for example rows
+        $sheet->getStyle('A2:J5')->applyFromArray([
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F1F5F9']],
+        ]);
+
+        // Tulis ke temp file
+        $tmpFile  = tempnam(sys_get_temp_dir(), 'lpk_template_') . '.xlsx';
+        $writer   = new Xlsx($spreadsheet);
+        $writer->save($tmpFile);
+
         $fileName = 'Template_Import_Soal_LPK_' . date('Y-m-d') . '.xlsx';
-        
-        // Simpan sementara
-        $temp_file = tempnam(sys_get_temp_dir(), 'excel');
-        $writer->save($temp_file);
-        
-        return response()->download($temp_file, $fileName)->deleteFileAfterSend(true);
+
+        return response()->download($tmpFile, $fileName)->deleteFileAfterSend(true);
     }
 
+    // ── Process Upload ────────────────────────────────────────
     public function store(Request $request)
     {
         $request->validate([
-            'file_excel' => 'required|mimes:xlsx,xls,csv|max:5120'
+            'file_excel' => 'required|mimes:xlsx,xls,csv|max:5120',
         ], [
-            'file_excel.required' => 'File Excel wajib diunggah',
-            'file_excel.mimes' => 'Format harus xlsx, xls, atau csv'
+            'file_excel.required' => 'File Excel wajib diunggah.',
+            'file_excel.mimes'    => 'Format harus xlsx, xls, atau csv.',
+            'file_excel.max'      => 'Ukuran file maksimal 5 MB.',
         ]);
 
         try {
+            // Simpan file ke temp path agar bisa dibaca PhpSpreadsheet
+            $tmpPath = $request->file('file_excel')->getRealPath();
+
             $import = new SoalImport();
-            Excel::import($import, $request->file('file_excel'));
-            
+            $import->import($tmpPath);
+
             $summary = $import->getSummary();
-            
+
             if ($summary['sukses'] > 0) {
-                return redirect()->route('guru.soal.index')->with('success', "Berhasil import! {$summary['sukses']} soal ditambahkan. " . ($summary['gagal'] > 0 ? "Namun {$summary['gagal']} soal/baris gagal diimport karena format tidak valid." : 'Semua baris valid.'));
-            } else {
-                return back()->with('error', "Gagal import. Tidak ada baris yang memenuhi standar format atau dokumen kosong.");
+                $msg = "{$summary['sukses']} soal berhasil diimport.";
+                if ($summary['gagal'] > 0) {
+                    $msg .= " {$summary['gagal']} baris diabaikan (format tidak valid).";
+                }
+                return redirect()->route('guru.soal.index')->with('success', $msg);
             }
-        } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+
+            return back()->with('error', 'Tidak ada soal yang berhasil diimport. Periksa format file Anda.');
+
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Terjadi kesalahan saat membaca file: ' . $e->getMessage());
         }
     }
 }

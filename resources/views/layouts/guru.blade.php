@@ -31,10 +31,30 @@
                 
                 <a href="{{ route('guru.import.index') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('guru.import.*') ? 'bg-accent-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">Import Excel</a>
 
-                <a href="#" class="block px-4 py-2 rounded text-slate-300 hover:bg-slate-700 hover:text-white transition-colors flex justify-between items-center">
+                <a href="{{ route('guru.monitor.index') }}" class="block px-4 py-2 rounded transition-colors flex justify-between items-center {{ request()->routeIs('guru.monitor.*') ? 'bg-accent-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
                     <span>Monitor Ujian</span>
                     <span class="bg-red-500 text-xs px-2 py-1 rounded-full text-white">Live</span>
                 </a>
+
+                {{-- ── Pembatas Seksi ── --}}
+                <div class="pt-3 pb-1">
+                    <p class="px-4 text-[10px] font-semibold uppercase tracking-widest text-slate-500">Media & Keamanan</p>
+                </div>
+
+                <a href="{{ route('guru.audio.index') }}" class="flex items-center px-4 py-2 rounded transition-colors {{ request()->routeIs('guru.audio.*') ? 'bg-accent-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+                    <svg class="mr-2 h-4 w-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                    </svg>
+                    Audio Explorer
+                </a>
+
+                <a href="{{ route('guru.cheat-logs.index') }}" class="flex items-center px-4 py-2 rounded transition-colors {{ request()->routeIs('guru.cheat-logs.*') ? 'bg-accent-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+                    <svg class="mr-2 h-4 w-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    Log Kecurangan
+                </a>
+
                 <form method="POST" action="{{ route('logout') }}" class="pt-4 border-t border-slate-700 mt-4">
                     @csrf
                     <button type="submit" class="w-full text-left block px-4 py-2 text-red-400 hover:bg-slate-700 rounded transition-colors">Logout</button>

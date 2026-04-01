@@ -11,6 +11,17 @@
 
 @section('content')
 
+@if(session('error'))
+<div class="mb-6 bg-red-50 border-l-4 border-red-400 p-4 shadow-sm">
+    <div class="flex">
+        <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">Gagal Memproses:</h3>
+            <p class="mt-1 text-sm text-red-700">{{ session('error') }}</p>
+        </div>
+    </div>
+</div>
+@endif
+
 @if($errors->any())
 <div class="mb-6 bg-red-50 border-l-4 border-red-400 p-4 shadow-sm">
     <div class="flex">

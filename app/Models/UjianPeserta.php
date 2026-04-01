@@ -12,6 +12,7 @@ class UjianPeserta extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'mulai_at'   => 'datetime',
         'selesai_at' => 'datetime',
     ];
 

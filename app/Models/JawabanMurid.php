@@ -20,4 +20,9 @@ class JawabanMurid extends Model
     {
         return $this->belongsTo(Soal::class, 'soal_id');
     }
+
+    public function pilihanJawaban()
+    {
+        return $this->belongsTo(PilihanJawaban::class, 'pilihan_jawaban_id');
+    }
 }
