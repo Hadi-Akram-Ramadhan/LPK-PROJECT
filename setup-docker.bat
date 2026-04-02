@@ -11,8 +11,8 @@ IF NOT EXIST ".env" (
     echo [1/5] File .env sudah ada, di-skip.
 )
 
-echo [2/5] Menginstal dependensi Composer via Docker...
-docker run --rm -v "%cd%":/var/www/html -w /var/www/html laravelsail/php82-composer:latest composer install --ignore-platform-reqs
+echo [2/5] Menginstal dependensi Composer via Docker (Bisa memakan waktu beberapa menit)...
+docker run --rm -v "%cd%":/app composer:latest install --ignore-platform-reqs
 
 echo [3/5] Menjalankan Container (Web, Database, Redis, Reverb)...
 call vendor\bin\sail up -d
