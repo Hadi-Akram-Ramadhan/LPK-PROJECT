@@ -33,6 +33,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
         Route::resource('kelas', \App\Http\Controllers\Admin\KelasController::class);
+        Route::resource('ujian', \App\Http\Controllers\Admin\UjianController::class);
+        Route::get('/ujian/{ujian}/soal', [\App\Http\Controllers\Admin\UjianController::class, 'manajemenSoal'])->name('ujian.soal');
+        Route::post('/ujian/{ujian}/soal', [\App\Http\Controllers\Admin\UjianController::class, 'updateSoal'])->name('ujian.updateSoal');
+        
+        // Bank Soal
+        Route::resource('soal', \App\Http\Controllers\Admin\SoalController::class);
+        Route::get('/import-soal', [\App\Http\Controllers\Admin\SoalController::class, 'import'])->name('soal.import');
+        Route::post('/import-soal', [\App\Http\Controllers\Admin\SoalController::class, 'storeImport'])->name('soal.storeImport');
+        Route::get('/import-soal/template', [\App\Http\Controllers\Admin\SoalController::class, 'downloadTemplate'])->name('soal.template');
         
         // Ujian Monitoring
         Route::get('/monitor', [\App\Http\Controllers\Admin\ExamMonitorController::class, 'index'])->name('monitor.index');

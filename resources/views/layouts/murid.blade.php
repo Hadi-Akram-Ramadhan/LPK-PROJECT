@@ -12,51 +12,56 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        * { margin: 0; padding: 0; box-box: border-box; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.5; }
+        .wrapper { min-height: 100-vh; display: flex; flex-direction: column; }
+
+        .murid-nav { background: #111827; height: 70px; display: flex; align-items: center; padding: 0 40px; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .nav-left { display: flex; align-items: center; gap: 14px; font-size: 19px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+        .logo-box { background: #2563eb; color: #fff; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; }
+
+        .nav-right { display: flex; align-items: center; gap: 24px; }
+        .user-pill { background: #1f2937; border: 1.5px solid #374151; padding: 10px 20px; border-radius: 40px; display: flex; align-items: center; gap: 12px; color: #fff; font-size: 14px; font-weight: 600; }
+        .user-pill svg { width: 18px; height: 18px; color: #94a3b8; flex-shrink: 0; }
+
+        .logout-btn { color: #cbd5e1; font-size: 14px; font-weight: 700; text-decoration: none; border: none; background: transparent; cursor: pointer; transition: 0.2s; padding: 8px 12px; }
+        .logout-btn:hover { color: #ef4444; }
+
+        .main-content { flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; padding: 40px 24px; box-sizing: border-box; }
+
+        footer { background: #fff; border-top: 1px solid #e2e8f0; padding: 30px 40px; margin-top: auto; }
+        .footer-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #64748b; }
+    </style>
 </head>
-<body class="font-sans antialiased bg-slate-50 text-slate-800">
-    <div class="min-h-screen flex flex-col">
+<body>
+    <div class="wrapper">
         <!-- Top Navbar -->
-        <nav class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 flex items-center">
-                            <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-500">
-                                LPK CBT
-                            </span>
-                        </div>
-                        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                            <a href="{{ route('murid.dashboard') }}" class="border-primary-500 text-slate-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                                Dashboard
-                            </a>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-sm font-medium text-slate-600">{{ Auth::user()->name }}</span>
-                            <div class="h-8 w-8 rounded-full bg-gradient-to-r from-primary-400 to-accent-400 text-white flex items-center justify-center font-bold shadow-inner">
-                                {{ substr(Auth::user()->name, 0, 1) }}
-                            </div>
-                            <form method="POST" action="{{ route('logout') }}" class="ml-4">
-                                @csrf
-                                <button type="submit" class="text-sm text-slate-500 hover:text-red-500 transition-colors">Logout</button>
-                            </form>
-                        </div>
-                    </div>
+        <nav class="murid-nav">
+            <div class="nav-left">
+                <div class="logo-box">L</div>
+                LPK CBT System
+            </div>
+            <div class="nav-right">
+                <div class="user-pill">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    {{ Auth::user()->name }}
                 </div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
             </div>
         </nav>
 
         <!-- Main Content -->
-        <main class="flex-1 w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 animate-slide-up">
+        <main class="main-content">
             @yield('content')
         </main>
-        
+
         <!-- Footer -->
-        <footer class="bg-white border-t border-slate-200 mt-auto py-6">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-sm text-slate-500">
+        <footer>
+            <div class="footer-inner">
                 <p>&copy; {{ date('Y') }} LPK CBT System. All rights reserved.</p>
                 <p>Support: admin@lpk.test</p>
             </div>

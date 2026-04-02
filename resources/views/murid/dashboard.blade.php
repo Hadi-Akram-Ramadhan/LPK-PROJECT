@@ -1,104 +1,180 @@
 @extends('layouts.murid')
 
-@section('header')
-<div class="flex items-center">
-    <svg class="h-6 w-6 text-slate-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-    <span>Daftar Ujian Anda</span>
-</div>
-@endsection
-
 @section('content')
+<style>
+    /* Dashboard specific styles */
+    .header-section { margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+    .page-title { font-size: 32px; font-weight: 800; color: #1e293b; margin-bottom: 12px; letter-spacing: -0.5px; }
+    .page-subtitle { font-size: 15px; color: #64748b; line-height: 1.6; }
+    
+    .search-box { position: relative; width: 300px; }
+    .search-box input { width: 100%; padding: 12px 16px 12px 40px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 14px; outline: none; transition: 0.2s; }
+    .search-box input:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+    .search-box svg { position: absolute; left: 14px; top: 14px; width: 16px; height: 16px; color: #94a3b8; }
 
-@if(session('success'))
-<div class="mb-6 bg-green-50 border-l-4 border-green-400 p-4 shadow-sm">
-    <div class="flex">
-        <div class="ml-3">
-            <p class="text-sm text-green-700 font-medium">{{ session('success') }}</p>
+    .exam-grid { display: grid; grid-template-columns: 1fr; gap: 30px; margin-top: 20px; }
+    @media (min-width: 768px) {
+        .exam-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .exam-card { background: #fff; border-radius: 20px; border: 1.5px solid #e2e8f0; padding: 32px 40px; transition: all 0.3s; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .exam-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.05); border-color: #2563eb44; }
+    .exam-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: #111827; }
+    
+    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .tag { padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid transparent; }
+    
+    .tag-category { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+    .tag-available { background: #ecfdf5; color: #10b981; }
+    .tag-finished { background: #eff6ff; color: #2563eb; }
+    .tag-doing { background: #fffbeb; color: #d97706; border-color: #fef3c7; }
+    .tag-blocked { background: #fef2f2; color: #ef4444; }
+    .tag-time { background: #f1f5f9; color: #475569; }
+
+    .exam-title { font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 16px; line-height: 1.2; }
+    .exam-desc { font-size: 16px; color: #64748b; line-height: 1.6; margin-bottom: 30px; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    
+    .exam-meta { background: #f8fafc; border-radius: 14px; padding: 18px 22px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-bottom: 30px; border: 1px solid #f1f5f9; }
+    .meta-item { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #475569; }
+    .meta-item svg { width: 18px; height: 18px; color: #3b82f6; flex-shrink: 0; }
+    
+    .btn-action { width: 100%; padding: 16px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; border: none; text-align: center; text-decoration: none; display: inline-block; }
+    .btn-primary { background: #111827; color: #fff; }
+    .btn-primary:hover { background: #1e293b; transform: scale(1.01); }
+    .btn-success { background: #10b981; color: #fff; }
+    .btn-danger { background: #ef4444; color: #fff; }
+    .btn-disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+
+    .alert { padding: 16px 20px; border-radius: 12px; margin-bottom: 30px; font-size: 14px; font-weight: 600; }
+    .alert-success { background: #ecfdf5; color: #065f46; border-left: 4px solid #10b981; }
+
+    .empty-state { grid-column: 1 / -1; background: #fff; border-radius: 20px; padding: 80px 40px; text-align: center; border: 1.5px dashed #e2e8f0; }
+    .empty-icon { width: 64px; height: 64px; background: #f8fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: #94a3b8; }
+    .empty-icon svg { width: 32px; height: 32px; }
+</style>
+
+<div class="dashboard-wrapper">
+    @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="alert alert-danger" style="background: #fef2f2; color: #991b1b; border-left: 4px solid #ef4444; padding: 16px 20px; border-radius: 12px; margin-bottom: 30px; font-size: 14px; font-weight: 600;">
+        {{ session('error') }}
+    </div>
+    @endif
+
+    <div class="header-section">
+        <div>
+            <h1 class="page-title">Daftar Ujian Tersedia</h1>
+            <p class="page-subtitle">
+                Pilih paket ujian di bawah ini untuk memulai simulasi.<br>
+                Pastikan koneksi internet Anda stabil sebelum memulai.
+            </p>
+        </div>
+        <div class="search-box">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" placeholder="Cari ujian...">
         </div>
     </div>
-</div>
-@endif
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    @forelse($ujianPesertas as $peserta)
-        @php
-            $ujian = $peserta->ujian;
-            $now = \Carbon\Carbon::now();
-            
-            $isBelumWaktunya = $ujian->mulai && $now->lt(\Carbon\Carbon::parse($ujian->mulai));
-            $isTerlambat = $ujian->selesai && $now->gt(\Carbon\Carbon::parse($ujian->selesai)) && $peserta->status == 'belum_mulai';
-        @endphp
+    <div class="exam-grid">
+        @forelse($ujianPesertas as $peserta)
+            @php
+                $ujian = $peserta->ujian;
+                $now = \Carbon\Carbon::now();
+                $isBelumWaktunya = $ujian->mulai && $now->lt(\Carbon\Carbon::parse($ujian->mulai));
+                $isTerlambat = $ujian->selesai && $now->gt(\Carbon\Carbon::parse($ujian->selesai)) && $peserta->status == 'belum_mulai';
+                
+                $statusTag = '';
+                $statusLabel = '';
+                $btnColor = 'btn-primary';
+                $btnLabel = 'Mulai Ujian Sekarang';
+                $isDisabled = false;
+                $route = route('murid.exam.start', $peserta);
+                $isPost = true;
 
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col transition-all hover:shadow-md">
-            <div class="p-6 flex-1">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                        {{ $peserta->status === 'selesai' ? 'bg-green-100 text-green-800' : 
-                           ($peserta->status === 'mengerjakan' ? 'bg-blue-100 text-blue-800 animate-pulse' : 
-                           ($peserta->status === 'diblokir' ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-800')) }}">
-                        @if($peserta->status === 'selesai') Selesai
-                        @elseif($peserta->status === 'mengerjakan') Sedang Mengerjakan
-                        @elseif($peserta->status === 'diblokir') Terblokir
-                        @else Belum Dikerjakan
-                        @endif
-                    </span>
-                    <span class="text-sm font-medium text-slate-500 flex items-center">
-                        <svg class="h-4 w-4 mr-1 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                if ($peserta->status === 'selesai') {
+                    $statusTag = 'tag-finished';
+                    $statusLabel = 'SELESAI (SKOR: '.$peserta->skor.')';
+                    $btnLabel = 'Lihat Hasil & Rekap';
+                    $route = route('murid.exam.result', $peserta);
+                    $isPost = false;
+                } elseif ($peserta->status === 'mengerjakan') {
+                    $statusTag = 'tag-doing';
+                    $statusLabel = 'SEDANG DIKERJAKAN';
+                    $btnColor = 'btn-success';
+                    $btnLabel = 'Lanjutkan Ujian';
+                    $route = route('murid.exam.show', $peserta);
+                    $isPost = false;
+                } elseif ($peserta->status === 'diblokir') {
+                    $statusTag = 'tag-blocked';
+                    $statusLabel = 'TERBLOKIR';
+                    $btnColor = 'btn-danger';
+                    $btnLabel = 'Info Pemblokiran';
+                    $route = route('murid.exam.blocked', $peserta);
+                    $isPost = false;
+                } elseif ($isTerlambat) {
+                    $statusTag = 'tag-time';
+                    $statusLabel = 'DITUTUP';
+                    $btnColor = 'btn-disabled';
+                    $btnLabel = 'Waktu Habis';
+                    $isDisabled = true;
+                } elseif ($isBelumWaktunya) {
+                    $statusTag = 'tag-time';
+                    $statusLabel = 'BELUM DIBUKA';
+                    $btnColor = 'btn-disabled';
+                    $btnLabel = 'Belum Dimulai';
+                    $isDisabled = true;
+                } else {
+                    $statusTag = 'tag-available';
+                    $statusLabel = 'TERSEDIA';
+                }
+            @endphp
+
+            <div class="exam-card">
+                <div class="card-top">
+                    <span class="tag tag-category">{{ $ujian->kategori ?? 'UMUM' }}</span>
+                    <span class="tag {{ $statusTag }}">{{ $statusLabel }}</span>
+                </div>
+                
+                <h3 class="exam-title">{{ $ujian->judul }}</h3>
+                <p class="exam-desc">{{ $ujian->deskripsi ?? 'Klik tombol di bawah untuk mengerjakan ujian ini sesuai instruksi.' }}</p>
+                
+                <div class="exam-meta">
+                    <div class="meta-item">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         {{ $ujian->durasi }} Menit
-                    </span>
-                </div>
-                
-                <h3 class="text-lg font-bold text-slate-900 mb-1 line-clamp-2">{{ $ujian->judul }}</h3>
-                <p class="text-sm text-slate-500 mb-4 line-clamp-2">{{ $ujian->deskripsi ?? 'Tidak ada deskripsi.' }}</p>
-                
-                <div class="space-y-2 text-xs text-slate-600">
-                    @if($ujian->mulai)
-                    <div class="flex items-center">
-                        <svg class="h-4 w-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        Mulai: {{ \Carbon\Carbon::parse($ujian->mulai)->format('d M Y, H:i') }}
                     </div>
-                    @endif
-                    
-                    @if($ujian->selesai)
-                    <div class="flex items-center">
-                        <svg class="h-4 w-4 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Batas: {{ \Carbon\Carbon::parse($ujian->selesai)->format('d M Y, H:i') }}
+                    <div class="meta-item">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ $ujian->soals()->count() }} Soal
                     </div>
-                    @endif
-                </div>
-            </div>
-            
-            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                <div>
-                    @if($peserta->status === 'selesai')
-                        <span class="text-sm font-bold text-slate-800">Skor: {{ $peserta->skor }}</span>
-                    @endif
                 </div>
 
-                @if($peserta->status === 'selesai')
-                    <a href="{{ route('murid.exam.result', $peserta) }}" class="text-sm font-medium text-accent-600 hover:text-accent-500">Lihat Rekap &rarr;</a>
-                @elseif($peserta->status === 'diblokir')
-                    <a href="{{ route('murid.exam.blocked', $peserta) }}" class="text-sm font-medium text-red-600 hover:text-red-500">Info Blokir &rarr;</a>
-                @elseif($isTerlambat && $peserta->status === 'belum_mulai')
-                    <span class="text-sm font-medium text-red-500">Terlambat</span>
-                @elseif($isBelumWaktunya)
-                    <span class="text-sm font-medium text-slate-400">Belum Waktunya</span>
+                @if($isDisabled)
+                    <button class="btn-action btn-disabled" disabled>{{ $btnLabel }}</button>
                 @else
-                    <form action="{{ route('murid.exam.start', $peserta) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white {{ $peserta->status === 'mengerjakan' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-accent-600 hover:bg-accent-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition-colors">
-                            {{ $peserta->status === 'mengerjakan' ? 'Lanjutkan' : 'Mulai Kerjakan' }}
-                        </button>
-                    </form>
+                    @if($isPost)
+                        <form action="{{ $route }}" method="POST" style="margin:0;">
+                            @csrf
+                            <button type="submit" class="btn-action {{ $btnColor }}">{{ $btnLabel }}</button>
+                        </form>
+                    @else
+                        <a href="{{ $route }}" class="btn-action {{ $btnColor }}">{{ $btnLabel }}</a>
+                    @endif
                 @endif
             </div>
-        </div>
-    @empty
-        <div class="col-span-full bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center text-slate-500">
-            <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-            <span class="mt-2 block text-sm font-medium text-slate-900">Belum ada ujian.</span>
-            <p class="mt-1 text-sm text-slate-500">Tidak ada ujian yang ditugaskan ke kelas Anda saat ini.</p>
-        </div>
-    @endforelse
+        @empty
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+                </div>
+                <h3 style="font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 10px;">Belum ada ujian ditugaskan</h3>
+                <p style="color: #64748b; font-size: 15px;">Silakan hubungi pengelola LPK jika anda merasa seharusnya memiliki jadwal ujian hari ini.</p>
+            </div>
+        @endforelse
+    </div>
 </div>
 @endsection

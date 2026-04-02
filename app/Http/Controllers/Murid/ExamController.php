@@ -92,11 +92,22 @@ class ExamController extends Controller
         }
 
         $totalSoal = $soals->count();
+
+        if ($totalSoal == 0) {
+            return redirect()->route('murid.dashboard')->with('error', 'Ujian ini belum memiliki soal. Silakan hubungi admin.');
+        }
+
         $page = (int) $request->get('page', 1);
+        $soals = $soals->values(); // Penting: Reset index agar berurutan dari 0
+        
         if ($page < 1) $page = 1;
         if ($page > $totalSoal) $page = $totalSoal;
 
-        $currentSoal = $soals[$page - 1];
+        $currentSoal = $soals->get($page - 1);
+
+        if (!$currentSoal) {
+             return redirect()->route('murid.dashboard')->with('error', 'Soal tidak dapat ditemukan. Silakan hubungi admin.');
+        }
 
         // Ambil jawaban saat ini
         $jawabanSaatIni = JawabanMurid::where('ujian_peserta_id', $ujian_peserta->id)
