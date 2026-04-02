@@ -48,7 +48,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
                 @forelse($logs as $log)
-                <tr class="hover:bg-slate-50 transition-colors {{ $log->status === 'pending' ? 'bg-red-50/30' : '' }}">
+                <tr data-log-id="{{ $log->id }}" class="hover:bg-slate-50 transition-colors {{ $log->status === 'pending' ? 'bg-red-50/30' : '' }}">
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                         <span class="font-semibold text-slate-800">{{ $log->timestamp->format('H:i:s') }}</span>
                         <br>
@@ -166,21 +166,28 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     // Update Action Cell
-                    document.getElementById('row-action-' + logId).innerHTML = '<span class="text-slate-300">Selesai</span>';
+                    const actionCell = document.getElementById('row-action-' + logId);
+                    if (actionCell) {
+                        actionCell.innerHTML = '<span class="text-slate-300">Selesai</span>';
+                    }
                     
                     // Optional: Update Row decoration (remove red glow)
-                    const row = document.getElementById('row-action-' + logId).closest('tr');
-                    row.classList.remove('bg-red-50/30');
+                    const row = document.querySelector(`tr[data-log-id="${logId}"]`) || (actionCell ? actionCell.closest('tr') : null);
+                    if (row) {
+                        row.classList.remove('bg-red-50/30');
+                    }
                     
                     // Update Status Badge via DOM navigation (assuming table structure)
-                    const statusCell = row.querySelectorAll('td')[3];
-                    if (status === 'approved') {
-                        statusCell.innerHTML = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">✓ Diizinkan Lanjut</span>';
-                    } else {
-                        statusCell.innerHTML = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">✗ Ditolak</span>';
+                    if (row) {
+                        const statusCell = row.querySelectorAll('td')[3];
+                        if (status === 'approved') {
+                            statusCell.innerHTML = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">✓ Diizinkan Lanjut</span>';
+                        } else {
+                            statusCell.innerHTML = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">✗ Ditolak</span>';
+                        }
                     }
                 } else {
-                    alert('Gagal memproses data.');
+                    alert('Gagal: ' + (data.message || 'Terjadi kesalahan sistem.'));
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalHtml;
                 }
@@ -193,6 +200,34 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    // --- REAL-TIME AUTO-REFRESH ---
+    if (window.Echo) {
+        console.log("Listening for new cheat logs (Admin)...");
+        window.Echo.channel('cheat-logs')
+            .listen('.CheatLogReportedEvent', (e) => {
+                console.log("New cheat log received (Admin):", e);
+                
+                // Tampilkan banner notifikasi
+                const bannerId = 'new-log-banner-admin';
+                if (!document.getElementById(bannerId)) {
+                    const banner = document.createElement('div');
+                    banner.id = bannerId;
+                    banner.className = 'fixed top-20 right-4 z-50 bg-red-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-4 animate-bounce cursor-pointer';
+                    banner.innerHTML = `
+                        <div class="bg-white/20 p-2 rounded-lg">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm">Ada Pelanggaran Baru!</p>
+                            <p class="text-xs opacity-90">Klik di sini untuk memuat ulang tabel.</p>
+                        </div>
+                    `;
+                    banner.onclick = () => window.location.reload();
+                    document.body.appendChild(banner);
+                }
+            });
+    }
 });
 </script>
 @endsection

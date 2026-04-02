@@ -29,7 +29,7 @@
                 
                 <a href="{{ route('admin.kelas.index') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('admin.kelas.*') ? 'bg-primary-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">Kelola Kelas</a>
                 
-                <a href="{{ route('admin.exams.index') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('admin.exams.*') ? 'bg-primary-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">Monitor Ujian</a>
+                <a href="{{ route('admin.monitor.index') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('admin.monitor.*') ? 'bg-primary-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">Monitor Ujian</a>
 
                 <a href="{{ route('admin.audio.index') }}" class="block px-4 py-2 rounded transition-colors {{ request()->routeIs('admin.audio.*') ? 'bg-primary-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">Audio Explorer</a>
 

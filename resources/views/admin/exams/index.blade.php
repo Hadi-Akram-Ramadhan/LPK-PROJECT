@@ -49,7 +49,10 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="#" class="text-primary-600 hover:text-primary-900 mr-3">Lihat Detail</a>
+                        <div class="flex justify-end space-x-2">
+                            <a href="{{ route('admin.monitor.show', $ujian) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md border border-indigo-100 transition-colors">Detail</a>
+                            <a href="{{ route('admin.monitor.export', $ujian) }}" class="text-green-600 hover:text-green-900 bg-green-50 px-3 py-1 rounded-md border border-green-100 transition-colors">Export</a>
+                        </div>
                     </td>
                 </tr>
                 @empty

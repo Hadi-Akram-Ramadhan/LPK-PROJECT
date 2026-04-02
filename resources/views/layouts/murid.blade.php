@@ -28,7 +28,7 @@
                             </span>
                         </div>
                         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                            <a href="{{ route('dashboard') }}" class="border-primary-500 text-slate-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            <a href="{{ route('murid.dashboard') }}" class="border-primary-500 text-slate-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 Dashboard
                             </a>
                         </div>

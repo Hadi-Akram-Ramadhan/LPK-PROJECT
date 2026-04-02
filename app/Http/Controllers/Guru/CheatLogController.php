@@ -45,25 +45,32 @@ class CheatLogController extends Controller
             'notes'  => 'nullable|string|max:500',
         ]);
 
-        $cheatLog->update([
-            'status'      => $request->status,
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
-            'notes'       => $request->notes,
-        ]);
-
-        if ($request->status === 'approved') {
-            $peserta = $cheatLog->ujianPeserta;
-            if ($peserta && $peserta->status === 'diblokir') {
-                $peserta->update(['status' => 'mengerjakan']);
-                event(new \App\Events\CheatLogApproved($peserta));
+        try {
+            $cheatLog->update([
+                'status'      => $request->status,
+                'approved_by' => auth()->id(),
+                'approved_at' => now(),
+                'notes'       => $request->notes,
+            ]);
+    
+            if ($request->status === 'approved') {
+                $peserta = $cheatLog->ujianPeserta;
+                if ($peserta && $peserta->status === 'diblokir') {
+                    $peserta->update(['status' => 'mengerjakan']);
+                    event(new \App\Events\CheatLogApproved($peserta));
+                }
             }
+    
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'Status pelanggaran berhasil diperbarui.']);
+            }
+    
+            return back()->with('success', 'Status pelanggaran berhasil diperbarui dan murid telah diberitahu.');
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Gagal: ' . $e->getMessage()], 500);
+            }
+            return back()->with('error', 'Gagal memproses data: ' . $e->getMessage());
         }
-
-        if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'Status pelanggaran berhasil diperbarui.']);
-        }
-
-        return back()->with('success', 'Status pelanggaran berhasil diperbarui dan murid telah diberitahu.');
     }
 }

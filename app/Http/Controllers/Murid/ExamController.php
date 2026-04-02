@@ -191,6 +191,17 @@ class ExamController extends Controller
      */
     public function finish(Request $request, UjianPeserta $ujian_peserta)
     {
+        // Jika request via GET (refresh halaman), arahkan secara cerdas
+        if ($request->isMethod('get')) {
+            if ($ujian_peserta->status === 'selesai') {
+                return redirect()->route('murid.exam.result', $ujian_peserta);
+            }
+            if ($ujian_peserta->status === 'diblokir') {
+                return redirect()->route('murid.exam.blocked', $ujian_peserta);
+            }
+            return redirect()->route('murid.dashboard');
+        }
+
         return $this->forceFinish($ujian_peserta);
     }
 
@@ -226,12 +237,15 @@ class ExamController extends Controller
         $ujian_peserta->update(['status' => 'diblokir']);
 
         // Catat ke log
-        CheatLog::create([
+        $log = CheatLog::create([
             'ujian_peserta_id' => $ujian_peserta->id,
             'keterangan' => 'Terdeteksi memindahkan/menyembunyikan tab ujian.',
             'status' => 'pending',
             'timestamp' => Carbon::now(),
         ]);
+
+        // Broadcast ke Guru/Admin
+        broadcast(new \App\Events\CheatLogReported($log));
 
         return response()->json(['success' => true, 'redirect' => route('murid.exam.blocked', $ujian_peserta)]);
     }
@@ -266,7 +280,7 @@ class ExamController extends Controller
     {
         if ($ujian_peserta->user_id !== auth()->id() && !auth()->user()->isAdmin() && !auth()->user()->isGuru()) abort(403);
         if ($ujian_peserta->status !== 'selesai') {
-            return redirect()->route('dashboard');
+            return redirect()->route('murid.dashboard');
         }
 
         $ujian = $ujian_peserta->ujian;

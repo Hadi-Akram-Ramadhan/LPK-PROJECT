@@ -52,8 +52,13 @@ class MonitorUjianController extends Controller
             ->whereIn('soal_id', $soalEssays->pluck('id'))
             ->get()
             ->keyBy('soal_id');
+
+        // Hitung skor Pilihan Ganda saja (semua soal kecuali essay)
+        $skorPG = JawabanMurid::where('ujian_peserta_id', $ujian_peserta->id)
+            ->whereNotIn('soal_id', $soalEssays->pluck('id'))
+            ->sum('poin_didapat');
             
-        return view('guru.monitor.grade', compact('ujian_peserta', 'ujian', 'soalEssays', 'jawabans'));
+        return view('guru.monitor.grade', compact('ujian_peserta', 'ujian', 'soalEssays', 'jawabans', 'skorPG'));
     }
 
     public function storeGrade(Request $request, UjianPeserta $ujian_peserta)
@@ -93,5 +98,69 @@ class MonitorUjianController extends Controller
             DB::rollBack();
             return back()->with('error', 'Gagal menyimpan nilai: ' . $e->getMessage());
         }
+    }
+
+    public function export(Ujian $ujian)
+    {
+        // Pastikan hanya guru pemilik ujian yang bisa export
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $pesertas = UjianPeserta::with('user.kelas')
+            ->where('ujian_id', $ujian->id)
+            ->get();
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Nilai Peserta');
+
+        // Header Styling
+        $headerStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '059669']], // Tailwind Emerald-600
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        ];
+
+        // Headers
+        $headers = ['No', 'Nama Murid', 'Kelas', 'Waktu Mulai', 'Waktu Selesai', 'Status', 'Skor'];
+        $column = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($column . '1', $header);
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+            $column++;
+        }
+        $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
+
+        // Data
+        $row = 2;
+        foreach ($pesertas as $index => $p) {
+            $sheet->setCellValue('A' . $row, $index + 1);
+            $sheet->setCellValue('B' . $row, $p->user->name);
+            $sheet->setCellValue('C' . $row, $p->user->kelas->nama ?? '-');
+            $sheet->setCellValue('D' . $row, $p->mulai_at);
+            $sheet->setCellValue('E' . $row, $p->selesai_at);
+            $sheet->setCellValue('F' . $row, strtoupper($p->status));
+            $sheet->setCellValue('G' . $row, $p->skor);
+            
+            // Alignments
+            $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('F' . $row . ':G' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            
+            $row++;
+        }
+
+        // Borders
+        $sheet->getStyle('A1:G' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+        $filename = "Nilai_Ujian_" . str_replace(' ', '_', $ujian->judul) . "_" . date('Y-m-d') . ".xlsx";
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }

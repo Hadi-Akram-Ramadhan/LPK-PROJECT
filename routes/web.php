@@ -11,12 +11,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Murid Routes
     Route::middleware('role:murid')->group(function () {
-        Route::get('/dashboard', [\App\Http\Controllers\Murid\ExamController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Murid\ExamController::class, 'index'])->name('murid.dashboard');
         
         Route::post('/exam/{ujian_peserta}/start', [\App\Http\Controllers\Murid\ExamController::class, 'start'])->name('murid.exam.start');
         Route::get('/exam/{ujian_peserta}/show', [\App\Http\Controllers\Murid\ExamController::class, 'show'])->name('murid.exam.show');
         Route::post('/exam/{ujian_peserta}/auto-save', [\App\Http\Controllers\Murid\ExamController::class, 'storeAnswer'])->name('murid.exam.autoSave');
         Route::post('/exam/{ujian_peserta}/finish', [\App\Http\Controllers\Murid\ExamController::class, 'finish'])->name('murid.exam.finish');
+        Route::get('/exam/{ujian_peserta}/finish', [\App\Http\Controllers\Murid\ExamController::class, 'finish']); // Fallback untuk refresh/GET
         Route::get('/exam/{ujian_peserta}/result', [\App\Http\Controllers\Murid\ExamController::class, 'result'])->name('murid.exam.result');
         
         // Anti-Cheat Endpoints
@@ -34,7 +35,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('kelas', \App\Http\Controllers\Admin\KelasController::class);
         
         // Ujian Monitoring
-        Route::get('/exams', [\App\Http\Controllers\Admin\ExamMonitorController::class, 'index'])->name('exams.index');
+        Route::get('/monitor', [\App\Http\Controllers\Admin\ExamMonitorController::class, 'index'])->name('monitor.index');
+        Route::get('/monitor/{ujian}', [\App\Http\Controllers\Admin\ExamMonitorController::class, 'show'])->name('monitor.show');
+        Route::get('/monitor/{ujian}/export', [\App\Http\Controllers\Admin\ExamMonitorController::class, 'export'])->name('monitor.export');
         
         // Cheat Logs Monitoring
         Route::get('/cheat-logs', [\App\Http\Controllers\Admin\CheatLogController::class, 'index'])->name('cheat-logs.index');
@@ -68,6 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Monitor Ujian & Penilaian
         Route::get('/monitor', [\App\Http\Controllers\Guru\MonitorUjianController::class, 'index'])->name('monitor.index');
         Route::get('/monitor/{ujian}', [\App\Http\Controllers\Guru\MonitorUjianController::class, 'show'])->name('monitor.show');
+        Route::get('/monitor/{ujian}/export', [\App\Http\Controllers\Guru\MonitorUjianController::class, 'export'])->name('monitor.export');
         Route::get('/monitor/grade/{ujian_peserta}', [\App\Http\Controllers\Guru\MonitorUjianController::class, 'grade'])->name('monitor.grade');
         Route::post('/monitor/grade/{ujian_peserta}', [\App\Http\Controllers\Guru\MonitorUjianController::class, 'storeGrade'])->name('monitor.storeGrade');
 

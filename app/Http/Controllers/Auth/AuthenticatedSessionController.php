@@ -36,7 +36,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('guru.dashboard', absolute: false));
         }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('murid.dashboard', absolute: false));
     }
 
     /**

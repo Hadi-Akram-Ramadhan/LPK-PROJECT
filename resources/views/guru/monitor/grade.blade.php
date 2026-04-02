@@ -85,7 +85,7 @@
     @if(count($soalEssays) > 0)
     <div class="mt-8 bg-slate-50 px-6 py-4 border border-slate-200 rounded-xl flex items-center justify-between sticky bottom-4 shadow-lg">
         <div>
-            <span class="text-sm font-medium text-slate-700">Skor Pilihan Ganda Saat Ini: <strong>{{ JawabanMurid::where('ujian_peserta_id', $ujian_peserta->id)->whereNotIn('soal_id', $soalEssays->pluck('id'))->sum('poin_didapat') }}</strong></span>
+            <span class="text-sm font-medium text-slate-700">Skor Pilihan Ganda Saat Ini: <strong>{{ $skorPG }}</strong></span>
         </div>
         <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition-colors">
             Simpan Nilai Essay
