@@ -80,11 +80,11 @@
                             <div class="text-xs text-slate-400 mt-1">oleh {{ explode(' ', $log->approvedBy->name)[0] }}</div>
                         @endif
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                    <td id="row-action-{{ $log->id }}" class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                         @if($log->status === 'pending')
                         <div class="flex justify-center space-x-2">
                             <!-- Approve Button (Tidak Sengaja) -->
-                            <form action="{{ route('admin.cheat-logs.approve', $log) }}" method="POST" class="inline" onsubmit="return confirm('Izinkan peserta ini melanjutkan ujian?');">
+                            <form action="{{ route('admin.cheat-logs.approve', $log) }}" method="POST" class="inline ajax-form" data-id="{{ $log->id }}" data-status="approved">
                                 @csrf
                                 <input type="hidden" name="status" value="approved">
                                 <button type="submit" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-green-600 hover:bg-green-700 transition-colors">
@@ -94,7 +94,7 @@
                             </form>
                             
                             <!-- Reject Button (Sengaja/Pelanggaran Berat) -->
-                            <form action="{{ route('admin.cheat-logs.approve', $log) }}" method="POST" class="inline" onsubmit="return confirm('Tandai sebagai pelanggaran berat? Ujian akan dikunci permanen untuk peserta ini.');">
+                            <form action="{{ route('admin.cheat-logs.approve', $log) }}" method="POST" class="inline ajax-form" data-id="{{ $log->id }}" data-status="rejected">
                                 @csrf
                                 <input type="hidden" name="status" value="rejected">
                                 <button type="submit" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700 transition-colors">
@@ -128,4 +128,71 @@
     </div>
     @endif
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ajaxForms = document.querySelectorAll('.ajax-form');
+    
+    ajaxForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const logId = this.dataset.id;
+            const status = this.dataset.status;
+            const actionUrl = this.getAttribute('action');
+            const token = this.querySelector('[name="_token"]').value;
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            if(!confirm(status === 'approved' ? 'Izinkan peserta melanjutkan?' : 'Tandai sebagai pelanggaran berat?')) {
+                return;
+            }
+            
+            // Loading state
+            const originalHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+            
+            fetch(actionUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Update Action Cell
+                    document.getElementById('row-action-' + logId).innerHTML = '<span class="text-slate-300">Selesai</span>';
+                    
+                    // Optional: Update Row decoration (remove red glow)
+                    const row = document.getElementById('row-action-' + logId).closest('tr');
+                    row.classList.remove('bg-red-50/30');
+                    
+                    // Update Status Badge via DOM navigation (assuming table structure)
+                    const statusCell = row.querySelectorAll('td')[3];
+                    if (status === 'approved') {
+                        statusCell.innerHTML = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">✓ Diizinkan Lanjut</span>';
+                    } else {
+                        statusCell.innerHTML = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">✗ Ditolak</span>';
+                    }
+                } else {
+                    alert('Gagal memproses data.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Terjadi kesalahan jaringan.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHtml;
+            });
+        });
+    });
+});
+</script>
 @endsection

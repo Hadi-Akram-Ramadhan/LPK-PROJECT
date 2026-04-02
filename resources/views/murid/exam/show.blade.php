@@ -223,8 +223,21 @@
         setInterval(updateTimer, 1000);
         
         // --- ANTI-CHEAT: TAB VISIBILITY ---
+        let isNavigating = false;
+
+        // Tandai jika murid sedang melakukan navigasi sengaja
+        document.querySelectorAll('a, button, form').forEach(el => {
+            el.addEventListener('click', () => {
+                isNavigating = true;
+            });
+        });
+
+        document.getElementById('finish-form').addEventListener('submit', () => {
+            isNavigating = true;
+        });
+
         document.addEventListener("visibilitychange", function() {
-            if (document.hidden) {
+            if (document.hidden && !isNavigating) {
                 // Murid pindah tab atau minimize
                 triggerAntiCheatLog();
             }
@@ -232,7 +245,9 @@
 
         // Anti Alt-Tab (Blur event on window)
         window.addEventListener('blur', function() {
-            triggerAntiCheatLog();
+            if (!isNavigating) {
+                triggerAntiCheatLog();
+            }
         });
 
         let cheatReported = false;

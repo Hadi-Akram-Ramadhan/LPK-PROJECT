@@ -196,7 +196,7 @@ class ExamController extends Controller
 
     private function forceFinish(UjianPeserta $ujian_peserta)
     {
-        if ($ujian_peserta->user_id !== auth()->id() && !auth()->user()->isGuru()) abort(403);
+        if ($ujian_peserta->user_id !== auth()->id() && !auth()->user()->isAdmin() && !auth()->user()->isGuru()) abort(403);
         if ($ujian_peserta->status === 'selesai') {
             return redirect()->route('murid.exam.result', $ujian_peserta);
         }
@@ -264,7 +264,7 @@ class ExamController extends Controller
      */
     public function result(UjianPeserta $ujian_peserta)
     {
-        if ($ujian_peserta->user_id !== auth()->id()) abort(403);
+        if ($ujian_peserta->user_id !== auth()->id() && !auth()->user()->isAdmin() && !auth()->user()->isGuru()) abort(403);
         if ($ujian_peserta->status !== 'selesai') {
             return redirect()->route('dashboard');
         }

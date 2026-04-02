@@ -39,6 +39,10 @@ class CheatLogController extends Controller
             }
         }
         
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Status pelanggaran berhasil diperbarui.']);
+        }
+
         return back()->with('success', 'Status pelanggaran berhasil diperbarui.');
     }
 }

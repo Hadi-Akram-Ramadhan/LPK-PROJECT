@@ -26,7 +26,7 @@ class Ujian extends Model
         return $this->belongsToMany(Soal::class, 'ujian_soal', 'ujian_id', 'soal_id')
                     ->withPivot('urutan')
                     ->withTimestamps()
-                    ->orderBy('pivot_urutan');
+                    ->orderBy('ujian_soal.urutan');
     }
 
     public function pesertas()
