@@ -16,6 +16,11 @@ class Soal extends Model
         return $this->belongsTo(User::class, 'guru_id');
     }
 
+    public function paketSoal()
+    {
+        return $this->belongsTo(PaketSoal::class, 'paket_soal_id');
+    }
+
     public function pilihanJawabans()
     {
         return $this->hasMany(PilihanJawaban::class, 'soal_id');
