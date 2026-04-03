@@ -19,8 +19,10 @@ class UjianController extends Controller
     public function create()
     {
         $kelases = Kelas::all();
-        $soals = \App\Models\Soal::latest()->get();
-        return view('admin.ujian.create', compact('kelases', 'soals'));
+        $paketSoals = \App\Models\PaketSoal::with(['soals' => function($q) {
+            $q->orderBy('id', 'asc');
+        }])->get();
+        return view('admin.ujian.create', compact('kelases', 'paketSoals'));
     }
 
     public function store(Request $request)
@@ -67,7 +69,11 @@ class UjianController extends Controller
     public function edit(Ujian $ujian)
     {
         $kelases = Kelas::all();
-        return view('admin.ujian.edit', compact('ujian', 'kelases'));
+        $paketSoals = \App\Models\PaketSoal::with(['soals' => function($q) {
+            $q->orderBy('id', 'asc');
+        }])->get();
+        $selectedSoal = $ujian->soals->pluck('id')->toArray();
+        return view('admin.ujian.edit', compact('ujian', 'kelases', 'paketSoals', 'selectedSoal'));
     }
 
     public function update(Request $request, Ujian $ujian)
@@ -84,9 +90,11 @@ class UjianController extends Controller
 
     public function manajemenSoal(Ujian $ujian)
     {
-        $soals = \App\Models\Soal::latest()->get();
+        $paketSoals = \App\Models\PaketSoal::with(['soals' => function($q) {
+            $q->orderBy('id', 'asc');
+        }])->get();
         $ujianSoalIds = $ujian->soals()->pluck('soals.id')->toArray();
-        return view('admin.ujian.soal', compact('ujian', 'soals', 'ujianSoalIds'));
+        return view('admin.ujian.soal', compact('ujian', 'paketSoals', 'ujianSoalIds'));
     }
 
     public function updateSoal(Request $request, Ujian $ujian)

@@ -30,7 +30,8 @@
         @csrf
         @if($paketSoal)
         <input type="hidden" name="paket_soal_id" value="{{ $paketSoal->id }}">
-        
+        @endif
+
         <div class="space-y-8">
             <!-- Tipe Soal -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-slate-100">
@@ -110,12 +111,14 @@
             
         </div>
 
-        <div class="pt-10 flex justify-end border-t border-slate-100 mt-8">
-            <a href="{{ route('guru.soal.index') }}" class="bg-white border border-slate-300 rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500">
+        <div style="padding-top:40px;display:flex;justify-content:flex-end;border-top:1px solid #f1f5f9;margin-top:32px;gap:12px;">
+            <a href="{{ $paketSoal ? route('guru.paket-soal.show', $paketSoal) : route('guru.paket-soal.index') }}"
+               style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:8px 16px;display:inline-flex;justify-content:center;font-size:14px;font-weight:500;color:#334155;text-decoration:none;">
                 Batal
             </a>
-            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500">
-                Simpan Bank Soal
+            <button type="submit"
+                style="display:inline-flex;justify-content:center;padding:8px 24px;border:none;box-shadow:0 1px 2px rgba(0,0,0,.1);font-size:14px;font-weight:600;border-radius:8px;color:#fff;background:#4f46e5;cursor:pointer;">
+                Simpan Soal
             </button>
         </div>
     </form>
