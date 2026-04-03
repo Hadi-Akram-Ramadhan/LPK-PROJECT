@@ -32,6 +32,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('dashboard');
 
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+        Route::get('/import-users', [\App\Http\Controllers\Admin\UserController::class, 'import'])->name('users.import');
+        Route::post('/import-users', [\App\Http\Controllers\Admin\UserController::class, 'storeImport'])->name('users.storeImport');
+        Route::get('/import-users/template', [\App\Http\Controllers\Admin\UserController::class, 'downloadTemplate'])->name('users.template');
+
+        Route::get('/staff', [\App\Http\Controllers\Admin\UserController::class, 'staff'])->name('staff.index');
         Route::resource('kelas', \App\Http\Controllers\Admin\KelasController::class);
         Route::resource('ujian', \App\Http\Controllers\Admin\UjianController::class);
         Route::get('/ujian/{ujian}/soal', [\App\Http\Controllers\Admin\UjianController::class, 'manajemenSoal'])->name('ujian.soal');

@@ -9,9 +9,9 @@
     <script>
         window.EXAM_ID = {{ $ujian_peserta->id }};
         window.TIMER_SECONDS = {{ $sisaDetik }};
-        window.AUTO_SAVE_URL = "{{ route('murid.exam.autoSave', $ujian_peserta) }}";
-        window.REPORT_CHEAT_URL = "{{ route('murid.exam.reportCheat', $ujian_peserta) }}";
-        window.FINISH_URL = "{{ route('murid.exam.finish', $ujian_peserta) }}";
+        window.AUTO_SAVE_URL = "{{ route('murid.exam.autoSave', $ujian_peserta, false) }}";
+        window.REPORT_CHEAT_URL = "{{ route('murid.exam.reportCheat', $ujian_peserta, false) }}";
+        window.FINISH_URL = "{{ route('murid.exam.finish', $ujian_peserta, false) }}";
     </script>
 
     <style>
@@ -623,16 +623,21 @@
         updateTimer();
         setInterval(updateTimer, 1000);
         
-        // ANTI CHEAT
+        // ANTI CHEAT & TAB DETECTION
         let isNavigating = false;
-        document.querySelectorAll('a, button, input').forEach(el => {
+        
+        // Hanya elemen yang memindahkan halaman yang mematikan cheat detector
+        document.querySelectorAll('a[href], button[onclick*="submit"]').forEach(el => {
             el.addEventListener('click', () => { isNavigating = true; });
         });
+        document.getElementById('finish-form').addEventListener('submit', () => { isNavigating = true; });
 
         document.addEventListener("visibilitychange", function() {
             if (document.hidden && !isNavigating) triggerAntiCheatLog();
         });
         window.addEventListener('blur', function() {
+            // Abaikan blur jika user sedang klik dalam window/iframe
+            if (document.activeElement !== document.body && document.activeElement.tagName === 'IFRAME') return;
             if (!isNavigating) triggerAntiCheatLog();
         });
 
@@ -640,15 +645,49 @@
         function triggerAntiCheatLog() {
             if (cheatReported) return;
             cheatReported = true;
+
+            // UI Peringatan Kecurangan Langsung Muncul
+            const cheatUI = document.createElement('div');
+            cheatUI.style.cssText = "position:fixed;inset:0;background:rgba(220,38,38,1);z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;font-family:sans-serif;text-align:center;";
+            cheatUI.innerHTML = `
+                <svg style="width:120px;height:120px;margin-bottom:20px;animation: pulse 2s infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <h1 style="font-size:3rem;font-weight:900;letter-spacing:1px;margin:0;">PELANGGARAN TERDETEKSI</h1>
+                <p style="font-size:1.25rem;margin-top:10px;">Anda terdeteksi berpindah tab atau keluar dari browserujian!</p>
+                <div style="margin-top:30px;padding:15px 30px;background:rgba(0,0,0,0.2);border-radius:10px;">
+                    <p style="font-size:1rem;margin:0;">Laporan terkirim ke sistem Guru & Admin secara realtime...</p>
+                </div>
+            `;
+            document.body.appendChild(cheatUI);
+
             fetch(window.REPORT_CHEAT_URL, {
                 method: 'POST',
+                credentials: 'same-origin',
+                keepalive: true, // PENTING: Mencegah browser mobile membatalkan request saat tab diminimize
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 }
-            }).then(res => res.json())
-              .then(data => { if(data.redirect) window.location.href = data.redirect; })
-              .catch(() => window.location.reload());
+            })
+            .then(async res => {
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    throw new Error(data.message || ("HTTP error " + res.status));
+                }
+                return data;
+            })
+            .then(data => { 
+                if(data.redirect) {
+                    window.location.replace(data.redirect); 
+                } else {
+                    alert("Akses diblokir (Response tidak lengkap).");
+                }
+            })
+            .catch((err) => {
+                console.error("Anti cheat error:", err);
+                alert("Sistem gagal memverifikasi sesi (" + err.message + "). Silakan hubungi pengawas.");
+                // Tetap di halaman ini tanpa reload
+            });
         }
 
         // AUTO SAVE 

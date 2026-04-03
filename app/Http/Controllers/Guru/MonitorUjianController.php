@@ -27,7 +27,7 @@ class MonitorUjianController extends Controller
             abort(403);
         }
 
-        $pesertas = UjianPeserta::with('user')
+        $pesertas = UjianPeserta::with(['user', 'cheatLogs'])
             ->where('ujian_id', $ujian->id)
             ->latest()
             ->paginate(20);

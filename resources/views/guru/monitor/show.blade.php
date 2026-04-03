@@ -56,6 +56,7 @@
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Nama Peserta (Murid)</th>
                     <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Pelanggaran</th>
                     <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Skor Sementara</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Waktu Selesai</th>
                     <th scope="col" class="relative px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -71,22 +72,37 @@
                         <div class="text-xs text-slate-500 mt-1">{{ optional($peserta->user)->email ?? '-' }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-center">
-                        @if($peserta->status === 'belum_mulai')
+                        @if(in_array(strtolower($peserta->status), ['belum_mulai', 'belum']))
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
                                 Belum Mulai
                             </span>
-                        @elseif($peserta->status === 'mengerjakan')
+                        @elseif(strtolower($peserta->status) === 'mengerjakan')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                 Sedang Mengerjakan
                             </span>
-                        @elseif($peserta->status === 'selesai')
+                        @elseif(strtolower($peserta->status) === 'selesai')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 Selesai
                             </span>
-                        @elseif($peserta->status === 'diblokir')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                Diblokir / Pelanggaran
+                        @elseif(strtolower($peserta->status) === 'diblokir')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">
+                                ⚠ Diblokir / Pelanggaran
                             </span>
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 italic">
+                                {{ $peserta->status }}
+                            </span>
+                        @endif
+                    </td>
+                    {{-- Jumlah Pelanggaran --}}
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                        @php $cheatCount = $peserta->cheatLogs->count(); @endphp
+                        @if($cheatCount > 0)
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200">
+                                {{ $cheatCount }}x
+                            </span>
+                        @else
+                            <span class="text-slate-300 text-xs">—</span>
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
@@ -112,7 +128,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-12 text-center text-slate-500">
+                    <td colspan="6" class="px-6 py-12 text-center text-slate-500">
                         <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         <span class="mt-2 block text-sm font-medium text-slate-900">Belum ada peserta yang ditugaskan untuk ujian ini.</span>
                     </td>

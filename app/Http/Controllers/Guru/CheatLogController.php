@@ -19,8 +19,7 @@ class CheatLogController extends Controller
 
         $logs = CheatLog::with(['ujianPeserta.user', 'ujianPeserta.ujian', 'approvedBy'])
             ->whereHas('ujianPeserta', function ($q) use ($ujianIds) {
-                $q->whereIn('ujian_id', $ujianIds)
-                  ->where('status', '!=', 'selesai');
+                $q->whereIn('ujian_id', $ujianIds);
             })
             ->latest()
             ->paginate(20);

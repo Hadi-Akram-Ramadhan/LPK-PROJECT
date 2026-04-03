@@ -52,9 +52,9 @@
                 <label for="role" class="block text-sm font-medium text-slate-700">Role Pengguna</label>
                 <div class="mt-1">
                     <select id="role" name="role" required class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-slate-300 rounded-md">
-                        <option value="murid" {{ old('role') == 'murid' ? 'selected' : '' }}>Murid</option>
-                        <option value="guru" {{ old('role') == 'guru' ? 'selected' : '' }}>Guru / Instrukur</option>
-                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrator</option>
+                        <option value="murid" {{ old('role', request('role')) == 'murid' ? 'selected' : '' }}>Murid</option>
+                        <option value="guru" {{ old('role', request('role')) == 'guru' ? 'selected' : '' }}>Guru / Instrukur</option>
+                        <option value="admin" {{ old('role', request('role')) == 'admin' ? 'selected' : '' }}>Administrator</option>
                     </select>
                 </div>
                 @error('role') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror

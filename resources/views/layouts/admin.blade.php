@@ -13,110 +13,55 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        /* ===== RESET ===== */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: #f0f4f8; color: #334155; }
-
-        /* ===== LAYOUT WRAPPER ===== */
         .adm-wrap { display: flex; min-height: 100vh; }
 
-        /* ===== SIDEBAR ===== */
         .adm-side {
-            width: 260px;
-            background: #111827;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            position: fixed;
-            top: 0; left: 0; bottom: 0;
-            z-index: 50;
-            overflow-y: auto;
+            width: 260px; background: #111827; display: flex; flex-direction: column;
+            flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; z-index: 50; overflow-y: auto;
         }
-
-        /* Brand */
-        .side-brand {
-            display: flex; align-items: center;
-            padding: 28px 24px 12px;
-        }
-        .side-brand-icon {
-            width: 38px; height: 38px; border-radius: 10px;
-            background: #1e293b; display: flex; align-items: center; justify-content: center;
-            margin-right: 12px; flex-shrink: 0;
-        }
+        .side-brand { display: flex; align-items: center; padding: 28px 24px 12px; }
+        .side-brand-icon { width: 38px; height: 38px; border-radius: 10px; background: #1e293b; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; }
         .side-brand-icon svg { width: 20px; height: 20px; color: #fff; }
         .side-brand-text h1 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; }
         .side-brand-text p { font-size: 10px; color: #60a5fa; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
 
-        /* Profile */
-        .side-profile {
-            display: flex; align-items: center;
-            padding: 20px 24px; margin-bottom: 6px;
-        }
-        .side-avatar {
-            width: 42px; height: 42px; border-radius: 50%;
-            background: #3b82f6; color: #fff; font-weight: 700; font-size: 17px;
-            display: flex; align-items: center; justify-content: center;
-            margin-right: 12px; flex-shrink: 0;
-        }
+        .side-profile { display: flex; align-items: center; padding: 20px 24px; margin-bottom: 6px; }
+        .side-avatar { width: 42px; height: 42px; border-radius: 50%; background: #3b82f6; color: #fff; font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; }
         .side-profile-name { color: #fff; font-size: 13px; font-weight: 600; }
         .side-profile-role { color: #94a3b8; font-size: 11px; margin-top: 2px; }
 
-        /* Nav */
         .side-nav { flex: 1; padding: 0 14px; }
-        .side-link {
-            display: flex; align-items: center;
-            padding: 11px 14px; margin-bottom: 3px;
-            color: #94a3b8; text-decoration: none;
-            border-radius: 10px; font-size: 13.5px; font-weight: 500;
-            transition: background 0.15s, color 0.15s;
-        }
+        .side-link { display: flex; align-items: center; padding: 11px 14px; margin-bottom: 3px; color: #94a3b8; text-decoration: none; border-radius: 10px; font-size: 13.5px; font-weight: 500; transition: background 0.15s, color 0.15s; }
         .side-link:hover { background: #1e293b; color: #e2e8f0; }
-        .side-link.active {
-            background: #2563eb; color: #fff;
-            box-shadow: 0 4px 12px rgba(37,99,235,0.35);
-        }
+        .side-link.active { background: #2563eb; color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
         .side-link svg { width: 20px; height: 20px; margin-right: 14px; flex-shrink: 0; }
+        .side-link .live-dot { margin-left: auto; background: #ef4444; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
 
-        /* Logout */
-        .side-logout {
-            padding: 20px 14px; margin-top: auto;
-        }
-        .side-logout-btn {
-            display: flex; align-items: center; width: 100%;
-            padding: 11px 14px; background: transparent; border: none;
-            color: #f87171; border-radius: 10px; font-size: 13.5px;
-            font-weight: 500; cursor: pointer; transition: background 0.15s;
-            font-family: 'Inter', sans-serif;
-        }
+        .side-section-label { padding: 18px 14px 6px; font-size: 10px; font-weight: 700; color: #475569; letter-spacing: 1.5px; text-transform: uppercase; }
+
+        .side-logout { padding: 20px 14px; margin-top: auto; }
+        .side-logout-btn { display: flex; align-items: center; width: 100%; padding: 11px 14px; background: transparent; border: none; color: #f87171; border-radius: 10px; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: background 0.15s; font-family: 'Inter', sans-serif; }
         .side-logout-btn:hover { background: rgba(248,113,113,0.1); }
         .side-logout-btn svg { width: 20px; height: 20px; margin-right: 14px; }
 
-        /* ===== MAIN AREA ===== */
-        .adm-main {
-            flex: 1; display: flex; flex-direction: column;
-            margin-left: 260px; min-height: 100vh;
-        }
-
-        /* Header */
-        .adm-header {
-            height: 72px; background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 32px; flex-shrink: 0;
-        }
+        .adm-main { flex: 1; display: flex; flex-direction: column; margin-left: 260px; min-height: 100vh; }
+        .adm-header { height: 72px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; flex-shrink: 0; }
         .adm-header-title { font-size: 17px; font-weight: 700; color: #1e293b; }
         .adm-header-sub { font-size: 12px; color: #94a3b8; margin-top: 3px; }
-        .adm-header-clock {
-            display: flex; align-items: center; color: #94a3b8;
-            font-size: 13px; font-weight: 500;
-        }
+        .adm-header-clock { display: flex; align-items: center; color: #94a3b8; font-size: 13px; font-weight: 500; }
         .adm-header-clock svg { width: 16px; height: 16px; margin-right: 6px; }
         .adm-header-clock .divider { margin: 0 10px; color: #cbd5e1; }
-
-        /* Content */
         .adm-content { padding: 28px 32px; flex: 1; }
 
-        /* ===== SHARED UTILITY CLASSES ===== */
+        @media (max-width: 768px) {
+            .adm-side { width: 220px; }
+            .adm-main { margin-left: 220px; }
+            .adm-content { padding: 20px 16px; }
+        }
+
+        /* ===== SHARED UTILITY CLASSES (backward compat) ===== */
         .card { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; }
         .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
@@ -139,48 +84,27 @@
         .btn-danger:hover { background: #fef2f2; }
         .btn svg { width: 16px; height: 16px; margin-right: 6px; }
 
-        /* Tables */
         .tbl { width: 100%; border-collapse: collapse; }
         .tbl th { text-align: left; padding: 14px 16px; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
         .tbl td { padding: 16px; font-size: 14px; color: #334155; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
         .tbl tr:last-child td { border-bottom: none; }
         .tbl tr:hover td { background: #f8fafc; }
 
-        /* Search */
         .search-box { position: relative; }
         .search-box input { width: 100%; padding: 10px 14px 10px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px; outline: none; background: #fff; font-family: 'Inter', sans-serif; transition: border 0.15s; }
         .search-box input:focus { border-color: #3b82f6; }
         .search-box svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #94a3b8; }
 
-        /* Icon circles */
         .icon-circle { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .icon-circle svg { width: 22px; height: 22px; }
-        .ic-blue { background: #dbeafe; color: #2563eb; }
-        .ic-green { background: #dcfce7; color: #16a34a; }
-        .ic-purple { background: #ede9fe; color: #7c3aed; }
-        .ic-orange { background: #ffedd5; color: #ea580c; }
-        .ic-red { background: #fee2e2; color: #dc2626; }
 
-        /* Avatar letter */
-        .avatar-sm { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; flex-shrink: 0; margin-right: 12px; }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .grid-4 { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 768px) {
-            .adm-side { width: 220px; }
-            .adm-main { margin-left: 220px; }
-            .grid-4, .grid-2 { grid-template-columns: 1fr; }
-            .adm-content { padding: 20px 16px; }
-        }
+        @media (max-width: 1024px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .grid-4, .grid-2 { grid-template-columns: 1fr; } }
     </style>
     @yield('extra-css')
 </head>
 <body>
     <div class="adm-wrap">
-
-        <!-- ===== SIDEBAR ===== -->
         <aside class="adm-side">
             <div class="side-brand">
                 <div class="side-brand-icon">
@@ -196,7 +120,7 @@
                 <div class="side-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
                 <div>
                     <div class="side-profile-name">{{ Auth::user()->name }}</div>
-                    <div class="side-profile-role">Admin</div>
+                    <div class="side-profile-role">Administrator</div>
                 </div>
             </div>
 
@@ -205,9 +129,9 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                     Dashboard
                 </a>
-                <a href="{{ route('admin.users.index') }}" class="side-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.users.index') }}" class="side-link {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.staff.*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                    Siswa
+                    Manajemen User
                 </a>
                 <a href="{{ route('admin.kelas.index') }}" class="side-link {{ request()->routeIs('admin.kelas.*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
@@ -225,13 +149,17 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     Nilai & Hasil
                 </a>
-                <a href="{{ route('admin.cheat-logs.index') }}" class="side-link {{ request()->routeIs('admin.cheat-logs.*') ? 'active' : '' }}">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    Monitor Ujian
-                </a>
+
+                <div class="side-section-label">Media & Keamanan</div>
+
                 <a href="{{ route('admin.audio.index') }}" class="side-link {{ request()->routeIs('admin.audio.*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
                     Audio Explorer
+                </a>
+                <a href="{{ route('admin.cheat-logs.index') }}" class="side-link {{ request()->routeIs('admin.cheat-logs.*') ? 'active' : '' }}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    Log Kecurangan
+                    <span class="live-dot">Live</span>
                 </a>
             </nav>
 
@@ -246,12 +174,11 @@
             </div>
         </aside>
 
-        <!-- ===== MAIN ===== -->
         <main class="adm-main">
             <header class="adm-header">
                 <div>
                     <div class="adm-header-title">@yield('header', 'Dashboard')</div>
-                    <div class="adm-header-sub">@yield('header-sub', 'Selamat datang di panel admin')</div>
+                    <div class="adm-header-sub">@yield('header-sub', 'Panel Admin')</div>
                 </div>
                 <div class="adm-header-clock">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -260,7 +187,6 @@
                     <span id="adm-date">01 Jan 2026</span>
                 </div>
             </header>
-
             <div class="adm-content">
                 @yield('content')
             </div>

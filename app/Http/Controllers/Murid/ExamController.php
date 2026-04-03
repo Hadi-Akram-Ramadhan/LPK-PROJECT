@@ -42,11 +42,11 @@ class ExamController extends Controller
         if ($ujian->mulai && $now->lt(Carbon::parse($ujian->mulai))) {
             return back()->with('error', 'Ujian belum dimulai.');
         }
-        if ($ujian->selesai && $now->gt(Carbon::parse($ujian->selesai)) && $ujian_peserta->status == 'belum_mulai') {
+        if ($ujian->selesai && $now->gt(Carbon::parse($ujian->selesai)) && in_array(strtolower($ujian_peserta->status), ['belum_mulai', 'belum'])) {
             return back()->with('error', 'Batas waktu masuk ujian telah berakhir.');
         }
 
-        if ($ujian_peserta->status == 'belum_mulai') {
+        if (in_array(strtolower($ujian_peserta->status), ['belum_mulai', 'belum'])) {
             $ujian_peserta->update([
                 'status' => 'mengerjakan',
                 'mulai_at' => $now,
@@ -240,25 +240,53 @@ class ExamController extends Controller
      */
     public function reportCheat(UjianPeserta $ujian_peserta)
     {
-        if ($ujian_peserta->user_id !== auth()->id() || $ujian_peserta->status !== 'mengerjakan') {
-            return response()->json(['success' => false], 403);
+        try {
+            if (!auth()->check()) {
+                \Illuminate\Support\Facades\Log::error("Anti-Cheat 403: User not authenticated.");
+                return response()->json(['success' => false, 'message' => 'Sesi login tidak terdeteksi.'], 403);
+            }
+            if ($ujian_peserta->user_id !== auth()->id()) {
+                \Illuminate\Support\Facades\Log::error("Anti-Cheat 403: User ID mismatch. Ujian user: {$ujian_peserta->user_id}, Auth ID: " . auth()->id());
+                return response()->json(['success' => false, 'message' => 'Ujian ini bukan milik Anda.'], 403);
+            }
+            $status = strtolower($ujian_peserta->status);
+            if ($status !== 'mengerjakan' && $status !== 'diblokir') {
+                \Illuminate\Support\Facades\Log::error("Anti-Cheat 403: Status mismatch. Status: {$ujian_peserta->status}");
+                // Jika mereka di status lain (misal "belum_mulai"), paksa jadikan mengerjakan lalu blokir.
+                // Atau biarkan saja dan beritahu user.
+                return response()->json(['success' => false, 'message' => "Status ujian tidak valid: {$ujian_peserta->status}"], 403);
+            }
+
+            // Blokir ujian
+            $ujian_peserta->update(['status' => 'diblokir']);
+
+            // Cek apakah log sudah ada agar tidak tumpang tindih berulang kali
+            $existingLog = CheatLog::where('ujian_peserta_id', $ujian_peserta->id)
+                                ->where('status', 'pending')
+                                ->first();
+
+            if (!$existingLog) {
+                // Catat ke log
+                $log = CheatLog::create([
+                    'ujian_peserta_id' => $ujian_peserta->id,
+                    'keterangan' => 'Terdeteksi memindahkan/menyembunyikan tab ujian.',
+                    'status' => 'pending',
+                    'timestamp' => Carbon::now(),
+                ]);
+
+                // Broadcast ke Guru/Admin. Dibungkus try-catch agar ujian tetap diblokir meski websocket mati.
+                try {
+                    broadcast(new \App\Events\CheatLogReported($log));
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Websocket failed: " . $e->getMessage());
+                }
+            }
+
+            return response()->json(['success' => true, 'redirect' => route('murid.exam.blocked', $ujian_peserta)]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Cheat Log Error: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Server Error'], 500);
         }
-
-        // Blokir ujian
-        $ujian_peserta->update(['status' => 'diblokir']);
-
-        // Catat ke log
-        $log = CheatLog::create([
-            'ujian_peserta_id' => $ujian_peserta->id,
-            'keterangan' => 'Terdeteksi memindahkan/menyembunyikan tab ujian.',
-            'status' => 'pending',
-            'timestamp' => Carbon::now(),
-        ]);
-
-        // Broadcast ke Guru/Admin
-        broadcast(new \App\Events\CheatLogReported($log));
-
-        return response()->json(['success' => true, 'redirect' => route('murid.exam.blocked', $ujian_peserta)]);
     }
 
     /**

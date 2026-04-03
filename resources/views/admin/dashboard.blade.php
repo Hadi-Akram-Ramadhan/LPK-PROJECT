@@ -4,132 +4,86 @@
 @section('header-sub', 'Selamat datang di panel admin')
 
 @section('content')
-<style>
-    /* Stat Cards */
-    .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 28px; }
-    .stat-card { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 24px; display: flex; align-items: center; gap: 16px; }
-    .stat-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .stat-icon svg { width: 24px; height: 24px; }
-    .stat-icon.blue { background: #dbeafe; color: #2563eb; }
-    .stat-icon.green { background: #dcfce7; color: #16a34a; }
-    .stat-icon.purple { background: #ede9fe; color: #7c3aed; }
-    .stat-icon.orange { background: #ffedd5; color: #ea580c; }
-    .stat-val { font-size: 28px; font-weight: 800; color: #1e293b; }
-    .stat-label { font-size: 13px; color: #94a3b8; margin-top: 2px; }
-
-    /* Bottom sections */
-    .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .section-card { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; }
-    .section-head { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid #f1f5f9; }
-    .section-title { font-size: 16px; font-weight: 700; color: #1e293b; }
-    .section-link { font-size: 13px; color: #2563eb; text-decoration: none; font-weight: 500; }
-    .section-link:hover { text-decoration: underline; }
-
-    /* Exam list items */
-    .exam-item { padding: 16px 24px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
-    .exam-item:last-child { border-bottom: none; }
-    .exam-name { font-size: 14px; font-weight: 600; color: #1e293b; }
-    .exam-meta { font-size: 12px; color: #94a3b8; margin-top: 3px; }
-    .exam-badge { display: inline-block; padding: 4px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .exam-badge.aktif { background: #dcfce7; color: #16a34a; }
-    .exam-badge.selesai { background: #f1f5f9; color: #64748b; }
-
-    /* Result items */
-    .result-item { padding: 16px 24px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
-    .result-item:last-child { border-bottom: none; }
-    .result-name { font-size: 14px; font-weight: 600; color: #1e293b; }
-    .result-sub { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-    .result-score { font-size: 16px; font-weight: 700; color: #2563eb; text-align: right; }
-    .result-grade { font-size: 12px; color: #94a3b8; margin-top: 2px; text-align: right; }
-
-    @media (max-width: 1024px) {
-        .stat-cards { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 768px) {
-        .stat-cards { grid-template-columns: 1fr; }
-        .bottom-grid { grid-template-columns: 1fr; }
-    }
-</style>
-
-<!-- Stat Cards -->
-<div class="stat-cards">
-    <div class="stat-card">
-        <div class="stat-icon blue">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        </div>
-        <div>
-            <div class="stat-val">3</div>
-            <div class="stat-label">Total Siswa</div>
-        </div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <!-- Stat Cards -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <p class="text-sm text-slate-500 font-medium mb-1">Total Siswa</p>
+        <p class="text-3xl font-bold text-slate-800">3</p>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon green">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-        </div>
-        <div>
-            <div class="stat-val">2</div>
-            <div class="stat-label">Ujian Aktif</div>
-        </div>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <p class="text-sm text-slate-500 font-medium mb-1">Ujian Aktif</p>
+        <p class="text-3xl font-bold text-slate-800">2</p>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon purple">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </div>
-        <div>
-            <div class="stat-val">13</div>
-            <div class="stat-label">Total Soal</div>
-        </div>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <p class="text-sm text-slate-500 font-medium mb-1">Total Soal</p>
+        <p class="text-3xl font-bold text-slate-800">13</p>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon orange">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-        </div>
-        <div>
-            <div class="stat-val">87.5%</div>
-            <div class="stat-label">Rata-rata Nilai</div>
-        </div>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+        <p class="text-sm text-slate-500 font-medium mb-1">Rata-rata Nilai</p>
+        <p class="text-3xl font-bold text-primary-600 flex items-center">
+            87.5%
+            <span class="ml-2 inline-flex h-3 w-3 rounded-full bg-primary-500 animate-pulse"></span>
+        </p>
     </div>
 </div>
 
-<!-- Bottom Sections -->
-<div class="bottom-grid">
-    <!-- Ujian Terbaru -->
-    <div class="section-card">
-        <div class="section-head">
-            <div class="section-title">Ujian Terbaru</div>
-            <a href="#" class="section-link">Lihat semua</a>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-800">Ujian Terbaru</h2>
         </div>
-        <div class="exam-item">
-            <div>
-                <div class="exam-name">tes ngaji</div>
-                <div class="exam-meta">10 soal · 1 peserta · 0 selesai</div>
+        <div class="p-6">
+            <div class="bg-slate-50 rounded-lg p-4 border border-slate-100 flex justify-between items-center mb-4">
+                <div>
+                    <h3 class="font-semibold text-slate-800 text-lg">tes ngaji</h3>
+                    <p class="text-slate-500 text-sm mt-1 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        10 soal · 1 peserta · 0 selesai
+                    </p>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">Aktif</span>
             </div>
-            <span class="exam-badge aktif">Aktif</span>
-        </div>
-        <div class="exam-item">
-            <div>
-                <div class="exam-name">tes</div>
-                <div class="exam-meta">3 soal · 2 peserta · 1 selesai</div>
+            <div class="bg-slate-50 rounded-lg p-4 border border-slate-100 flex justify-between items-center mb-4">
+                <div>
+                    <h3 class="font-semibold text-slate-800 text-lg">tes</h3>
+                    <p class="text-slate-500 text-sm mt-1 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        3 soal · 2 peserta · 1 selesai
+                    </p>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">Aktif</span>
             </div>
-            <span class="exam-badge aktif">Aktif</span>
+            
+            <a href="{{ route('admin.ujian.index') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 w-full mt-2 transition-colors">
+                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Kelola Ujian
+            </a>
         </div>
     </div>
-
-    <!-- Hasil Ujian Terbaru -->
-    <div class="section-card">
-        <div class="section-head">
-            <div class="section-title">Hasil Ujian Terbaru</div>
-            <a href="#" class="section-link">Lihat semua</a>
+    
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-800">Aksi Cepat</h2>
         </div>
-        <div class="result-item">
-            <div>
-                <div class="result-name">Budi Santoso</div>
-                <div class="result-sub">tes</div>
-            </div>
-            <div>
-                <div class="result-score">87.50%</div>
-                <div class="result-grade">Grade: A</div>
-            </div>
+        <div class="p-4 space-y-2">
+            <a href="{{ route('admin.users.index') }}" class="block px-4 py-3 bg-slate-50 hover:bg-primary-50 hover:text-primary-700 rounded-lg border border-slate-100 transition-colors text-slate-700 font-medium flex items-center">
+                <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Kelola Siswa
+            </a>
+            <a href="{{ route('admin.soal.index') }}" class="block px-4 py-3 bg-slate-50 hover:bg-primary-50 hover:text-primary-700 rounded-lg border border-slate-100 transition-colors text-slate-700 font-medium flex items-center">
+                <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Tambah Soal Baru
+            </a>
+            <a href="{{ route('admin.cheat-logs.index') }}" class="block px-4 py-3 bg-slate-50 hover:bg-primary-50 hover:text-primary-700 rounded-lg border border-slate-100 transition-colors text-slate-700 font-medium flex items-center">
+                <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                Monitor Kecurangan
+            </a>
+            <a href="{{ route('admin.audio.index') }}" class="block px-4 py-3 bg-slate-50 hover:bg-primary-50 hover:text-primary-700 rounded-lg border border-slate-100 transition-colors text-slate-700 font-medium flex items-center">
+                <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                Upload Audio Soal
+            </a>
         </div>
     </div>
 </div>

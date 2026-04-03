@@ -44,12 +44,12 @@
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
                 @forelse($logs as $log)
-                <tr class="hover:bg-slate-50 transition-colors {{ $log->status === 'pending' ? 'bg-red-50/30' : '' }}">
+                <tr data-log-id="{{ $log->id }}" class="hover:bg-slate-50 transition-colors {{ $log->status === 'pending' ? 'bg-red-50/30' : '' }}">
 
                     {{-- Waktu --}}
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <span class="font-semibold text-slate-800">{{ $log->created_at->format('H:i:s') }}</span><br>
-                        <span class="text-slate-500 text-xs">{{ $log->created_at->format('d M Y') }}</span>
+                        <span class="font-semibold text-slate-800">{{ $log->timestamp->format('H:i:s') }}</span><br>
+                        <span class="text-slate-500 text-xs">{{ $log->timestamp->format('d M Y') }}</span>
                     </td>
 
                     {{-- Peserta --}}

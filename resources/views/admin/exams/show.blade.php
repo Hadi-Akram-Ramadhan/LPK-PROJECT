@@ -44,12 +44,12 @@
                     </td>
                     <td class="px-6 py-4 text-slate-600">{{ $p->user->kelas->nama ?? '-' }}</td>
                     <td class="px-6 py-4">
-                        @if($p->status === 'selesai')
+                        @if(strtolower($p->status) === 'selesai')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">SELESAI</span>
-                        @elseif($p->status === 'mengerjakan')
+                        @elseif(strtolower($p->status) === 'mengerjakan')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">MENGERJAKAN</span>
-                        @elseif($p->status === 'diblokir')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">DIBLOKIR</span>
+                        @elseif(strtolower($p->status) === 'diblokir')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200 animate-pulse">⚠ DIBLOKIR</span>
                         @else
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200 italic">BELUM MULAI</span>
                         @endif
