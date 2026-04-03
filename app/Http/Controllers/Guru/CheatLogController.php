@@ -14,7 +14,6 @@ class CheatLogController extends Controller
      */
     public function index()
     {
-        // Ambil ID ujian milik guru ini
         $ujianIds = Ujian::where('guru_id', auth()->id())->pluck('id');
 
         $logs = CheatLog::with(['ujianPeserta.user', 'ujianPeserta.ujian', 'approvedBy'])
@@ -28,12 +27,12 @@ class CheatLogController extends Controller
     }
 
     /**
-     * Guru dapat approve/reject cheat log ujian miliknya.
+     * Guru dapat approve cheat log ujian miliknya.
      */
     public function approve(Request $request, CheatLog $cheatLog)
     {
         // Pastikan log ini milik ujian yang dibuat guru ini
-        $ujianIds = Ujian::where('guru_id', auth()->id())->pluck('id');
+        $ujianIds       = Ujian::where('guru_id', auth()->id())->pluck('id');
         $pesertaUjianId = optional($cheatLog->ujianPeserta)->ujian_id;
 
         if (!$ujianIds->contains($pesertaUjianId)) {
@@ -42,7 +41,6 @@ class CheatLogController extends Controller
 
         $request->validate([
             'status' => 'required|in:approved,rejected',
-            'notes'  => 'nullable|string|max:500',
         ]);
 
         try {
@@ -50,9 +48,8 @@ class CheatLogController extends Controller
                 'status'      => $request->status,
                 'approved_by' => auth()->id(),
                 'approved_at' => now(),
-                'notes'       => $request->notes,
             ]);
-    
+
             if ($request->status === 'approved') {
                 $peserta = $cheatLog->ujianPeserta;
                 if ($peserta && $peserta->status === 'diblokir') {
@@ -60,17 +57,10 @@ class CheatLogController extends Controller
                     event(new \App\Events\CheatLogApproved($peserta));
                 }
             }
-    
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => true, 'message' => 'Status pelanggaran berhasil diperbarui.']);
-            }
-    
-            return back()->with('success', 'Status pelanggaran berhasil diperbarui dan murid telah diberitahu.');
+
+            return back()->with('success', 'Murid berhasil dibuka blokirnya.');
         } catch (\Exception $e) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => 'Gagal: ' . $e->getMessage()], 500);
-            }
-            return back()->with('error', 'Gagal memproses data: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memproses: ' . $e->getMessage());
         }
     }
 }
