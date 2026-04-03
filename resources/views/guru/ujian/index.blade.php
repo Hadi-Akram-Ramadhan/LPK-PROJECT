@@ -1,16 +1,30 @@
 @extends('layouts.guru')
 
-@section('header')
-<div class="flex justify-between items-center w-full">
-    <span>Manajemen Ujian</span>
-    <a href="{{ route('guru.ujian.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition-colors">
-        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-        Buat Ujian Baru
-    </a>
-</div>
+@section('header', 'Manajemen Ujian')
+@section('header-sub', 'Panel Guru / Manajemen Ujian')
+
+@section('extra-css')
+<style>
+    .page-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .toolbar-search { position: relative; }
+    .toolbar-search input { padding: 10px 14px 10px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px; outline: none; background: #fff; font-family: 'Inter', sans-serif; width: 280px; }
+    .toolbar-search input:focus { border-color: #3b82f6; }
+    .toolbar-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #94a3b8; }
+</style>
 @endsection
 
 @section('content')
+
+<div class="page-toolbar">
+    <div class="toolbar-search">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" placeholder="Cari nama ujian...">
+    </div>
+    <a href="{{ route('guru.ujian.create') }}" style="display:inline-flex;align-items:center;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#2563eb;color:#fff;border:none;transition:background 0.15s;">
+        <svg style="width:16px;height:16px;margin-right:6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Buat Ujian Baru
+    </a>
+</div>
 
 @if(session('success'))
 <div class="mb-6 bg-green-50 border-l-4 border-green-400 p-4 shadow-sm">
