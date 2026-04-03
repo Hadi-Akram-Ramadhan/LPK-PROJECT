@@ -16,7 +16,7 @@
 </head>
 <body class="font-sans antialiased text-gray-900 bg-white" style="font-family: 'Inter', sans-serif;">
     <div class="flex min-h-screen">
-        
+
         <!-- Left Panel -->
         <div class="hidden lg:flex lg:w-[50%] bg-[#0B1528] text-white p-12 xl:p-16 flex-col justify-between relative overflow-hidden">
             <!-- Background Glows -->
@@ -62,9 +62,45 @@
             </div>
         </div>
 
+    <style>
+        /* Mobile styling SAFELY applied without Tailwind recompilation */
+        .mobile-only { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 2rem; }
+        .mobile-card {
+            background-color: white;
+            border-radius: 1.25rem;
+            padding: 2.25rem 1.75rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+            border: 1px solid #f1f5f9;
+            width: 100%;
+        }
+        .right-panel-mobile-bg { background-color: #F8FAFC; align-items: center; justify-content: center; }
+
+        /* Desktop resets */
+        @media (min-width: 1024px) {
+            .mobile-only { display: none !important; }
+            .mobile-card {
+                background-color: transparent !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            .right-panel-mobile-bg { background-color: transparent !important; align-items: center !important; justify-content: center !important; }
+        }
+    </style>
+
         <!-- Right Panel (Form) -->
-        <div class="w-full lg:w-[50%] flex items-center justify-center p-8 sm:p-12 relative">
-            <div class="w-full max-w-[400px]">
+        <div class="w-full lg:w-[50%] flex justify-center p-6 sm:p-12 relative right-panel-mobile-bg">
+            <div class="w-full max-w-[400px] mobile-card">
+                
+                <!-- Logo Mobile Only -->
+                <div class="mobile-only">
+                    <div class="w-12 h-12 rounded-xl bg-[#0B1528] flex items-center justify-center mb-3 shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                    </div>
+                    <h1 class="text-[20px] font-bold text-[#0B1528] tracking-wide">LPK <span class="text-[#4C8DF5]">Urisowon</span></h1>
+                </div>
+
                 <div class="mb-10 text-center lg:text-left">
                     <h2 class="text-[28px] font-bold text-[#0B1528] mb-2">Selamat Datang</h2>
                     <p class="text-[#64748B] text-[15px]">Silakan masuk ke akun peserta ujian Anda.</p>
@@ -138,12 +174,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             const passwordInput = document.getElementById('password');
             const toggleButton = document.getElementById('toggle-password');
-            
+
             if (toggleButton && passwordInput) {
                 toggleButton.addEventListener('click', function() {
                     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                     passwordInput.setAttribute('type', type);
-                    
+
                     // Toggle SVG (Eye to Eye-off)
                     if (type === 'text') {
                         toggleButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 hover:text-gray-600 transition-colors"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>';
