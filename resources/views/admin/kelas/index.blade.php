@@ -1,87 +1,100 @@
 @extends('layouts.admin')
 
-@section('header')
-<div class="flex justify-between items-center w-full">
-    <span>Daftar Kelas LPK</span>
-    <a href="{{ route('admin.kelas.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-        Tambah Kelas Baru
-    </a>
-</div>
+@section('header', 'Daftar Kelas LPK')
+@section('header-sub', 'Admin / Kelas')
+
+@section('extra-css')
+<style>
+    .page-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .toolbar-search { position: relative; }
+    .toolbar-search input { padding: 10px 14px 10px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px; outline: none; background: #fff; font-family: 'Inter', sans-serif; width: 280px; }
+    .toolbar-search input:focus { border-color: #3b82f6; }
+    .toolbar-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #94a3b8; }
+    .tbtn { display: inline-flex; align-items: center; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; text-decoration: none; transition: 0.15s; font-family: 'Inter', sans-serif; }
+    .tbtn svg { width: 16px; height: 16px; margin-right: 6px; }
+    .tbtn-green { background: #16a34a; color: #fff; }
+    .tbtn-green:hover { background: #15803d; }
+
+    .kelas-table { width: 100%; border-collapse: collapse; }
+    .kelas-table th { text-align: left; padding: 14px 20px; font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
+    .kelas-table td { padding: 18px 20px; font-size: 14px; color: #334155; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .kelas-table tr:hover td { background: #f8fafc; }
+    .kbadge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; background: #dbeafe; color: #2563eb; }
+    .action-icon { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: 0.15s; background: transparent; margin-left: 4px; }
+    .action-icon:hover { background: #f1f5f9; }
+    .action-icon svg { width: 18px; height: 18px; }
+    .action-edit svg { color: #2563eb; }
+    .action-delete svg { color: #dc2626; }
+</style>
 @endsection
 
 @section('content')
 
-@if(session('success'))
-<div class="mb-6 bg-green-50 border-l-4 border-green-400 p-4">
-    <div class="flex">
-        <div class="ml-3">
-            <p class="text-sm text-green-700">{{ session('success') }}</p>
-        </div>
+<!-- Toolbar -->
+<div class="page-toolbar">
+    <div class="toolbar-search">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" placeholder="Cari kelas...">
     </div>
+    <a href="{{ route('admin.kelas.create') }}" class="tbtn tbtn-green">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        + Tambah Kelas Baru
+    </a>
+</div>
+
+@if(session('success'))
+<div style="margin-bottom: 20px; background: #f0fdf4; border-left: 4px solid #4ade80; padding: 14px 16px; border-radius: 8px; font-size: 14px; color: #166534;">
+    {{ session('success') }}
 </div>
 @endif
 
 @if(session('error'))
-<div class="mb-6 bg-red-50 border-l-4 border-red-400 p-4">
-    <div class="flex">
-        <div class="ml-3">
-            <p class="text-sm text-red-700">{{ session('error') }}</p>
-        </div>
-    </div>
+<div style="margin-bottom: 20px; background: #fef2f2; border-left: 4px solid #f87171; padding: 14px 16px; border-radius: 8px; font-size: 14px; color: #991b1b;">
+    {{ session('error') }}
 </div>
 @endif
 
-<!-- Table List Kelas -->
-<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200">
-            <thead class="bg-slate-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Nama Kelas</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Jumlah Murid terdaftar</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Tgl Dibuat</th>
-                    <th scope="col" class="relative px-6 py-3">
-                        <span class="sr-only">Aksi</span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-slate-200">
-                @forelse($kelas as $k)
-                <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-semibold text-slate-800">{{ $k->nama }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {{ $k->users_count }} Murid
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                        {{ $k->created_at->format('d M Y') }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{{ route('admin.kelas.edit', $k) }}" class="text-primary-600 hover:text-primary-900 mr-3">Edit</a>
-                        <form action="{{ route('admin.kelas.destroy', $k) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus kelas ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-900" {{ $k->users_count > 0 ? 'disabled title="Masih ada murid"' : '' }} class="disabled:opacity-50">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" class="px-6 py-12 text-center text-slate-500">
-                        <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                        <span class="mt-2 block text-sm font-medium text-slate-900">Belum ada kelas yang terdaftar</span>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+<!-- Table -->
+<div style="background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden;">
+    <table class="kelas-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nama Kelas</th>
+                <th>Jumlah Murid</th>
+                <th>Tgl Dibuat</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($kelas as $index => $k)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td><strong>{{ $k->nama }}</strong></td>
+                <td><span class="kbadge">{{ $k->users_count }} Murid</span></td>
+                <td style="color: #94a3b8;">{{ $k->created_at->format('d M Y') }}</td>
+                <td>
+                    <a href="{{ route('admin.kelas.edit', $k) }}" class="action-icon action-edit">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </a>
+                    <form action="{{ route('admin.kelas.destroy', $k) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus kelas ini?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="action-icon action-delete" {{ $k->users_count > 0 ? 'disabled title="Masih ada murid" style="opacity:0.3;cursor:not-allowed;"' : '' }}>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 48px; color: #94a3b8;">Belum ada kelas yang terdaftar</td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
     @if($kelas->hasPages())
-    <div class="px-6 py-4 border-t border-slate-200">
+    <div style="padding: 12px 20px; border-top: 1px solid #e2e8f0;">
         {{ $kelas->links() }}
     </div>
     @endif

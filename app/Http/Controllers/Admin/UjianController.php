@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Ujian;
+use App\Models\Kelas;
+use App\Models\MataPelajaran;
+use Illuminate\Http\Request;
+
+class UjianController extends Controller
+{
+    public function index()
+    {
+        $ujians = Ujian::with(['guru'])->latest()->get();
+        return view('admin.ujian.index', compact('ujians'));
+    }
+
+    public function create()
+    {
+        $kelases = Kelas::all();
+        $soals = \App\Models\Soal::latest()->get();
+        return view('admin.ujian.create', compact('kelases', 'soals'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'judul' => 'required',
+            'durasi' => 'required|numeric',
+            'kelas_id' => 'required',
+        ]);
+
+        $ujian = Ujian::create([
+            'judul' => $request->judul,
+            'deskripsi' => $request->deskripsi,
+            'durasi' => $request->durasi,
+            'mulai' => $request->mulai,
+            'selesai' => $request->selesai,
+            'guru_id' => auth()->id(),
+        ]);
+
+        // Otomatis daftarkan semua siswa di kelas ini ke ujian
+        $siswas = \App\Models\User::where('role', 'murid')
+            ->where('kelas_id', $request->kelas_id)
+            ->get();
+
+        foreach($siswas as $s) {
+            \App\Models\UjianPeserta::create([
+                'ujian_id' => $ujian->id,
+                'user_id' => $s->id,
+                'status' => 'belum',
+            ]);
+        }
+
+        // Simpan relasi soal ke dalam ujian
+        $soalIds = $request->input('soal_ids', []);
+        $syncData = [];
+        foreach($soalIds as $index => $id) {
+            $syncData[$id] = ['urutan' => $index + 1];
+        }
+        $ujian->soals()->sync($syncData);
+
+        return redirect()->route('admin.ujian.index')->with('success', 'Ujian berhasil dibuat, didaftarkan ke ' . $siswas->count() . ' siswa, dan ' . count($soalIds) . ' soal ditambahkan.');
+    }
+
+    public function edit(Ujian $ujian)
+    {
+        $kelases = Kelas::all();
+        return view('admin.ujian.edit', compact('ujian', 'kelases'));
+    }
+
+    public function update(Request $request, Ujian $ujian)
+    {
+        $ujian->update($request->all());
+        return redirect()->route('admin.ujian.index')->with('success', 'Ujian berhasil diperbarui.');
+    }
+
+    public function destroy(Ujian $ujian)
+    {
+        $ujian->delete();
+        return redirect()->route('admin.ujian.index')->with('success', 'Ujian berhasil dihapus.');
+    }
+
+    public function manajemenSoal(Ujian $ujian)
+    {
+        $soals = \App\Models\Soal::latest()->get();
+        $ujianSoalIds = $ujian->soals()->pluck('soals.id')->toArray();
+        return view('admin.ujian.soal', compact('ujian', 'soals', 'ujianSoalIds'));
+    }
+
+    public function updateSoal(Request $request, Ujian $ujian)
+    {
+        $soalIds = $request->input('soal_ids', []);
+        
+        $syncData = [];
+        foreach($soalIds as $index => $id) {
+            $syncData[$id] = ['urutan' => $index + 1];
+        }
+
+        $ujian->soals()->sync($syncData);
+
+        return redirect()->route('admin.ujian.index')->with('success', 'Soal berhasil diperbarui untuk ujian ini.');
+    }
+}

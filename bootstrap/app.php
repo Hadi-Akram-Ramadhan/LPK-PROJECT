@@ -15,6 +15,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
+        
+        $middleware->redirectUsersTo(function (\Illuminate\Http\Request $request) {
+            if (auth()->check()) {
+                if (auth()->user()->isAdmin()) return route('admin.dashboard');
+                if (auth()->user()->isGuru()) return route('guru.dashboard');
+                return route('murid.dashboard');
+            }
+            return '/dashboard';
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
