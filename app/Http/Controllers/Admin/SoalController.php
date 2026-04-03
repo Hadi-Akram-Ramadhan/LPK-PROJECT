@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Soal;
+use App\Models\PaketSoal;
 use App\Models\PilihanJawaban;
 use App\Imports\SoalImport;
 use Illuminate\Http\Request;
@@ -21,28 +22,25 @@ class SoalController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Soal::with('guru')->latest();
-        
-        if ($request->filled('tipe')) {
-            $query->where('tipe', $request->tipe);
-        }
-        
-        $soals = $query->paginate(15);
-        $totalSoal = Soal::count();
-        
-        return view('admin.soal.index', compact('soals', 'totalSoal'));
+        // Redirect ke daftar paket soal
+        return redirect()->route('admin.paket-soal.index');
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
+        $paketSoal = null;
+        if ($request->filled('paket')) {
+            $paketSoal = PaketSoal::findOrFail($request->paket);
+        }
+
         $audioFiles = collect(Storage::disk('public')->files('audio'))->map(function($file) {
             return basename($file);
         });
 
-        return view('admin.soal.create', compact('audioFiles'));
+        return view('admin.soal.create', compact('audioFiles', 'paketSoal'));
     }
 
     /**
@@ -51,20 +49,22 @@ class SoalController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'tipe' => 'required|in:pilihan_ganda,multiple_choice,essay,audio',
-            'pertanyaan' => 'required|string',
-            'poin' => 'required|integer|min:1',
-            'audio_path' => 'nullable|string',
+            'paket_soal_id' => 'required|exists:paket_soals,id',
+            'tipe'          => 'required|in:pilihan_ganda,multiple_choice,essay,audio',
+            'pertanyaan'    => 'required|string',
+            'poin'          => 'required|integer|min:1',
+            'audio_path'    => 'nullable|string',
         ]);
 
         DB::beginTransaction();
         try {
             $soal = Soal::create([
-                'guru_id' => auth()->id(), // Admin as creator
-                'tipe' => $request->tipe,
-                'pertanyaan' => $request->pertanyaan,
-                'poin' => $request->poin,
-                'audio_path' => $request->audio_path,
+                'guru_id'       => auth()->id(),
+                'paket_soal_id' => $request->paket_soal_id,
+                'tipe'          => $request->tipe,
+                'pertanyaan'    => $request->pertanyaan,
+                'poin'          => $request->poin,
+                'audio_path'    => $request->audio_path,
             ]);
 
             if (in_array($request->tipe, ['pilihan_ganda', 'multiple_choice', 'audio'])) {
@@ -78,8 +78,8 @@ class SoalController extends Controller
                                 $isBenar = (is_array($request->jawaban_benar) && in_array($index, $request->jawaban_benar));
                             }
                             PilihanJawaban::create([
-                                'soal_id' => $soal->id,
-                                'teks' => $teks,
+                                'soal_id'  => $soal->id,
+                                'teks'     => $teks,
                                 'is_benar' => $isBenar,
                             ]);
                         }
@@ -88,7 +88,8 @@ class SoalController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.soal.index')->with('success', 'Soal berhasil disimpan.');
+            return redirect()->route('admin.paket-soal.show', $request->paket_soal_id)
+                ->with('success', 'Soal berhasil disimpan ke paket.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
@@ -101,7 +102,6 @@ class SoalController extends Controller
         $audioFiles = collect(Storage::disk('public')->files('audio'))->map(function($file) {
             return basename($file);
         });
-
         return view('admin.soal.edit', compact('soal', 'audioFiles'));
     }
 
@@ -143,7 +143,8 @@ class SoalController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.soal.index')->with('success', 'Soal berhasil diperbarui.');
+            return redirect()->route('admin.paket-soal.show', $soal->paket_soal_id)
+                ->with('success', 'Soal berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
@@ -152,9 +153,11 @@ class SoalController extends Controller
 
     public function destroy(Soal $soal)
     {
+        $paketId = $soal->paket_soal_id;
         $soal->pilihanJawabans()->delete();
         $soal->delete();
-        return back()->with('success', 'Soal berhasil dihapus.');
+        return redirect()->route('admin.paket-soal.show', $paketId)
+            ->with('success', 'Soal berhasil dihapus.');
     }
 
     // ── Import Soal ───────────────────────────────────────────

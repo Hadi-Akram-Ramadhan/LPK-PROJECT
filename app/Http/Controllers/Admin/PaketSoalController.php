@@ -1,0 +1,85 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\PaketSoal;
+use App\Models\Soal;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class PaketSoalController extends Controller
+{
+    public function index()
+    {
+        $pakets = PaketSoal::withCount('soals')
+            ->with('guru')
+            ->latest()
+            ->get();
+
+        return view('admin.paket_soal.index', compact('pakets'));
+    }
+
+    public function create()
+    {
+        $gurus = User::whereIn('role', ['admin', 'guru'])->get();
+        return view('admin.paket_soal.create', compact('gurus'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama'      => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+        ]);
+
+        PaketSoal::create([
+            'guru_id'   => auth()->id(),
+            'nama'      => $request->nama,
+            'deskripsi' => $request->deskripsi,
+        ]);
+
+        return redirect()->route('admin.paket-soal.index')
+            ->with('success', "Paket Soal \"{$request->nama}\" berhasil dibuat.");
+    }
+
+    public function show(PaketSoal $paketSoal)
+    {
+        $soals = $paketSoal->soals()->with('pilihanJawabans')->latest()->get();
+        return view('admin.paket_soal.show', compact('paketSoal', 'soals'));
+    }
+
+    public function edit(PaketSoal $paketSoal)
+    {
+        return view('admin.paket_soal.edit', compact('paketSoal'));
+    }
+
+    public function update(Request $request, PaketSoal $paketSoal)
+    {
+        $request->validate([
+            'nama'      => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+        ]);
+
+        $paketSoal->update([
+            'nama'      => $request->nama,
+            'deskripsi' => $request->deskripsi,
+        ]);
+
+        return redirect()->route('admin.paket-soal.show', $paketSoal)
+            ->with('success', 'Paket Soal berhasil diperbarui.');
+    }
+
+    public function destroy(PaketSoal $paketSoal)
+    {
+        // Hapus semua soal dalam paket beserta pilihan jawabannya
+        foreach ($paketSoal->soals as $soal) {
+            $soal->pilihanJawabans()->delete();
+            $soal->delete();
+        }
+        $paketSoal->delete();
+
+        return redirect()->route('admin.paket-soal.index')
+            ->with('success', 'Paket Soal beserta semua soalnya berhasil dihapus.');
+    }
+}

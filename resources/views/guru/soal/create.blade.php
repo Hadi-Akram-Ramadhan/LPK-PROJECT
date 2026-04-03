@@ -11,8 +11,25 @@
 
 @section('content')
 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden max-w-4xl mx-auto">
+    {{-- Paket Info Banner --}}
+    @if($paketSoal)
+    <div style="background:#eff6ff;border-bottom:1px solid #bfdbfe;padding:14px 28px;display:flex;align-items:center;gap:12px;">
+        <svg style="width:18px;height:18px;color:#2563eb;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <div>
+            <span style="font-size:12px;color:#64748b;">Menambah soal ke paket:</span>
+            <span style="font-size:13px;font-weight:700;color:#1e40af;margin-left:6px;">{{ $paketSoal->nama }}</span>
+        </div>
+    </div>
+    @else
+    <div style="background:#fefce8;border-bottom:1px solid #fde68a;padding:14px 28px;">
+        <span style="font-size:13px;color:#92400e;">⚠️ Pilih paket terlebih dahulu dari <a href="{{ route('guru.paket-soal.index') }}" style="color:#b45309;font-weight:600;">Bank Soal</a>.</span>
+    </div>
+    @endif
+
     <form action="{{ route('guru.soal.store') }}" method="POST" class="p-8">
         @csrf
+        @if($paketSoal)
+        <input type="hidden" name="paket_soal_id" value="{{ $paketSoal->id }}">
         
         <div class="space-y-8">
             <!-- Tipe Soal -->

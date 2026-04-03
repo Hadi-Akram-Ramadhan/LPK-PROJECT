@@ -42,7 +42,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/ujian/{ujian}/soal', [\App\Http\Controllers\Admin\UjianController::class, 'manajemenSoal'])->name('ujian.soal');
         Route::post('/ujian/{ujian}/soal', [\App\Http\Controllers\Admin\UjianController::class, 'updateSoal'])->name('ujian.updateSoal');
         
-        // Bank Soal
+        // Paket Soal (Bank Soal terkelompok)
+        Route::resource('paket-soal', \App\Http\Controllers\Admin\PaketSoalController::class);
+
+        // Individual Soal (dalam konteks paket)
         Route::resource('soal', \App\Http\Controllers\Admin\SoalController::class);
         Route::get('/import-soal', [\App\Http\Controllers\Admin\SoalController::class, 'import'])->name('soal.import');
         Route::post('/import-soal', [\App\Http\Controllers\Admin\SoalController::class, 'storeImport'])->name('soal.storeImport');
@@ -69,7 +72,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return view('guru.dashboard');
         })->name('dashboard');
         
-        // Bank Soal
+        // Paket Soal (Bank Soal terkelompok)
+        Route::resource('paket-soal', \App\Http\Controllers\Guru\PaketSoalController::class);
+
+        // Individual Soal Guru
         Route::resource('soal', \App\Http\Controllers\Guru\SoalController::class);
         
         // Manajemen Ujian

@@ -5,7 +5,7 @@
     <a href="{{ route('admin.soal.index') }}" class="text-slate-500 hover:text-slate-700 transition-colors">
         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
     </a>
-    <span>Edit Soal: {{ strip_tags(substr($soal->pertanyaan, 0, 30)) }}...</span>
+    <span>Edit Soal: {{ strip_tags(substr($soal->pertanyaan, 0, 40)) }}...</span>
 </div>
 @endsection
 
@@ -14,9 +14,9 @@
     <form action="{{ route('admin.soal.update', $soal) }}" method="POST" class="p-8">
         @csrf
         @method('PUT')
-        
+
         <div class="space-y-8">
-            <!-- Tipe Soal (Disabled as Changing type mid-way is complex) -->
+            <!-- Tipe Soal (Read-only) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-slate-100">
                 <div>
                     <label class="block text-sm font-medium text-slate-700">Tipe Soal (Tidak dapat diubah)</label>
@@ -31,20 +31,20 @@
                 </div>
                 <div>
                     <label for="poin" class="block text-sm font-medium text-slate-700">Poin Soal (Bobot Nilai)</label>
-                    <input type="number" name="poin" id="poin" value="{{ old('poin', $soal->poin) }}" required min="1" class="mt-1 shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">
+                    <input type="number" name="poin" id="poin" value="{{ old('poin', $soal->poin) }}" required min="1" class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-slate-300 rounded-md">
                 </div>
             </div>
 
             <!-- Pertanyaan -->
             <div>
                 <label for="pertanyaan" class="block text-sm font-medium text-slate-700 mb-2">Teks Pertanyaan</label>
-                <textarea id="pertanyaan" name="pertanyaan" rows="4" required class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">{{ old('pertanyaan', $soal->pertanyaan) }}</textarea>
+                <textarea id="pertanyaan" name="pertanyaan" rows="4" required class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-slate-300 rounded-md">{{ old('pertanyaan', $soal->pertanyaan) }}</textarea>
                 @error('pertanyaan') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
 
             <!-- Audio Selection -->
             @if($soal->tipe == 'audio')
-            <div id="audio_section" class="bg-blue-50 border border-blue-200 rounded-lg p-5">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-5">
                 <label for="audio_path" class="block text-sm font-medium text-blue-800 flex items-center mb-2">
                     <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M8 12h.01M12 12h.01M16 12h.01M9 16H5a2 2 0 01-2-2V10a2 2 0 012-2h4l5-5v18l-5-5z"></path></svg>
                     Pilih File Audio Pendukung (Choukai)
@@ -63,22 +63,22 @@
             <div id="pilihan_section">
                 <div class="flex items-center justify-between mb-4">
                     <label class="block text-sm font-medium text-slate-700">Pilihan Jawaban</label>
-                    <button type="button" id="add_pilihan" class="inline-flex items-center px-3 py-1.5 border border-slate-300 shadow-sm text-xs font-medium rounded text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition-colors">
-                        <svg class="-ml-1 mr-1.5 h-4 w-4 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    <button type="button" id="add_pilihan" class="inline-flex items-center px-3 py-1.5 border border-slate-300 shadow-sm text-xs font-medium rounded text-slate-700 bg-white hover:bg-slate-50 transition-colors">
+                        <svg class="-ml-1 mr-1.5 h-4 w-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                         Tambah Pilihan
                     </button>
                 </div>
-                
+
                 <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
                     <div id="pilihan_container" class="space-y-3">
                         @php $i = 0; @endphp
-                        @foreach($soal->pilihanJawabans as $index => $pilihan)
+                        @foreach($soal->pilihanJawabans as $pilihan)
                         <div class="flex items-center space-x-3 pilihan-item">
                             <div class="pt-2">
                                 @if($soal->tipe == 'multiple_choice')
-                                    <input type="checkbox" id="jawaban_benar_{{$i}}" name="jawaban_benar[]" value="{{$i}}" class="jawaban-selector h-5 w-5 text-accent-600 focus:ring-accent-500 border-slate-300 rounded" {{ $pilihan->is_benar ? 'checked' : '' }}>
+                                    <input type="checkbox" name="jawaban_benar[]" value="{{$i}}" class="jawaban-selector h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" {{ $pilihan->is_benar ? 'checked' : '' }}>
                                 @else
-                                    <input type="radio" id="jawaban_benar_{{$i}}" name="jawaban_benar" value="{{$i}}" class="jawaban-selector h-5 w-5 text-accent-600 focus:ring-accent-500 border-slate-300" {{ $pilihan->is_benar ? 'checked' : '' }}>
+                                    <input type="radio" name="jawaban_benar" value="{{$i}}" class="jawaban-selector h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-slate-300" {{ $pilihan->is_benar ? 'checked' : '' }}>
                                 @endif
                             </div>
                             <div class="flex-1">
@@ -86,7 +86,7 @@
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <span class="text-slate-500 sm:text-sm">{{ chr(65 + $i) }}.</span>
                                     </div>
-                                    <input type="text" name="pilihan[{{$i}}]" class="focus:ring-accent-500 focus:border-accent-500 block w-full pl-8 sm:text-sm border-slate-300 rounded-md py-2" value="{{ $pilihan->teks }}" required>
+                                    <input type="text" name="pilihan[{{$i}}]" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-8 sm:text-sm border-slate-300 rounded-md py-2" value="{{ $pilihan->teks }}" required>
                                 </div>
                             </div>
                             <button type="button" class="remove-pilihan text-slate-400 hover:text-red-500 pt-2 transition-colors">
@@ -98,68 +98,64 @@
                     </div>
                 </div>
             </div>
-            @endif
-            
+
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const tipe = "{{ $soal->tipe }}";
-                    if (tipe !== 'essay') {
-                        let optionCount = {{ $soal->pilihanJawabans->count() }};
-                        
-                        document.getElementById('add_pilihan').addEventListener('click', function() {
-                            const container = document.getElementById('pilihan_container');
-                            const letter = String.fromCharCode(65 + optionCount); // A, B, C...
-                            
-                            const isMultiple = tipe === 'multiple_choice';
-                            const inputType = isMultiple ? 'checkbox' : 'radio';
-                            const inputName = isMultiple ? 'jawaban_benar[]' : 'jawaban_benar';
-                            const roundedClass = isMultiple ? 'rounded' : '';
-                            
-                            const html = `
-                                <div class="flex items-center space-x-3 pilihan-item mt-3">
-                                    <div class="pt-2">
-                                        <input type="${inputType}" name="${inputName}" value="${optionCount}" class="jawaban-selector h-5 w-5 text-accent-600 focus:ring-accent-500 border-slate-300 ${roundedClass}">
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="relative rounded-md shadow-sm">
-                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <span class="text-slate-500 sm:text-sm">${letter}.</span>
-                                            </div>
-                                            <input type="text" name="pilihan[${optionCount}]" class="focus:ring-accent-500 focus:border-accent-500 block w-full pl-8 sm:text-sm border-slate-300 rounded-md py-2" placeholder="Opsi jawaban..." required>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="remove-pilihan text-slate-400 hover:text-red-500 pt-2 transition-colors">
-                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                    </button>
+                    let optionCount = {{ $soal->pilihanJawabans->count() }};
+
+                    document.getElementById('add_pilihan').addEventListener('click', function() {
+                        const container = document.getElementById('pilihan_container');
+                        const letter = String.fromCharCode(65 + optionCount);
+                        const isMultiple = tipe === 'multiple_choice';
+                        const inputType = isMultiple ? 'checkbox' : 'radio';
+                        const inputName = isMultiple ? 'jawaban_benar[]' : 'jawaban_benar';
+                        const roundedClass = isMultiple ? 'rounded' : '';
+                        const html = `
+                            <div class="flex items-center space-x-3 pilihan-item mt-3">
+                                <div class="pt-2">
+                                    <input type="${inputType}" name="${inputName}" value="${optionCount}" class="jawaban-selector h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-slate-300 ${roundedClass}">
                                 </div>
-                            `;
-                            container.insertAdjacentHTML('beforeend', html);
-                            optionCount++;
-                            attachRemoveListeners();
-                        });
-                        
-                        function attachRemoveListeners() {
-                            document.querySelectorAll('.remove-pilihan').forEach(btn => {
-                                btn.onclick = function() {
-                                    if (document.querySelectorAll('.pilihan-item').length > 2) {
-                                        this.closest('.pilihan-item').remove();
-                                    } else {
-                                        alert('Minimal harus ada 2 pilihan jawaban.');
-                                    }
-                                };
-                            });
-                        }
+                                <div class="flex-1">
+                                    <div class="relative rounded-md shadow-sm">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-slate-500 sm:text-sm">${letter}.</span>
+                                        </div>
+                                        <input type="text" name="pilihan[${optionCount}]" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-8 sm:text-sm border-slate-300 rounded-md py-2" placeholder="Opsi jawaban..." required>
+                                    </div>
+                                </div>
+                                <button type="button" class="remove-pilihan text-slate-400 hover:text-red-500 pt-2 transition-colors">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', html);
+                        optionCount++;
                         attachRemoveListeners();
+                    });
+
+                    function attachRemoveListeners() {
+                        document.querySelectorAll('.remove-pilihan').forEach(btn => {
+                            btn.onclick = function() {
+                                if (document.querySelectorAll('.pilihan-item').length > 2) {
+                                    this.closest('.pilihan-item').remove();
+                                } else {
+                                    alert('Minimal harus ada 2 pilihan jawaban.');
+                                }
+                            };
+                        });
                     }
+                    attachRemoveListeners();
                 });
             </script>
+            @endif
         </div>
 
         <div class="pt-10 flex justify-end border-t border-slate-100 mt-8">
-            <a href="{{ route('admin.soal.index') }}" class="bg-white border border-slate-300 rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500">
+            <a href="{{ route('admin.soal.index') }}" class="bg-white border border-slate-300 rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-slate-700 hover:bg-slate-50">
                 Batal
             </a>
-            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500">
+            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 Perbarui Soal
             </button>
         </div>
