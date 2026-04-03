@@ -83,23 +83,13 @@
                     <td id="row-action-{{ $log->id }}" class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                         @if($log->status === 'pending')
                         <div class="flex justify-center space-x-2">
-                            <!-- Approve Button (Tidak Sengaja) -->
+                            <!-- Approve Button (Terima) -->
                             <form action="{{ route('admin.cheat-logs.approve', $log) }}" method="POST" class="inline ajax-form" data-id="{{ $log->id }}" data-status="approved">
                                 @csrf
                                 <input type="hidden" name="status" value="approved">
-                                <button type="submit" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-green-600 hover:bg-green-700 transition-colors">
-                                    <svg class="mr-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    Izinkan
-                                </button>
-                            </form>
-                            
-                            <!-- Reject Button (Sengaja/Pelanggaran Berat) -->
-                            <form action="{{ route('admin.cheat-logs.approve', $log) }}" method="POST" class="inline ajax-form" data-id="{{ $log->id }}" data-status="rejected">
-                                @csrf
-                                <input type="hidden" name="status" value="rejected">
-                                <button type="submit" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700 transition-colors">
-                                    <svg class="mr-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                    Tolak
+                                <button type="submit" class="inline-flex items-center px-4 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-green-600 hover:bg-green-700 transition-colors">
+                                    <svg class="mr-1 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Terima
                                 </button>
                             </form>
                         </div>
@@ -143,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const token = this.querySelector('[name="_token"]').value;
             const submitBtn = this.querySelector('button[type="submit"]');
             
-            if(!confirm(status === 'approved' ? 'Izinkan peserta melanjutkan?' : 'Tandai sebagai pelanggaran berat?')) {
+            if(!confirm('Apakah Anda yakin ingin menerima log ini dan membuka blokir ujian murid?')) {
                 return;
             }
             
@@ -180,11 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Update Status Badge via DOM navigation (assuming table structure)
                     if (row) {
                         const statusCell = row.querySelectorAll('td')[3];
-                        if (status === 'approved') {
-                            statusCell.innerHTML = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">✓ Diizinkan Lanjut</span>';
-                        } else {
-                            statusCell.innerHTML = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">✗ Ditolak</span>';
-                        }
+                        statusCell.innerHTML = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">✓ Diterima</span>';
                     }
                 } else {
                     alert('Gagal: ' + (data.message || 'Terjadi kesalahan sistem.'));
