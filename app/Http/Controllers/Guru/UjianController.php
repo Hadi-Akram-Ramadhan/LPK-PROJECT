@@ -29,12 +29,18 @@ class UjianController extends Controller
      */
     public function create()
     {
-        // Hanya ambil soal milik guru ini
-        $bankSoal = Soal::where('guru_id', auth()->id())->latest()->get();
+        // Ambil Paket Soal milik guru ini atau admin (umum)
+        $paketSoals = \App\Models\PaketSoal::where('guru_id', auth()->id())
+            ->orWhereNull('guru_id')
+            ->with(['soals' => function($q) {
+                $q->orderBy('id', 'asc');
+            }])
+            ->get();
+
         // Kelas untuk assign peserta
         $kelas = Kelas::all();
         
-        return view('guru.ujian.create', compact('bankSoal', 'kelas'));
+        return view('guru.ujian.create', compact('paketSoals', 'kelas'));
     }
 
     /**
@@ -116,10 +122,15 @@ class UjianController extends Controller
 
         $ujian->load('soals');
         $selectedSoal = $ujian->soals->pluck('id')->toArray();
-        $bankSoal = Soal::where('guru_id', auth()->id())->latest()->get();
-        // Assignment edit might be complex, we just allow updating basic info and questions for now
         
-        return view('guru.ujian.edit', compact('ujian', 'bankSoal', 'selectedSoal'));
+        $paketSoals = \App\Models\PaketSoal::where('guru_id', auth()->id())
+            ->orWhereNull('guru_id')
+            ->with(['soals' => function($q) {
+                $q->orderBy('id', 'asc');
+            }])
+            ->get();
+        
+        return view('guru.ujian.edit', compact('ujian', 'paketSoals', 'selectedSoal'));
     }
 
     /**

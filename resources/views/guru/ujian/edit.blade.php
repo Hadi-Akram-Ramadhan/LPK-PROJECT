@@ -85,39 +85,79 @@
                 </div>
 
                 <div>
-                    <div class="flex justify-between items-center mb-2">
+                    <div class="flex justify-between items-center mb-4">
                         <label class="block text-sm font-medium text-slate-700">Pilih Soal dari Bank Soal</label>
-                        <span class="text-xs bg-accent-600 text-white px-2 py-1 rounded-full"><span id="soal_count">{{ count($selectedSoal) }}</span> Soal Dipilih</span>
+                        <span class="text-xs font-semibold bg-accent-600 text-white px-3 py-1 rounded-full border border-accent-600">
+                            <span id="soal_count">{{ count($selectedSoal) }}</span> Soal Dipilih
+                        </span>
+                    </div>
+
+                    {{-- Group Selection by Package --}}
+                    <div class="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label for="package_selector" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Berdasarkan Paket (Opsi Cepat)</label>
+                        <div class="flex space-x-2">
+                            <select id="package_selector" class="block w-full text-sm border-slate-300 rounded-lg shadow-sm focus:ring-accent-500 focus:border-accent-500">
+                                <option value="">-- Pilih Paket Soal --</option>
+                                @foreach($paketSoals as $paket)
+                                    <option value="{{ $paket->id }}" data-soals="{{ $paket->soals->pluck('id')->join(',') }}">
+                                        {{ $paket->nama }} ({{ $paket->soals->count() }} Soal)
+                                    </option>
+                                @endforeach
+                            </select>
+                            <button type="button" id="btn_add_package" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-accent-600 hover:bg-accent-700 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500">
+                                <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                Tambahkan
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="border border-slate-200 rounded-md overflow-hidden bg-white">
-                        <div class="p-2 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-                            <label class="flex items-center text-sm font-medium text-slate-700 cursor-pointer">
-                                <input type="checkbox" id="check_all_soal" class="h-4 w-4 text-accent-600 focus:ring-accent-500 border-slate-300 rounded mr-2" {{ (count($selectedSoal) === count($bankSoal) && count($bankSoal) > 0) ? 'checked' : '' }}>
-                                Pilih Semua
+                    <div class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                        <div class="p-3 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
+                            <label class="flex items-center text-sm font-semibold text-slate-700 cursor-pointer">
+                                <input type="checkbox" id="check_all_soal" class="h-4 w-4 text-accent-600 focus:ring-accent-500 border-slate-300 rounded mr-2">
+                                Pilih Semua Soal
                             </label>
-                            <input type="text" id="soalSearch" placeholder="Cari pertanyaan..." class="text-xs border-slate-300 rounded-md shadow-sm h-8">
+                            <div class="relative">
+                                <input type="text" id="soalSearch" placeholder="Cari pertanyaan..." class="text-xs border-slate-300 rounded-lg shadow-sm h-9 pl-8 focus:ring-accent-500 focus:border-accent-500 w-48 sm:w-64">
+                                <svg class="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            </div>
                         </div>
-                        <ul class="divide-y divide-slate-100 max-h-96 overflow-y-auto" id="soalList">
-                            @forelse($bankSoal as $soal)
-                                <li class="p-3 hover:bg-slate-50 transition-colors soal-item">
-                                    <div class="flex items-start">
-                                        <div class="flex-shrink-0 pt-0.5">
-                                            <input id="soal_{{ $soal->id }}" name="soal_id[]" type="checkbox" value="{{ $soal->id }}" class="item_soal h-4 w-4 text-accent-600 focus:ring-accent-500 border-slate-300 rounded cursor-pointer" {{ (in_array($soal->id, is_array(old('soal_id')) ? old('soal_id') : $selectedSoal)) ? 'checked' : '' }}>
-                                        </div>
-                                        <label for="soal_{{ $soal->id }}" class="ml-3 flex-1 flex flex-col cursor-pointer">
-                                            <span class="text-sm font-medium text-slate-900 line-clamp-2 question-text">{{ strip_tags($soal->pertanyaan) }}</span>
-                                            <div class="mt-1 flex space-x-2 text-xs text-slate-500">
-                                                <span class="bg-slate-100 px-1.5 py-0.5 rounded">{{ strtoupper(str_replace('_', ' ', $soal->tipe)) }}</span>
-                                                <span>{{ $soal->poin }} poin</span>
+                        
+                        <div class="max-h-[500px] overflow-y-auto custom-scrollbar" id="soalListContainer">
+                            @forelse($paketSoals as $paket)
+                                <div class="bg-slate-50/30 px-4 py-2 border-b border-slate-100 flex justify-between items-center group-header">
+                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{{ $paket->nama }}</span>
+                                    <button type="button" class="btn-check-group text-[10px] font-bold text-accent-600 hover:text-accent-800 uppercase" data-target=".paket-id-{{ $paket->id }}">Centang Grup</button>
+                                </div>
+                                <ul class="divide-y divide-slate-100">
+                                    @foreach($paket->soals as $soal)
+                                        <li class="p-4 hover:bg-blue-50/30 transition-colors soal-item" data-package-id="{{ $paket->id }}">
+                                            <div class="flex items-start">
+                                                <div class="flex-shrink-0 pt-0.5">
+                                                    <input id="soal_{{ $soal->id }}" name="soal_id[]" type="checkbox" value="{{ $soal->id }}" 
+                                                        class="item_soal paket-id-{{ $paket->id }} h-5 w-5 text-accent-600 focus:ring-accent-500 border-slate-300 rounded cursor-pointer transition-all" 
+                                                        {{ (in_array($soal->id, is_array(old('soal_id')) ? old('soal_id') : $selectedSoal)) ? 'checked' : '' }}>
+                                                </div>
+                                                <label for="soal_{{ $soal->id }}" class="ml-4 flex-1 flex flex-col cursor-pointer">
+                                                    <span class="text-sm font-medium text-slate-800 line-clamp-2 question-text leading-relaxed">{{ strip_tags($soal->pertanyaan) }}</span>
+                                                    <div class="mt-2 flex items-center space-x-3 text-xs">
+                                                        <span class="px-2 py-0.5 rounded-md font-bold {{ $soal->tipe == 'audio' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600' }}">
+                                                            {{ strtoupper(str_replace('_', ' ', $soal->tipe)) }}
+                                                        </span>
+                                                        <span class="text-slate-400 font-medium tracking-tight">{{ $soal->poin }} Poin</span>
+                                                    </div>
+                                                </label>
                                             </div>
-                                        </label>
-                                    </div>
-                                </li>
+                                        </li>
+                                    @endforeach
+                                </ul>
                             @empty
-                                <li class="p-4 text-sm text-slate-500 text-center">Bank Soal Anda, Kosong. Silakan buat soal terlebih dahulu di menu Bank Soal.</li>
+                                <div class="p-12 text-center">
+                                    <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                                    <h3 class="mt-2 text-sm font-medium text-slate-900">Belum ada soal</h3>
+                                </div>
                             @endforelse
-                        </ul>
+                        </div>
                     </div>
                 </div>
 
@@ -137,26 +177,55 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Mirrored script from create
         const checkAll = document.getElementById('check_all_soal');
         const checkboxes = document.querySelectorAll('.item_soal');
         const soalCountBadge = document.getElementById('soal_count');
         const searchInput = document.getElementById('soalSearch');
+        const packageSelector = document.getElementById('package_selector');
+        const btnAddPackage = document.getElementById('btn_add_package');
 
         function updateCount() {
             const checkedCount = document.querySelectorAll('.item_soal:checked').length;
             soalCountBadge.textContent = checkedCount;
             // update check all visual
-            checkAll.checked = checkedCount === checkboxes.length && checkboxes.length > 0;
+            checkAll.checked = checkedCount > 0 && checkedCount === checkboxes.length;
             
             if (checkedCount > 0) {
-                soalCountBadge.parentElement.classList.add('bg-accent-600', 'text-white');
-                soalCountBadge.parentElement.classList.remove('bg-slate-100', 'text-slate-600');
+                soalCountBadge.parentElement.classList.add('bg-accent-600', 'text-white', 'border-accent-600');
+                soalCountBadge.parentElement.classList.remove('bg-slate-100', 'text-slate-600', 'border-slate-200');
             } else {
-                soalCountBadge.parentElement.classList.remove('bg-accent-600', 'text-white');
-                soalCountBadge.parentElement.classList.add('bg-slate-100', 'text-slate-600');
+                soalCountBadge.parentElement.classList.remove('bg-accent-600', 'text-white', 'border-accent-600');
+                soalCountBadge.parentElement.classList.add('bg-slate-100', 'text-slate-600', 'border-slate-200');
             }
         }
+
+        // Add Group logic
+        btnAddPackage.addEventListener('click', function() {
+            const selectedOption = packageSelector.options[packageSelector.selectedIndex];
+            const soalIdsRaw = selectedOption.dataset.soals;
+            
+            if (soalIdsRaw) {
+                const ids = soalIdsRaw.split(',');
+                ids.forEach(id => {
+                    const el = document.getElementById('soal_' + id);
+                    if (el) el.checked = true;
+                });
+                updateCount();
+            } else if (!packageSelector.value) {
+                alert('Silakan pilih paket soal terlebih dahulu.');
+            }
+        });
+
+        // Individual group headers
+        document.querySelectorAll('.btn-check-group').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const target = this.dataset.target;
+                const groupChecks = document.querySelectorAll(target);
+                const allChecked = Array.from(groupChecks).every(cb => cb.checked);
+                groupChecks.forEach(cb => cb.checked = !allChecked);
+                updateCount();
+            });
+        });
 
         checkAll.addEventListener('change', function() {
             checkboxes.forEach(cb => {
@@ -175,10 +244,15 @@
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.soal-item').forEach(item => {
                 const text = item.querySelector('.question-text').textContent.toLowerCase();
-                if (text.includes(term)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
+                item.style.display = text.includes(term) ? 'block' : 'none';
+            });
+            
+            // Hide/Show headers
+            document.querySelectorAll('#soalListContainer ul').forEach(ul => {
+                const hasVisible = Array.from(ul.querySelectorAll('.soal-item')).some(li => li.style.display !== 'none');
+                const header = ul.previousElementSibling;
+                if (header && header.classList.contains('group-header')) {
+                    header.style.display = hasVisible ? 'flex' : 'none';
                 }
             });
         });
