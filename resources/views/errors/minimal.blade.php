@@ -29,7 +29,7 @@
             <div class="absolute w-40 h-40 bg-white/5 rounded-full -top-10 -left-10"></div>
             <div class="absolute w-24 h-24 bg-white/5 rounded-full bottom-10 -right-5"></div>
             
-            <img src="{{ asset('images/logo.png') }}" alt="LPK Logo" class="w-24 h-24 object-contain mb-4 relative z-10 filter drop-shadow-lg" onerror="this.src='https://ui-avatars.com/api/?name=LPK&background=2563eb&color=fff&rounded=true'">
+            <img src="{{ asset('logo.png') }}" alt="LPK Logo" class="w-24 h-24 object-contain mb-4 relative z-10 filter drop-shadow-lg" onerror="this.src='https://ui-avatars.com/api/?name=LPK&background=2563eb&color=fff&rounded=true'">
             
             <div class="text-center relative z-10">
                 <h2 class="text-xl font-bold text-white tracking-tight">LPK URISOWON</h2>
