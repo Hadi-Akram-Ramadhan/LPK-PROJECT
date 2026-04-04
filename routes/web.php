@@ -61,11 +61,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Audio Explorer
         Route::get('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'index'])->name('audio.index');
         Route::post('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'store'])->name('audio.store');
+        Route::post('/audio/rename', [\App\Http\Controllers\Admin\AudioController::class, 'rename'])->name('audio.rename');
         Route::delete('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'destroy'])->name('audio.destroy');
 
         // Image Explorer
         Route::get('/image', [\App\Http\Controllers\Admin\ImageController::class, 'index'])->name('image.index');
         Route::post('/image', [\App\Http\Controllers\Admin\ImageController::class, 'store'])->name('image.store');
+        Route::post('/image/rename', [\App\Http\Controllers\Admin\ImageController::class, 'rename'])->name('image.rename');
         Route::delete('/image', [\App\Http\Controllers\Admin\ImageController::class, 'destroy'])->name('image.destroy');
     });
 
@@ -99,11 +101,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Audio Explorer (Guru)
         Route::get('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'index'])->name('audio.index');
         Route::post('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'store'])->name('audio.store');
+        Route::post('/audio/rename', [\App\Http\Controllers\Guru\AudioController::class, 'rename'])->name('audio.rename');
         Route::delete('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'destroy'])->name('audio.destroy');
 
         // Image Explorer (Guru)
         Route::get('/image', [\App\Http\Controllers\Guru\ImageController::class, 'index'])->name('image.index');
         Route::post('/image', [\App\Http\Controllers\Guru\ImageController::class, 'store'])->name('image.store');
+        Route::post('/image/rename', [\App\Http\Controllers\Guru\ImageController::class, 'rename'])->name('image.rename');
         Route::delete('/image', [\App\Http\Controllers\Guru\ImageController::class, 'destroy'])->name('image.destroy');
 
         // Cheat Logs (Guru — hanya ujian milik guru ini)

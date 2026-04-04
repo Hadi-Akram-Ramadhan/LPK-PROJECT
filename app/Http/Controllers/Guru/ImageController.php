@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Traits\ImageCompressor;
 
 class ImageController extends Controller
 {
+    use ImageCompressor;
     /**
      * Guru dapat melihat & mengelola file gambar yang sama dengan Admin.
      * Storage disk 'public' → storage/app/public/gambar/
@@ -72,9 +74,18 @@ class ImageController extends Controller
                     if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
                         // Secure filename
                         $safeFilename = Str::slug($fileInfo['filename']) . '.' . $ext;
+                        $tempExtractFile = $targetPath . '/temp_' . time() . '_' . $safeFilename;
+                        $finalPath = $targetPath . '/' . $safeFilename;
                         
-                        // Extract specific file to target directory
-                        copy("zip://".$file->getRealPath()."#".$filename, $targetPath.'/'.$safeFilename);
+                        // Extract specific file to temp target
+                        copy("zip://".$file->getRealPath()."#".$filename, $tempExtractFile);
+                        
+                        // Compress and save correctly
+                        $this->compressAndSaveImage($tempExtractFile, $finalPath);
+                        
+                        // Delete temp
+                        @unlink($tempExtractFile);
+
                         $extractedCount++;
                     }
                 }
@@ -99,9 +110,15 @@ class ImageController extends Controller
                 ) . '.' . $extension;
         }
 
-        $file->storeAs('gambar', $filename, 'public');
+        $targetPath = storage_path('app/public/gambar');
+        if (!file_exists($targetPath)) {
+            mkdir($targetPath, 0755, true);
+        }
 
-        return back()->with('success', "File gambar \"$filename\" berhasil diunggah.");
+        // Kompres dari file sistem tmp ke public storage
+        $this->compressAndSaveImage($file->getRealPath(), $targetPath . '/' . $filename);
+
+        return back()->with('success', "File gambar \"$filename\" berhasil diunggah dan dikompresi otomatis.");
     }
 
     public function destroy(Request $request)
@@ -116,5 +133,44 @@ class ImageController extends Controller
         }
 
         return back()->with('error', 'File tidak ditemukan.');
+    }
+
+    public function rename(Request $request)
+    {
+        $request->validate([
+            'old_name' => 'required|string',
+            'new_name' => 'required|string'
+        ]);
+
+        $oldName = $request->old_name;
+        $newName = \Illuminate\Support\Str::slug(pathinfo($request->new_name, PATHINFO_FILENAME)) . '.' . pathinfo($oldName, PATHINFO_EXTENSION);
+
+        if ($oldName === $newName) {
+            return back()->with('success', 'Nama file tidak berubah.');
+        }
+
+        $oldPath = 'gambar/' . $oldName;
+        $newPath = 'gambar/' . $newName;
+
+        if (Storage::disk('public')->exists($newPath)) {
+            return back()->with('error', 'File dengan nama tujuan sudah ada. Silakan gunakan nama lain.');
+        }
+
+        if (Storage::disk('public')->exists($oldPath)) {
+            // Ubah file fisik
+            Storage::disk('public')->move($oldPath, $newPath);
+
+            // Relational Sync ke Database Soals
+            \App\Models\Soal::where('gambar_path', $oldName)->update(['gambar_path' => $newName]);
+            
+            // Relational Sync ke Pilihan Jawabans
+            \App\Models\PilihanJawaban::where('media_path', $oldName)
+                ->where('media_tipe', 'gambar')
+                ->update(['media_path' => $newName]);
+
+            return back()->with('success', "Nama file berhasil diubah dari {$oldName} ke {$newName}. Data relasional pada soal juga berhasil disinkronisasi.");
+        }
+
+        return back()->with('error', 'File sumber tidak ditemukan.');
     }
 }

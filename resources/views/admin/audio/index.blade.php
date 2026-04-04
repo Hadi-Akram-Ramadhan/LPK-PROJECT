@@ -121,6 +121,7 @@
                                 {{ $file['last_modified'] }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button type="button" onclick="renameFile('{{ $file['name'] }}', '{{ route('admin.audio.rename') }}')" class="mr-2 text-primary-600 hover:text-primary-900 border border-primary-200 hover:bg-primary-50 rounded-md px-3 py-1 transition-colors">Ubah Nama</button>
                                 <form action="{{ route('admin.audio.destroy') }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus file audio ini? File yang dihapus tidak dapat dipulihkan dan soal yang menggunakannya mungkin akan error.');">
                                     @csrf
                                     @method('DELETE')
@@ -151,6 +152,37 @@
         }, function(err) {
             console.error('Gagal menyalin: ', err);
         });
+    }
+
+    function renameFile(oldName, routeUrl) {
+        let newName = prompt(`Ubah nama file untuk "${oldName}"\nCatatan: Perubahan nama akan otomatis sinkron dengan semua soal terkait.\n\nMasukkan nama file baru:`, oldName);
+        
+        if (newName && newName !== oldName) {
+            let form = document.createElement('form');
+            form.method = 'POST';
+            form.action = routeUrl;
+            
+            let csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            
+            let inputOld = document.createElement('input');
+            inputOld.type = 'hidden';
+            inputOld.name = 'old_name';
+            inputOld.value = oldName;
+            
+            let inputNew = document.createElement('input');
+            inputNew.type = 'hidden';
+            inputNew.name = 'new_name';
+            inputNew.value = newName;
+            
+            form.appendChild(csrf);
+            form.appendChild(inputOld);
+            form.appendChild(inputNew);
+            document.body.appendChild(form);
+            form.submit();
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function() {

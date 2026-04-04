@@ -112,4 +112,43 @@ class AudioController extends Controller
 
         return back()->with('error', 'File tidak ditemukan.');
     }
+
+    public function rename(Request $request)
+    {
+        $request->validate([
+            'old_name' => 'required|string',
+            'new_name' => 'required|string'
+        ]);
+
+        $oldName = $request->old_name;
+        $newName = \Illuminate\Support\Str::slug(pathinfo($request->new_name, PATHINFO_FILENAME)) . '.' . pathinfo($oldName, PATHINFO_EXTENSION);
+
+        if ($oldName === $newName) {
+            return back()->with('success', 'Nama file tidak berubah.');
+        }
+
+        $oldPath = 'audio/' . $oldName;
+        $newPath = 'audio/' . $newName;
+
+        if (Storage::disk('public')->exists($newPath)) {
+            return back()->with('error', 'File dengan nama tujuan sudah ada. Silakan gunakan nama lain.');
+        }
+
+        if (Storage::disk('public')->exists($oldPath)) {
+            // Ubah file fisik
+            Storage::disk('public')->move($oldPath, $newPath);
+
+            // Relational Sync ke Database Soals
+            \App\Models\Soal::where('audio_path', $oldName)->update(['audio_path' => $newName]);
+            
+            // Relational Sync ke Pilihan Jawabans
+            \App\Models\PilihanJawaban::where('media_path', $oldName)
+                ->where('media_tipe', 'audio')
+                ->update(['media_path' => $newName]);
+
+            return back()->with('success', "Nama file Audio berhasil diubah dari {$oldName} ke {$newName}. Data relasional pada soal juga berhasil disinkronisasi.");
+        }
+
+        return back()->with('error', 'File sumber tidak ditemukan.');
+    }
 }

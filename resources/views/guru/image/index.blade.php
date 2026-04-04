@@ -124,6 +124,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $file['size'] }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $file['last_modified'] }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button type="button" onclick="renameFile('{{ $file['name'] }}', '{{ route('guru.image.rename') }}')" class="mr-2 text-orange-600 hover:text-orange-900 border border-orange-200 hover:bg-orange-50 rounded-md px-3 py-1 transition-colors text-xs">Ubah Nama</button>
                                 <form action="{{ route('guru.image.destroy') }}" method="POST" class="inline"
                                     onsubmit="return confirm('Yakin hapus gambar ini? Soal yang menggunakannya mungkin akan rusak (gagal load gambar).');">
                                     @csrf
@@ -154,4 +155,78 @@
     </div>
 
 </div>
+
+<script>
+    function renameFile(oldName, routeUrl) {
+        let newName = prompt(`Ubah nama file untuk "${oldName}"\nCatatan: Perubahan nama akan otomatis sinkron dengan semua soal terkait.\n\nMasukkan nama file baru:`, oldName);
+        
+        if (newName && newName !== oldName) {
+            let form = document.createElement('form');
+            form.method = 'POST';
+            form.action = routeUrl;
+            
+            let csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            
+            let inputOld = document.createElement('input');
+            inputOld.type = 'hidden';
+            inputOld.name = 'old_name';
+            inputOld.value = oldName;
+            
+            let inputNew = document.createElement('input');
+            inputNew.type = 'hidden';
+            inputNew.name = 'new_name';
+            inputNew.value = newName;
+            
+            form.appendChild(csrf);
+            form.appendChild(inputOld);
+            form.appendChild(inputNew);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropzones = document.querySelectorAll('.drag-drop-zone');
+        dropzones.forEach(zone => {
+            const input = zone.querySelector('input[type="file"]');
+            const display = zone.querySelector('.file-name-display');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                zone.addEventListener(eventName, () => {
+                    zone.classList.add('border-blue-500', 'bg-blue-50');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, () => {
+                    zone.classList.remove('border-blue-500', 'bg-blue-50');
+                }, false);
+            });
+
+            zone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                if(dt.files.length > 0) {
+                    input.files = dt.files;
+                    if(display) display.innerHTML = `File terpilih: <span class="font-bold">${dt.files[0].name}</span>`;
+                }
+            });
+
+            input.addEventListener('change', function(e) {
+                if(this.files && this.files.length > 0) {
+                    if(display) display.innerHTML = `File terpilih: <span class="font-bold">${this.files[0].name}</span>`;
+                }
+            });
+        });
+    });
+</script>
 @endsection
