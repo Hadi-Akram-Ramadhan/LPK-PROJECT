@@ -20,9 +20,9 @@
         .wrapper { min-height: 100vh; display: flex; flex-direction: column; }
 
         .murid-nav { background: #111827; height: 74px; display: flex; align-items: center; padding: 0 40px; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .nav-left { display: flex; align-items: center; gap: 14px; color: #fff; text-decoration: none; }
-        .nav-logo-img { width: 38px; height: 38px; object-fit: contain; }
-        .nav-brand-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #fff; }
+        .nav-left { display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; }
+        .nav-logo-img { width: 42px; height: 42px; object-fit: contain; }
+        .nav-brand-text { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: #fff; }
 
         .nav-right { display: flex; align-items: center; gap: 24px; }
         .user-pill { background: #1f2937; border: 1.5px solid #374151; padding: 10px 20px; border-radius: 40px; display: flex; align-items: center; gap: 12px; color: #fff; font-size: 14px; font-weight: 600; }

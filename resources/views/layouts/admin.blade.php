@@ -134,12 +134,12 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                     Kelas & Jurusan
                 </a>
-                <a href="{{ route('admin.soal.index') }}" class="side-link {{ request()->routeIs('admin.soal.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.soal.index') }}" class="side-link {{ request()->routeIs('admin.soal.*') || request()->routeIs('admin.paket-soal.*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Bank Soal
                 </a>
                 <a href="{{ route('admin.ujian.index') }}" class="side-link {{ request()->routeIs('admin.ujian.*') ? 'active' : '' }}">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01m-.01 4h.01"/></svg>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 022 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01m-.01 4h.01"/></svg>
                     Kelola Ujian
                 </a>
                 <a href="{{ route('admin.monitor.index') }}" class="side-link {{ request()->routeIs('admin.monitor.*') ? 'active' : '' }}">
@@ -173,9 +173,15 @@
 
         <main class="adm-main">
             <header class="adm-header">
-                <div>
-                    <div class="adm-header-title">@yield('header', 'Dashboard')</div>
-                    <div class="adm-header-sub">@yield('header-sub', 'Panel Admin')</div>
+                <div style="display: flex; align-items: center; gap: 24px;">
+                    <div style="display: flex; align-items: center; gap: 10px; padding-right: 24px; border-right: 1px solid #e2e8f0;">
+                        <img src="{{ asset('logo.png') }}" alt="Logo" style="width: 32px; height: 32px; object-fit: contain;">
+                        <span style="font-size: 14px; font-weight: 800; color: #1e293b; letter-spacing: -0.3px;">LPK URISOWON</span>
+                    </div>
+                    <div>
+                        <div class="adm-header-title">@yield('header', 'Dashboard')</div>
+                        <div class="adm-header-sub">@yield('header-sub', 'Panel Admin')</div>
+                    </div>
                 </div>
                 <div class="adm-header-clock">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>

@@ -80,7 +80,21 @@ class UjianController extends Controller
 
     public function update(Request $request, Ujian $ujian)
     {
-        $ujian->update($request->all());
+        $request->validate([
+            'judul' => 'required',
+            'jenis_ujian' => 'nullable|in:reguler,tryout',
+            'durasi' => 'required|numeric',
+        ]);
+
+        $ujian->update([
+            'judul' => $request->judul,
+            'jenis_ujian' => $request->jenis_ujian ?? 'reguler',
+            'deskripsi' => $request->deskripsi,
+            'durasi' => $request->durasi,
+            'mulai' => $request->mulai,
+            'selesai' => $request->selesai,
+            'acak_soal' => $request->has('acak_soal'),
+        ]);
         
         // Sync Soal
         $soalIds = $request->input('soal_ids', []);

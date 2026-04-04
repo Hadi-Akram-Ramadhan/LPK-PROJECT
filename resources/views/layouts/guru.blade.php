@@ -67,11 +67,9 @@
     <div class="adm-wrap">
         <aside class="adm-side">
             <div class="side-brand">
-                <div class="side-brand-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
-                </div>
+                <img src="{{ asset('logo.png') }}" alt="Logo" class="side-brand-logo" style="width: 42px; height: 42px; object-fit: contain; margin-right: 12px; flex-shrink: 0;">
                 <div class="side-brand-text">
-                    <h1>LPK URISOWON</h1>
+                    <h1 style="font-size: 16px; font-weight: 800; color: #fff; line-height: 1.2; letter-spacing: -0.2px;">LPK URISOWON</h1>
                     <p>Panel Guru</p>
                 </div>
             </div>
@@ -129,9 +127,15 @@
 
         <main class="adm-main">
             <header class="adm-header">
-                <div>
-                    <div class="adm-header-title">@yield('header', 'Dashboard')</div>
-                    <div class="adm-header-sub">@yield('header-sub', 'Panel Guru')</div>
+                <div style="display: flex; align-items: center; gap: 24px;">
+                    <div style="display: flex; align-items: center; gap: 10px; padding-right: 24px; border-right: 1px solid #e2e8f0;">
+                        <img src="{{ asset('logo.png') }}" alt="Logo" style="width: 32px; height: 32px; object-fit: contain;">
+                        <span style="font-size: 14px; font-weight: 800; color: #1e293b; letter-spacing: -0.3px;">LPK URISOWON</span>
+                    </div>
+                    <div>
+                        <div class="adm-header-title">@yield('header', 'Dashboard')</div>
+                        <div class="adm-header-sub">@yield('header-sub', 'Panel Guru')</div>
+                    </div>
                 </div>
                 <div class="adm-header-clock">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
