@@ -1,48 +1,528 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Login - {{ config('app.name', 'LPK Urisowon') }}</title>
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        /* ─── PORTRAIT WARNING ─── */
+        /* CSS media query: primary enforcement */
+        @@media (orientation: portrait) {
+            body { overflow: hidden !important; }
+            #portrait-warning { display: flex !important; }
+            .login-wrapper { display: none !important; }
+        }
+
+        #portrait-warning {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #0d1b3e;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-align: center;
+            padding: 32px;
+        }
+        #portrait-warning .rotate-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 28px;
+            color: #4590df;
+            animation: rotate-hint 2.5s ease-in-out infinite;
+        }
+        @keyframes rotate-hint {
+            0%, 100% { transform: rotate(0deg); }
+            45% { transform: rotate(90deg); }
+            55% { transform: rotate(90deg); }
+        }
+        #portrait-warning h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+        #portrait-warning p { font-size: 14px; color: #8ba3c7; max-width: 300px; line-height: 1.7; }
+
+        /* ─── SPLIT LAYOUT ─── */
+        .login-wrapper {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* ─── LEFT DARK PANEL ─── */
+        .left-panel {
+            width: 42%;
+            background: #0d1b3e;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 36px 44px;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Decorative circles */
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -130px;
+            right: -100px;
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            background: rgba(69,144,223,0.07);
+            pointer-events: none;
+        }
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            left: -100px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(69,144,223,0.05);
+            pointer-events: none;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .brand-icon svg { color: #fff; width: 22px; height: 22px; }
+        .brand-name { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.2px; }
+
+        .hero { position: relative; z-index: 1; }
+        .hero h1 {
+            font-size: clamp(26px, 3.2vw, 40px);
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.18;
+            letter-spacing: -0.8px;
+            margin-bottom: 18px;
+        }
+        .hero h1 .accent { color: #4590df; }
+        .hero p {
+            font-size: 13.5px;
+            color: #8ba3c7;
+            line-height: 1.8;
+            max-width: 310px;
+        }
+
+        .feature-box {
+            margin-top: 32px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .fb-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(69,144,223,0.15);
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .fb-icon svg { color: #4590df; width: 22px; height: 22px; }
+        .fb-title { font-size: 14.5px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+        .fb-desc { font-size: 12.5px; color: #8ba3c7; line-height: 1.65; }
+
+        .left-footer {
+            font-size: 12px;
+            color: #3d5070;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ─── RIGHT WHITE PANEL ─── */
+        .right-panel {
+            flex: 1;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 56px;
+            position: relative;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .form-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0d1b3e;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+        .form-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 32px;
+        }
+        .form-subtitle .accent { color: #4590df; font-weight: 500; }
+
+        /* ─── INPUT STYLES ─── */
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+        .label-row .form-label { margin-bottom: 0; }
+        .forgot-link {
+            font-size: 12px;
+            color: #4590df;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .forgot-link:hover { text-decoration: underline; }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .input-group .i-left {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+            width: 18px; height: 18px;
+        }
+        .input-group .i-right {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px; height: 20px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 13px 46px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-group input::placeholder { color: #c0cfe0; }
+        .input-group input:focus {
+            border-color: #4590df;
+            box-shadow: 0 0 0 3px rgba(69,144,223,0.13);
+        }
+
+        .form-error {
+            font-size: 12px;
+            color: #ef4444;
+            margin-top: -14px;
+            margin-bottom: 14px;
+        }
+
+        /* ─── REMEMBER ─── */
+        .remember-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .remember-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #0d1b3e;
+            cursor: pointer;
+        }
+        .remember-row label { font-size: 13px; color: #475569; cursor: pointer; }
+
+        /* ─── SUBMIT ─── */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #0d1b3e;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+        }
+        .btn-submit:hover { background: #162a5e; box-shadow: 0 6px 18px rgba(13,27,62,0.3); }
+        .btn-submit:active { transform: scale(0.985); }
+
+        /* ─── CONTACT ADMIN ─── */
+        .contact-text {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 13.5px;
+            color: #64748b;
+        }
+        .contact-text a { color: #4590df; font-weight: 600; text-decoration: none; }
+        .contact-text a:hover { text-decoration: underline; }
+
+        /* ─── HELP BTN ─── */
+        .help-fab {
+            position: absolute;
+            bottom: 22px;
+            right: 22px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .help-fab:hover { background: #e2e8f0; }
+
+        /* ─── ALERT ─── */
+        .status-alert {
+            background: #ecfdf5;
+            border: 1px solid #6ee7b7;
+            color: #047857;
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Portrait-only warning -->
+    <div id="portrait-warning">
+        <svg class="rotate-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <rect x="5" y="2" width="14" height="20" rx="2" stroke-width="1.5"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 17h.01"/>
+            <!-- rotation arrow -->
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M18 6a9 9 0 11-3.5-2.5"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M18 2v4h-4"/>
+        </svg>
+        <h2>Putar Perangkat Anda</h2>
+        <p>Aplikasi ini dioptimalkan untuk tampilan <strong>landscape (horizontal)</strong>. Silakan putar layar Anda untuk melanjutkan.</p>
+    </div>
+
+    <div class="login-wrapper">
+
+        <!-- ════ LEFT PANEL ════ -->
+        <div class="left-panel">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                    </svg>
+                </div>
+                <span class="brand-name">LPK Urisowon</span>
+            </div>
+
+            <div class="hero">
+                <h1>
+                    Raih Masa Depan<br>
+                    <span class="accent">Karir Profesional</span> &amp;<br>
+                    Kompeten.
+                </h1>
+                <p>Sistem ujian online terintegrasi untuk mengukur kompetensi, pantau hasil belajar, dan dapatkan sertifikasi resmi LPK Urisowon dalam satu platform modern.</p>
+
+                <div class="feature-box">
+                    <div class="fb-icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="fb-title">Keamanan Terjamin</div>
+                        <div class="fb-desc">Sistem anti-cheat &amp; data peserta terenkripsi dengan standar keamanan tinggi.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="left-footer">© {{ date('Y') }} LPK Urisowon. All rights reserved.</div>
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+        <!-- ════ RIGHT PANEL ════ -->
+        <div class="right-panel">
+            <div class="form-container">
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+                <h1 class="form-title">Selamat Datang</h1>
+                <p class="form-subtitle">Silakan masuk ke akun <span class="accent">admin</span> Anda.</p>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                @if(session('status'))
+                    <div class="status-alert">{{ session('status') }}</div>
+                @endif
+
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+
+                    <!-- Email -->
+                    <label class="form-label" for="email">Email Address</label>
+                    <div class="input-group">
+                        <svg class="i-left" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        <input type="email" id="email" name="email"
+                            value="{{ old('email') }}"
+                            placeholder="admin@cbt.com"
+                            required autofocus autocomplete="username">
+                    </div>
+                    @error('email')
+                        <p class="form-error">{{ $message }}</p>
+                    @enderror
+
+                    <!-- Password -->
+                    <div class="label-row">
+                        <label class="form-label" for="password">Password</label>
+                        @if(Route::has('password.request'))
+                            <a href="{{ route('password.request') }}" class="forgot-link">Lupa Password?</a>
+                        @endif
+                    </div>
+                    <div class="input-group">
+                        <svg class="i-left" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        <input type="password" id="password" name="password"
+                            placeholder="••••••••"
+                            required autocomplete="current-password">
+                        <button type="button" class="i-right" onclick="togglePassword()" aria-label="Toggle password">
+                            <svg id="eye-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    @error('password')
+                        <p class="form-error">{{ $message }}</p>
+                    @enderror
+
+                    <!-- Remember -->
+                    <div class="remember-row">
+                        <input id="remember_me" type="checkbox" name="remember">
+                        <label for="remember_me">Ingat saya di perangkat ini</label>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn-submit">Masuk Sekarang</button>
+                </form>
+
+                <p class="contact-text">
+                    Belum punya akun? <a href="mailto:admin@lpk-urisowon.com">Hubungi Admin</a>
+                </p>
+            </div>
+
+            <button class="help-fab" title="Bantuan">?</button>
         </div>
+    </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const pwd = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7
+                    a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242
+                    M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>`;
+            } else {
+                pwd.type = 'password';
+                icon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+                        -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
+            }
+        }
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
+        // Portrait lock — JS fallback (CSS media query is primary)
+        function checkOrientation() {
+            const overlay  = document.getElementById('portrait-warning');
+            const wrapper  = document.querySelector('.login-wrapper');
+            const isPortrait = window.innerHeight > window.innerWidth;
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+            if (isPortrait) {
+                overlay.style.display  = 'flex';
+                if (wrapper) wrapper.style.display = 'none';
+                document.body.style.overflow = 'hidden';
+            } else {
+                overlay.style.display  = 'none';
+                if (wrapper) wrapper.style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // keep overall hidden (no scroll on page)
+            }
+        }
 
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', checkOrientation);
+        document.addEventListener('DOMContentLoaded', checkOrientation);
+    </script>
+</body>
+</html>

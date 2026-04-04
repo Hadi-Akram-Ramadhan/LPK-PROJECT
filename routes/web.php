@@ -68,9 +68,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Guru Routes
     Route::middleware('role:guru')->prefix('guru')->name('guru.')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('guru.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', \App\Http\Controllers\Guru\DashboardController::class)->name('dashboard');
         
         // Paket Soal (Bank Soal terkelompok)
         Route::resource('paket-soal', \App\Http\Controllers\Guru\PaketSoalController::class);
