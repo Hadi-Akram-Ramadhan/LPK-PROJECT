@@ -8,13 +8,13 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: #f0f4f8; color: #334155; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f4f8; color: #334155; font-size: 15px; }
         .adm-wrap { display: flex; min-height: 100vh; }
 
         .adm-side {
@@ -42,7 +42,7 @@
         .side-section-label { padding: 18px 14px 6px; font-size: 10px; font-weight: 700; color: #475569; letter-spacing: 1.5px; text-transform: uppercase; }
 
         .side-logout { padding: 20px 14px; margin-top: auto; }
-        .side-logout-btn { display: flex; align-items: center; width: 100%; padding: 11px 14px; background: transparent; border: none; color: #f87171; border-radius: 10px; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: background 0.15s; font-family: 'Inter', sans-serif; }
+        .side-logout-btn { display: flex; align-items: center; width: 100%; padding: 11px 14px; background: transparent; border: none; color: #f87171; border-radius: 10px; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: background 0.15s; font-family: 'Poppins', sans-serif; }
         .side-logout-btn:hover { background: rgba(248,113,113,0.1); }
         .side-logout-btn svg { width: 20px; height: 20px; margin-right: 14px; }
 
@@ -73,7 +73,7 @@
         .badge-yellow { background: #fef9c3; color: #a16207; }
         .badge-gray { background: #f1f5f9; color: #64748b; }
 
-        .btn { display: inline-flex; align-items: center; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; text-decoration: none; transition: 0.15s; font-family: 'Inter', sans-serif; }
+        .btn { display: inline-flex; align-items: center; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; text-decoration: none; transition: 0.15s; font-family: 'Poppins', sans-serif; }
         .btn-primary { background: #2563eb; color: #fff; }
         .btn-primary:hover { background: #1d4ed8; }
         .btn-green { background: #16a34a; color: #fff; }
@@ -91,7 +91,7 @@
         .tbl tr:hover td { background: #f8fafc; }
 
         .search-box { position: relative; }
-        .search-box input { width: 100%; padding: 10px 14px 10px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px; outline: none; background: #fff; font-family: 'Inter', sans-serif; transition: border 0.15s; }
+        .search-box input { width: 100%; padding: 10px 14px 10px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px; outline: none; background: #fff; font-family: 'Poppins', sans-serif; transition: border 0.15s; }
         .search-box input:focus { border-color: #3b82f6; }
         .search-box svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #94a3b8; }
 
