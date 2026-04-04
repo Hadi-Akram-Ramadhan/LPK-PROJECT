@@ -51,15 +51,9 @@ class DashboardController extends Controller
             'totalSoal', 
             'totalUjian', 
             'sedangUjianCount', 
-<<<<<<< HEAD
             'upcomingExams',
             'latestExams',
             'perluDinilai'
-=======
-            'upcomingUjian',
-            'perluDinilai',
-            'ujianTerbaru'
->>>>>>> b90f6ff449e2a3fa195860fdcf2abb6ecdd92807
         ));
     }
 }

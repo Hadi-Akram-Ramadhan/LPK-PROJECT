@@ -11,13 +11,8 @@
         <p class="text-3xl font-bold text-slate-800">{{ $totalSiswa }}</p>
     </div>
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-<<<<<<< HEAD
         <p class="text-sm text-slate-500 font-medium mb-1">Ujian Aktif</p>
         <p class="text-3xl font-bold text-slate-800">{{ $ujianAktifCount }}</p>
-=======
-        <p class="text-sm text-slate-500 font-medium mb-1">Total Ujian</p>
-        <p class="text-3xl font-bold text-slate-800">{{ $totalUjian }}</p>
->>>>>>> b90f6ff449e2a3fa195860fdcf2abb6ecdd92807
     </div>
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
         <p class="text-sm text-slate-500 font-medium mb-1">Total Soal</p>
@@ -26,11 +21,7 @@
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
         <p class="text-sm text-slate-500 font-medium mb-1">Rata-rata Nilai</p>
         <p class="text-3xl font-bold text-primary-600 flex items-center">
-<<<<<<< HEAD
             {{ number_format($avgNilai, 1) }}%
-=======
-            {{ number_format($avgScore, 1) }}
->>>>>>> b90f6ff449e2a3fa195860fdcf2abb6ecdd92807
             <span class="ml-2 inline-flex h-3 w-3 rounded-full bg-primary-500 animate-pulse"></span>
         </p>
     </div>
@@ -62,12 +53,11 @@
                 @endforelse
             </div>
         </div>
-<<<<<<< HEAD
 
         {{-- Ujian Mendatang --}}
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-200">
-                <h2 class="text-lg font-semibold text-slate-800">Ujian yang Akan Datang</h2>
+                <h2 class="text-lg font-semibold text-slate-800">Jadwal Ujian Mendatang</h2>
             </div>
             <div class="p-6">
                 @forelse($upcomingExams as $ujian)
@@ -84,39 +74,8 @@
                 @empty
                 <div class="text-center py-6 border-2 border-dashed border-slate-200 rounded-lg text-slate-400 font-medium">
                     Belum ada jadwal ujian mendatang
-                </div>
                 @endforelse
             </div>
-=======
-        <div class="p-6">
-            @forelse($ujianTerbaru as $ujian)
-            <div class="bg-slate-50 rounded-lg p-4 border border-slate-100 flex justify-between items-center mb-4">
-                <div>
-                    <h3 class="font-semibold text-slate-800 text-lg">{{ $ujian->judul }}</h3>
-                    <p class="text-slate-500 text-sm mt-1 flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        {{ $ujian->soals()->count() }} soal · {{ $ujian->pesertas()->count() }} peserta · {{ $ujian->pesertas()->where('status', 'selesai')->count() }} selesai
-                    </p>
-                </div>
-                <div class="flex flex-col items-end gap-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $ujian->jenis_ujian === 'tryout' ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-purple-100 text-purple-800 border-purple-200' }} border uppercase">
-                        {{ $ujian->jenis_ujian }}
-                    </span>
-                </div>
-            </div>
-            @empty
-            <div class="text-center py-8 text-slate-500">
-                <p>Belum ada ujian yang dibuat.</p>
-            </div>
-            @endforelse
-
-            <a href="{{ route('admin.ujian.create') }}" 
-               class="flex items-center justify-center gap-2 mt-4 text-sm font-bold py-3 px-4 text-white rounded-xl transition-all shadow-sm hover:shadow-md font-['Poppins'] hover:scale-[1.01] active:scale-[0.99]"
-               style="background-color: #9333ea; color: white !important;">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                Buat Ujian Baru
-            </a>
->>>>>>> b90f6ff449e2a3fa195860fdcf2abb6ecdd92807
         </div>
     </div>
     

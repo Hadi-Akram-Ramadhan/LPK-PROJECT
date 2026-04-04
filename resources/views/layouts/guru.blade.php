@@ -66,11 +66,7 @@
     <div class="adm-wrap">
         <aside class="adm-side">
             <div class="side-brand">
-<<<<<<< HEAD
                 <img src="{{ asset('logo.png') }}" alt="Logo" class="side-brand-logo" style="width: 42px; height: 42px; object-fit: contain; margin-right: 12px; flex-shrink: 0;">
-=======
-                <img src="{{ asset('logo.png') }}" alt="Logo" class="side-brand-logo">
->>>>>>> b90f6ff449e2a3fa195860fdcf2abb6ecdd92807
                 <div class="side-brand-text">
                     <h1 style="font-size: 16px; font-weight: 800; color: #fff; line-height: 1.2; letter-spacing: -0.2px;">LPK URISOWON</h1>
                     <p>Panel Guru</p>

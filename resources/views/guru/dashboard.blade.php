@@ -28,7 +28,6 @@
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-<<<<<<< HEAD
     <div class="lg:col-span-2 space-y-6">
         {{-- Ujian yang Akan Datang --}}
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -85,40 +84,6 @@
                 </div>
                 @endforelse
             </div>
-=======
-    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200">
-            <h2 class="text-lg font-semibold text-slate-800">Ujian Terbaru</h2>
-        </div>
-        <div class="p-6">
-            @forelse($ujianTerbaru as $ujian)
-            <div class="bg-slate-50 rounded-lg p-4 border border-slate-100 flex justify-between items-center mb-4">
-                <div>
-                    <h3 class="font-semibold text-slate-800 text-lg">{{ $ujian->judul }}</h3>
-                    <p class="text-slate-500 text-sm mt-1 flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        {{ $ujian->soals()->count() }} soal · {{ $ujian->pesertas()->count() }} peserta · {{ $ujian->pesertas()->where('status', 'selesai')->count() }} selesai
-                    </p>
-                </div>
-                <div class="flex flex-col items-end gap-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $ujian->jenis_ujian === 'tryout' ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-purple-100 text-purple-800 border-purple-200' }} border uppercase">
-                        {{ $ujian->jenis_ujian }}
-                    </span>
-                </div>
-            </div>
-            @empty
-            <div class="text-center py-8 text-slate-500">
-                <p>Belum ada ujian yang dibuat.</p>
-            </div>
-            @endforelse
-
-            <a href="{{ route('guru.ujian.create') }}" 
-               class="flex items-center justify-center gap-2 mt-4 text-sm font-bold py-3 px-4 text-white rounded-xl transition-all shadow-sm hover:shadow-md font-['Poppins'] hover:scale-[1.01] active:scale-[0.99]"
-               style="background-color: #9333ea; color: white !important;">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                Buat Ujian Baru
-            </a>
->>>>>>> b90f6ff449e2a3fa195860fdcf2abb6ecdd92807
         </div>
     </div>
     
