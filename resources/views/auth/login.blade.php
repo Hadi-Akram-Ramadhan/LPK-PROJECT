@@ -21,41 +21,7 @@
             overflow: hidden;
         }
 
-        /* ─── PORTRAIT WARNING ─── */
-        /* CSS media query: primary enforcement */
-        @@media (orientation: portrait) {
-            body { overflow: hidden !important; }
-            #portrait-warning { display: flex !important; }
-            .login-wrapper { display: none !important; }
-        }
-
-        #portrait-warning {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #0d1b3e;
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            text-align: center;
-            padding: 32px;
-        }
-        #portrait-warning .rotate-icon {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 28px;
-            color: #4590df;
-            animation: rotate-hint 2.5s ease-in-out infinite;
-        }
-        @keyframes rotate-hint {
-            0%, 100% { transform: rotate(0deg); }
-            45% { transform: rotate(90deg); }
-            55% { transform: rotate(90deg); }
-        }
-        #portrait-warning h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
-        #portrait-warning p { font-size: 14px; color: #8ba3c7; max-width: 300px; line-height: 1.7; }
+ight: 1.7; }
 
         /* ─── SPLIT LAYOUT ─── */
         .login-wrapper {
@@ -66,12 +32,12 @@
 
         /* ─── LEFT DARK PANEL ─── */
         .left-panel {
-            width: 42%;
-            background: #0d1b3e;
+            width: 50%;
+            background: #0d1b3e; /* Very dark blue */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 36px 44px;
+            padding: 60px 80px; /* Increased to match exact padding in image */
             position: relative;
             overflow: hidden;
         }
@@ -102,48 +68,52 @@
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 12px; /* Gap between logo and text */
             position: relative;
             z-index: 1;
         }
-        .brand-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .brand-logo {
+            height: 48px; /* Smaller logo */
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            border-radius: 8px; /* Add slight rounding */
         }
-        .brand-icon svg { color: #fff; width: 22px; height: 22px; }
-        .brand-name { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.2px; }
+        .brand-name { 
+            font-size: 19px; 
+            font-weight: 800; 
+            color: #fff; 
+            letter-spacing: -0.2px; 
+        }
 
         .hero { position: relative; z-index: 1; }
         .hero h1 {
-            font-size: clamp(26px, 3.2vw, 40px);
+            font-size: clamp(34px, 4vw, 48px); /* Much larger as seen in the image */
             font-weight: 900;
             color: #fff;
-            line-height: 1.18;
-            letter-spacing: -0.8px;
-            margin-bottom: 18px;
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin-bottom: 24px;
         }
         .hero h1 .accent { color: #4590df; }
         .hero p {
-            font-size: 13.5px;
+            font-size: 16px; /* Matched to image size */
             color: #8ba3c7;
-            line-height: 1.8;
-            max-width: 310px;
+            line-height: 1.7;
+            max-width: 480px; /* Extended to allow wide text wrapping */
         }
 
         .feature-box {
-            margin-top: 32px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.09);
+            margin-top: 40px; /* Pushed down a bit more */
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
             border-radius: 14px;
-            padding: 18px 20px;
+            padding: 22px 24px;
             display: flex;
             align-items: flex-start;
             gap: 16px;
+            width: 100%;
+            max-width: 480px; /* Spans full width of paragraph block */
         }
         .fb-icon {
             width: 44px;
@@ -184,16 +154,16 @@
         }
 
         .form-title {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
-            color: #0d1b3e;
+            color: #0b1426;
             letter-spacing: -0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .form-subtitle {
-            font-size: 14px;
+            font-size: 15px;
             color: #64748b;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
         .form-subtitle .accent { color: #4590df; font-weight: 500; }
 
@@ -315,26 +285,7 @@
         .contact-text a { color: #4590df; font-weight: 600; text-decoration: none; }
         .contact-text a:hover { text-decoration: underline; }
 
-        /* ─── HELP BTN ─── */
-        .help-fab {
-            position: absolute;
-            bottom: 22px;
-            right: 22px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #f1f5f9;
-            border: none;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 700;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-        .help-fab:hover { background: #e2e8f0; }
+
 
         /* ─── ALERT ─── */
         .status-alert {
@@ -346,37 +297,81 @@
             font-size: 13px;
             margin-bottom: 18px;
         }
+
+        /* ─── MOBILE RESPONSIVENESS ─── */
+        .mobile-brand { display: none; }
+
+        @media (max-width: 900px) {
+            body { 
+                background: #f8fafc; 
+                overflow: auto !important; 
+            }
+            .login-wrapper {
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                padding: 24px;
+            }
+            .left-panel { display: none; }
+            .right-panel {
+                flex: none;
+                width: 100%;
+                background: transparent;
+                padding: 0;
+            }
+            .form-container {
+                background: #fff;
+                padding: 40px 32px;
+                border-radius: 20px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.02);
+                margin: 0 auto;
+                width: 100%;
+                max-width: 420px;
+            }
+            .mobile-brand {
+                display: flex;
+                flex-direction: row; /* side-by-side */
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+                margin-bottom: 28px;
+            }
+            .mobile-brand .brand-logo {
+                height: 52px; /* Smaller mobile logo */
+                width: auto;
+                border-radius: 8px;
+            }
+            .mobile-brand .brand-name {
+                font-size: 20px;
+                font-weight: 800;
+                color: #0b1426;
+                letter-spacing: -0.3px;
+            }
+            .form-title {
+                text-align: center;
+                font-size: 24px;
+                margin-bottom: 4px;
+            }
+            .form-subtitle {
+                text-align: center;
+                margin-bottom: 28px;
+                font-size: 13.5px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Portrait-only warning -->
-    <div id="portrait-warning">
-        <svg class="rotate-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <rect x="5" y="2" width="14" height="20" rx="2" stroke-width="1.5"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 17h.01"/>
-            <!-- rotation arrow -->
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                d="M18 6a9 9 0 11-3.5-2.5"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M18 2v4h-4"/>
-        </svg>
-        <h2>Putar Perangkat Anda</h2>
-        <p>Aplikasi ini dioptimalkan untuk tampilan <strong>landscape (horizontal)</strong>. Silakan putar layar Anda untuk melanjutkan.</p>
-    </div>
+
 
     <div class="login-wrapper">
 
         <!-- ════ LEFT PANEL ════ -->
         <div class="left-panel">
             <div class="brand">
-                <div class="brand-icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
-                    </svg>
-                </div>
-                <span class="brand-name">LPK Urisowon</span>
+                <img src="{{ asset('logo.png') }}" alt="Logo LPK Urisowon" class="brand-logo">
+                <span class="brand-name">LPK URISOWON</span>
             </div>
 
             <div class="hero">
@@ -407,6 +402,12 @@
         <!-- ════ RIGHT PANEL ════ -->
         <div class="right-panel">
             <div class="form-container">
+
+                <!-- Mobile Only Brand -->
+                <div class="mobile-brand">
+                    <img src="{{ asset('logo.png') }}" alt="Logo LPK Urisowon" class="brand-logo">
+                    <span class="brand-name">LPK URISOWON</span>
+                </div>
 
                 <h1 class="form-title">Selamat Datang</h1>
                 <p class="form-subtitle">Silakan masuk ke akun <span class="accent">admin</span> Anda.</p>
@@ -477,7 +478,6 @@
                 </p>
             </div>
 
-            <button class="help-fab" title="Bantuan">?</button>
         </div>
     </div>
 
@@ -503,26 +503,7 @@
             }
         }
 
-        // Portrait lock — JS fallback (CSS media query is primary)
-        function checkOrientation() {
-            const overlay  = document.getElementById('portrait-warning');
-            const wrapper  = document.querySelector('.login-wrapper');
-            const isPortrait = window.innerHeight > window.innerWidth;
 
-            if (isPortrait) {
-                overlay.style.display  = 'flex';
-                if (wrapper) wrapper.style.display = 'none';
-                document.body.style.overflow = 'hidden';
-            } else {
-                overlay.style.display  = 'none';
-                if (wrapper) wrapper.style.display = 'flex';
-                document.body.style.overflow = 'hidden'; // keep overall hidden (no scroll on page)
-            }
-        }
-
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('orientationchange', checkOrientation);
-        document.addEventListener('DOMContentLoaded', checkOrientation);
     </script>
 </body>
 </html>
