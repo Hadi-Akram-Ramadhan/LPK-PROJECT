@@ -158,34 +158,51 @@
 
 <script>
     function renameFile(oldName, routeUrl) {
-        let newName = prompt(`Ubah nama file untuk "${oldName}"\nCatatan: Perubahan nama akan otomatis sinkron dengan semua soal terkait.\n\nMasukkan nama file baru:`, oldName);
-        
-        if (newName && newName !== oldName) {
-            let form = document.createElement('form');
-            form.method = 'POST';
-            form.action = routeUrl;
-            
-            let csrf = document.createElement('input');
-            csrf.type = 'hidden';
-            csrf.name = '_token';
-            csrf.value = '{{ csrf_token() }}';
-            
-            let inputOld = document.createElement('input');
-            inputOld.type = 'hidden';
-            inputOld.name = 'old_name';
-            inputOld.value = oldName;
-            
-            let inputNew = document.createElement('input');
-            inputNew.type = 'hidden';
-            inputNew.name = 'new_name';
-            inputNew.value = newName;
-            
-            form.appendChild(csrf);
-            form.appendChild(inputOld);
-            form.appendChild(inputNew);
-            document.body.appendChild(form);
-            form.submit();
-        }
+        Swal.fire({
+            title: 'Ubah Nama File',
+            text: 'Catatan: Perubahan nama ini akan otomatis tersinkronisasi tanpa memecahkan media di Soal Ujian.',
+            input: 'text',
+            inputValue: oldName,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Simpan Nama',
+            cancelButtonText: 'Batal',
+            inputValidator: (value) => {
+                if (!value) return 'Nama file tidak boleh kosong!';
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let newName = result.value;
+                if (newName !== oldName) {
+                    let form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = routeUrl;
+                    
+                    let csrf = document.createElement('input');
+                    csrf.type = 'hidden';
+                    csrf.name = '_token';
+                    csrf.value = '{{ csrf_token() }}';
+                    
+                    let inputOld = document.createElement('input');
+                    inputOld.type = 'hidden';
+                    inputOld.name = 'old_name';
+                    inputOld.value = oldName;
+                    
+                    let inputNew = document.createElement('input');
+                    inputNew.type = 'hidden';
+                    inputNew.name = 'new_name';
+                    inputNew.value = newName;
+                    
+                    form.appendChild(csrf);
+                    form.appendChild(inputOld);
+                    form.appendChild(inputNew);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function() {

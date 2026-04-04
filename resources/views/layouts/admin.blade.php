@@ -211,6 +211,52 @@
             tick();setInterval(tick,1000);
         }();
     </script>
+    
+    <!-- SweetAlert2 Global Interceptor -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Intercept all forms that use inline onsubmit="return confirm(...)"
+            const forms = document.querySelectorAll('form[onsubmit*="confirm"]');
+            forms.forEach(form => {
+                let onsubmitStr = form.getAttribute('onsubmit');
+                let match = onsubmitStr.match(/confirm\(\s*['"](.*?)['"]\s*\)/);
+                let message = match ? match[1] : "Apakah Anda yakin ingin melanjutkan?";
+                
+                form.removeAttribute('onsubmit');
+                
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2563eb',
+                        cancelButtonColor: '#ef4444',
+                        confirmButtonText: 'Ya, Lanjutkan',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            // 2. Override native window.alert globally for cleaner look
+            window.alert = function(msg) {
+                Swal.fire({
+                    title: 'Informasi',
+                    text: msg,
+                    icon: 'info',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Tutup'
+                });
+            };
+        });
+    </script>
     @yield('extra-js')
 </body>
 </html>
