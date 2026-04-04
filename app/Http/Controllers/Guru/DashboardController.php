@@ -32,6 +32,9 @@ class DashboardController extends Controller
             ->orderBy('mulai', 'asc')
             ->first();
 
+        // Ujian Terbaru milik guru ini
+        $ujianTerbaru = Ujian::where('guru_id', $user->id)->latest()->take(5)->get();
+
         // Perlu Dinilai (Essay yang belum ada nilainya di ujian milik guru ini)
         // Kita hitung dari UjianPeserta yang statusnya 'selesai' namun belum ada grading
         // Note: Implementasi grading spesifik mungkin berbeda tergantung skema LPK ini
@@ -45,7 +48,8 @@ class DashboardController extends Controller
             'totalUjian', 
             'sedangUjianCount', 
             'upcomingUjian',
-            'perluDinilai'
+            'perluDinilai',
+            'ujianTerbaru'
         ));
     }
 }
