@@ -460,22 +460,37 @@
                     </div>
                 @endif
                 
-                @if(isset($currentSoal->gambar) && $currentSoal->gambar != "")
+                @if($currentSoal->gambar_path)
                     <div style="text-align: center; margin-top: 20px;">
-                        <img src="{{ asset('storage/'.$currentSoal->gambar) }}" style="max-width: 100%; border: 1px solid #d1d5db; padding: 4px;">
+                        <img src="{{ asset('storage/' . $currentSoal->gambar_path) }}" style="max-width: 100%; border: 1px solid #d1d5db; padding: 4px; border-radius: 8px;">
                     </div>
                 @endif
             </div>
 
             <!-- OPTIONS (RIGHT) -->
             <div class="cbt-right">
-                @if($currentSoal->tipe === 'pilihan_ganda' || $currentSoal->tipe === 'audio')
+                @if(in_array($currentSoal->tipe, ['pilihan_ganda', 'audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar']))
                     @foreach($currentSoal->pilihanJawabans as $index => $opsi)
                     <label class="opt-label">
                         <input type="radio" name="jawaban" value="{{ $opsi->id }}" form="answer-form" class="auto-save-trigger" {{ ($jawabanSaatIni && $jawabanSaatIni->pilihan_jawaban_id == $opsi->id) ? 'checked' : '' }}>
-                        <div class="opt-body">
-                            <div class="opt-circle">{{ $index + 1 }}</div>
-                            <div class="opt-text">{{ $opsi->teks }}</div>
+                        <div class="opt-body" style="padding-top: 15px; padding-bottom: 15px;">
+                            <div class="opt-circle">{{ chr(65 + $index) }}</div>
+                            <div class="opt-text" style="display:flex; flex-direction:column; gap:8px;">
+                                @if($opsi->teks)
+                                    <span>{{ $opsi->teks }}</span>
+                                @endif
+                                
+                                @if($opsi->media_tipe === 'audio' && $opsi->media_path)
+                                    <!-- Stop propagation on audio play so the radio button isn't toggled incorrectly on some devices -->
+                                    <div onclick="event.stopPropagation()">
+                                        <audio controls controlsList="nodownload" style="height: 40px; max-width: 220px; outline:none;">
+                                            <source src="{{ asset('storage/' . $opsi->media_path) }}" type="audio/mpeg">
+                                        </audio>
+                                    </div>
+                                @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
+                                    <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 120px; border-radius: 6px; border: 1px solid #e5e7eb; padding: 2px; max-width: 100%; object-fit: contain;">
+                                @endif
+                            </div>
                         </div>
                     </label>
                     @endforeach
@@ -485,16 +500,30 @@
                     @php $isChecked = in_array($opsi->id, $checkedMultiple); @endphp
                     <label class="opt-label">
                         <input type="checkbox" name="jawaban[]" value="{{ $opsi->id }}" form="answer-form" class="auto-save-trigger-mc" {{ $isChecked ? 'checked' : '' }}>
-                        <div class="opt-body">
-                            <div class="opt-circle" style="border-radius: 4px;">{{ chr(65+$index) }}</div>
-                            <div class="opt-text">{{ $opsi->teks }}</div>
+                        <div class="opt-body" style="padding-top: 15px; padding-bottom: 15px;">
+                            <div class="opt-circle" style="border-radius: 4px;">{{ chr(65 + $index) }}</div>
+                            <div class="opt-text" style="display:flex; flex-direction:column; gap:8px;">
+                                @if($opsi->teks)
+                                    <span>{{ $opsi->teks }}</span>
+                                @endif
+                                
+                                @if($opsi->media_tipe === 'audio' && $opsi->media_path)
+                                    <div onclick="event.stopPropagation()">
+                                        <audio controls controlsList="nodownload" style="height: 40px; max-width: 220px; outline:none;">
+                                            <source src="{{ asset('storage/' . $opsi->media_path) }}" type="audio/mpeg">
+                                        </audio>
+                                    </div>
+                                @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
+                                    <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 120px; border-radius: 6px; border: 1px solid #e5e7eb; padding: 2px; max-width: 100%; object-fit: contain;">
+                                @endif
+                            </div>
                         </div>
                     </label>
                     @endforeach
                 @elseif($currentSoal->tipe === 'essay')
                     <div style="padding: 35px; display: flex; flex-direction: column; height: 100%;">
                         <p style="font-size: 18px; margin-top: 0; color: #111;">Type Your Answer:</p>
-                        <textarea name="jawaban" form="answer-form" class="auto-save-trigger-typing" style="flex: 1; width: 100%; border: 1px solid #9ca3af; padding: 15px; font-size: 18px; resize: none;"></textarea>
+                        <textarea name="jawaban" form="answer-form" class="auto-save-trigger-typing" style="flex: 1; width: 100%; border: 1px solid #9ca3af; padding: 15px; font-size: 18px; resize: none; border-radius: 8px;"></textarea>
                     </div>
                 @endif
             </div>

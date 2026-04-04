@@ -36,17 +36,61 @@ class AudioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'audio_file'  => 'required|mimes:mp3,wav,ogg|max:10240',
+            'audio_file'  => 'required|mimes:mp3,wav,ogg,zip|max:51200', // max 50MB for zip potentially
             'custom_name' => 'nullable|string|max:100',
         ], [
-            'audio_file.required' => 'Silakan pilih file audio terlebih dahulu.',
-            'audio_file.mimes'    => 'Format file harus berupa MP3, WAV, atau OGG.',
-            'audio_file.max'      => 'Ukuran file maksimal 10MB.',
+            'audio_file.required' => 'Silakan pilih file audio atau ZIP terlebih dahulu.',
+            'audio_file.mimes'    => 'Format file harus berupa MP3, WAV, OGG, atau ZIP.',
+            'audio_file.max'      => 'Ukuran file maksimal 50MB.',
         ]);
 
         $file      = $request->file('audio_file');
-        $extension = $file->getClientOriginalExtension();
+        $extension = strtolower($file->getClientOriginalExtension());
 
+        if ($extension === 'zip') {
+            $zip = new \ZipArchive();
+            $res = $zip->open($file->getRealPath());
+            
+            if ($res === TRUE) {
+                $extractedCount = 0;
+                $targetPath = storage_path('app/public/audio');
+                
+                if (!file_exists($targetPath)) {
+                    mkdir($targetPath, 0755, true);
+                }
+
+                for ($i = 0; $i < $zip->numFiles; $i++) {
+                    $filename = $zip->getNameIndex($i);
+                    $fileInfo = pathinfo($filename);
+                    
+                    // Skip MacOS _MACOSX or hidden files and check valid extension
+                    if (strpos($filename, '__MACOSX') !== false || substr($fileInfo['basename'], 0, 1) === '.') {
+                        continue;
+                    }
+
+                    $ext = strtolower($fileInfo['extension'] ?? '');
+                    if (in_array($ext, ['mp3', 'wav', 'ogg'])) {
+                        // Secure filename
+                        $safeFilename = Str::slug($fileInfo['filename']) . '.' . $ext;
+                        
+                        // Extract specific file to target directory
+                        copy("zip://".$file->getRealPath()."#".$filename, $targetPath.'/'.$safeFilename);
+                        $extractedCount++;
+                    }
+                }
+                $zip->close();
+                
+                if ($extractedCount > 0) {
+                    return back()->with('success', "$extractedCount file audio berhasil diekstrak dari ZIP.");
+                } else {
+                    return back()->with('error', 'ZIP tidak mengandung file audio yang valid (MP3, WAV, OGG).');
+                }
+            } else {
+                return back()->with('error', 'Gagal membuka file ZIP.');
+            }
+        }
+
+        // Single file upload logic
         if ($request->filled('custom_name')) {
             $filename = Str::slug($request->custom_name) . '.' . $extension;
         } else {

@@ -114,4 +114,48 @@
     </div>
 
 </div>
+
+<script>
+    const wrapper = document.querySelector('.border-dashed');
+    const inputElement = document.getElementById('file_excel');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        wrapper.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        wrapper.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        wrapper.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        wrapper.classList.add('border-accent-500', 'bg-accent-100');
+        wrapper.classList.remove('border-slate-300', 'bg-slate-50');
+    }
+
+    function unhighlight(e) {
+        wrapper.classList.remove('border-accent-500', 'bg-accent-100');
+        wrapper.classList.add('border-slate-300', 'bg-slate-50');
+    }
+
+    wrapper.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        
+        if (files.length > 0) {
+            inputElement.files = files;
+            document.getElementById('file-name').innerHTML = `File terpilih: <span class="font-bold">${files[0].name}</span>`;
+        }
+    }
+</script>
 @endsection

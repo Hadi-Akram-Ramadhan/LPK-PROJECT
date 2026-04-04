@@ -41,14 +41,16 @@
                 @csrf
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Pilih File (MP3, WAV, OGG)</label>
-                        <input type="file" name="audio_file" accept=".mp3, .wav, .ogg" required
-                            class="block w-full text-sm text-slate-500
-                            file:mr-4 file:py-2 file:px-4
-                            file:rounded-full file:border-0
-                            file:text-sm file:font-semibold
-                            file:bg-primary-50 file:text-primary-700
-                            hover:file:bg-primary-100 transition-colors cursor-pointer"/>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Pilih File (MP3, WAV, OGG, ZIP)</label>
+                        <div class="drag-drop-zone relative border-2 border-dashed border-slate-300 rounded-lg p-6 hover:bg-slate-50 transition-colors bg-white">
+                            <input type="file" name="audio_file" accept=".mp3, .wav, .ogg, .zip" required
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"/>
+                            <div class="text-center pointer-events-none">
+                                <svg class="mx-auto h-10 w-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                <p class="mt-2 text-sm text-slate-600">Drag & drop file di sini, atau klik untuk memilih</p>
+                                <p class="file-name-display mt-2 text-xs text-primary-600 font-medium"></p>
+                            </div>
+                        </div>
                         @error('audio_file') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
                     
@@ -67,8 +69,8 @@
         </div>
         
         <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
-            <h4 class="text-sm font-bold text-blue-800">Tips Penggunaan</h4>
-            <p class="text-xs text-blue-700 mt-1 line-clamp-3">File yang diunggah di sini dapat dipilih saat membuat atau mengedit soal berjenis _Listening_ (Choukai).</p>
+            <h4 class="text-sm font-bold text-blue-800">Tips Penggunaan (Bulk Upload)</h4>
+            <p class="text-xs text-blue-700 mt-1">File yang diunggah di sini dapat dipilih saat membuat atau mengedit soal berjenis _Listening_ (Choukai). <strong>Anda bisa langsung mengunggah file ZIP</strong> yang saling berisi berbagai audio sekaligus (bulk upload), sistem akan secara otomatis mengekstrak isinya.</p>
         </div>
     </div>
     
@@ -147,8 +149,49 @@
         navigator.clipboard.writeText(text).then(function() {
             alert('URL audio disalin ke clipboard: ' + text);
         }, function(err) {
-            console.error('Lagal menyalin: ', err);
+            console.error('Gagal menyalin: ', err);
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropzones = document.querySelectorAll('.drag-drop-zone');
+        dropzones.forEach(zone => {
+            const input = zone.querySelector('input[type="file"]');
+            const display = zone.querySelector('.file-name-display');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                zone.addEventListener(eventName, () => {
+                    zone.classList.add('border-blue-500', 'bg-blue-50');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, () => {
+                    zone.classList.remove('border-blue-500', 'bg-blue-50');
+                }, false);
+            });
+
+            zone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                if(dt.files.length > 0) {
+                    input.files = dt.files;
+                    if(display) display.innerHTML = `File terpilih: <span class="font-bold">${dt.files[0].name}</span>`;
+                }
+            });
+
+            input.addEventListener('change', function(e) {
+                if(this.files && this.files.length > 0) {
+                    if(display) display.innerHTML = `File terpilih: <span class="font-bold">${this.files[0].name}</span>`;
+                }
+            });
+        });
+    });
 </script>
 @endsection

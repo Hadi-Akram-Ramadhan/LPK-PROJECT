@@ -34,7 +34,10 @@ class SoalController extends Controller
         $audioFiles = collect(Storage::disk('public')->files('audio'))->map(function($file) {
             return basename($file);
         });
-        return view('guru.soal.create', compact('audioFiles', 'paketSoal'));
+        $imageFiles = collect(Storage::disk('public')->files('gambar'))->map(function($file) {
+            return basename($file);
+        });
+        return view('guru.soal.create', compact('audioFiles', 'imageFiles', 'paketSoal'));
     }
 
     /**
@@ -44,10 +47,11 @@ class SoalController extends Controller
     {
         $request->validate([
             'paket_soal_id' => 'required|exists:paket_soals,id',
-            'tipe'          => 'required|in:pilihan_ganda,multiple_choice,essay,audio',
+            'tipe'          => 'required|in:pilihan_ganda,multiple_choice,essay,audio,pilihan_ganda_audio,pilihan_ganda_gambar',
             'pertanyaan'    => 'required|string',
             'poin'          => 'required|integer|min:1',
             'audio_path'    => 'nullable|string',
+            'gambar_path'   => 'nullable|string',
         ]);
 
         // Security check: Ensure the guru owns the destination package
@@ -65,22 +69,34 @@ class SoalController extends Controller
                 'pertanyaan'    => $request->pertanyaan,
                 'poin'          => $request->poin,
                 'audio_path'    => $request->audio_path,
+                'gambar_path'   => $request->gambar_path,
             ]);
 
-            if (in_array($request->tipe, ['pilihan_ganda', 'multiple_choice', 'audio'])) {
+            if (in_array($request->tipe, ['pilihan_ganda', 'multiple_choice', 'audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'])) {
                 if ($request->has('pilihan') && is_array($request->pilihan)) {
                     foreach ($request->pilihan as $index => $teks) {
-                        if (!empty($teks)) {
+                        // Check if a media path was provided for this option index
+                        $mediaPath = $request->pilihan_media[$index] ?? null;
+                        
+                        if (!empty($teks) || !empty($mediaPath)) {
                             $isBenar = false;
-                            if ($request->tipe == 'pilihan_ganda' || $request->tipe == 'audio') {
+                            if (in_array($request->tipe, ['pilihan_ganda', 'audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'])) {
                                 $isBenar = ($request->jawaban_benar == $index);
                             } else if ($request->tipe == 'multiple_choice') {
                                 $isBenar = (is_array($request->jawaban_benar) && in_array($index, $request->jawaban_benar));
                             }
+                            
+                            $mediaTipe = null;
+                            if (!empty($mediaPath)) {
+                                $mediaTipe = ($request->tipe === 'pilihan_ganda_audio') ? 'audio' : 'gambar';
+                            }
+                            
                             PilihanJawaban::create([
-                                'soal_id'  => $soal->id,
-                                'teks'     => $teks,
-                                'is_benar' => $isBenar,
+                                'soal_id'    => $soal->id,
+                                'teks'       => $teks ?? '',
+                                'media_path' => $mediaPath,
+                                'media_tipe' => $mediaTipe,
+                                'is_benar'   => $isBenar,
                             ]);
                         }
                     }
@@ -109,8 +125,11 @@ class SoalController extends Controller
         $audioFiles = collect(Storage::disk('public')->files('audio'))->map(function($file) {
             return basename($file);
         });
+        $imageFiles = collect(Storage::disk('public')->files('gambar'))->map(function($file) {
+            return basename($file);
+        });
 
-        return view('guru.soal.edit', compact('soal', 'audioFiles'));
+        return view('guru.soal.edit', compact('soal', 'audioFiles', 'imageFiles'));
     }
 
     /**
@@ -126,36 +145,59 @@ class SoalController extends Controller
             'pertanyaan' => 'required|string',
             'poin' => 'required|integer|min:1',
             'audio_path' => 'nullable|string',
+            'gambar_path' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
         try {
-            $soal->update([
+            // Because 'tipe' is locked in after initial creation for most logic, we just carry it over, 
+            // but let's assume 'tipe' might be slightly modified? Usually we don't allow changing 'tipe' on edit,
+            // but the system doesn't restrict it heavily in the model update, though it's not in the validator.
+            // Let's stick to updating non-structural fields unless tipe is provided.
+            
+            $updateData = [
                 'pertanyaan' => $request->pertanyaan,
                 'poin' => $request->poin,
                 'audio_path' => $request->audio_path,
-            ]);
+                'gambar_path' => $request->gambar_path,
+            ];
+            
+            // if tipe is provided we update it.
+            if ($request->filled('tipe')) {
+                $updateData['tipe'] = $request->tipe;
+            }
+
+            $soal->update($updateData);
 
             // Update Pilihan Jawaban
-            if (in_array($soal->tipe, ['pilihan_ganda', 'multiple_choice', 'audio'])) {
+            if (in_array($soal->tipe, ['pilihan_ganda', 'multiple_choice', 'audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'])) {
                 // Hapus yang lama
                 $soal->pilihanJawabans()->delete();
 
                 // Buat baru
                 if ($request->has('pilihan') && is_array($request->pilihan)) {
                     foreach ($request->pilihan as $index => $teks) {
-                        if (!empty($teks)) {
+                        $mediaPath = $request->pilihan_media[$index] ?? null;
+                        
+                        if (!empty($teks) || !empty($mediaPath)) {
                             $isBenar = false;
                             
-                            if ($soal->tipe == 'pilihan_ganda' || $soal->tipe == 'audio') {
+                            if (in_array($soal->tipe, ['pilihan_ganda', 'audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'])) {
                                 $isBenar = ($request->jawaban_benar == $index);
                             } else if ($soal->tipe == 'multiple_choice') {
                                 $isBenar = (is_array($request->jawaban_benar) && in_array($index, $request->jawaban_benar));
                             }
+                            
+                            $mediaTipe = null;
+                            if (!empty($mediaPath)) {
+                                $mediaTipe = ($soal->tipe === 'pilihan_ganda_audio') ? 'audio' : 'gambar';
+                            }
 
                             PilihanJawaban::create([
                                 'soal_id' => $soal->id,
-                                'teks' => $teks,
+                                'teks' => $teks ?? '',
+                                'media_path' => $mediaPath,
+                                'media_tipe' => $mediaTipe,
                                 'is_benar' => $isBenar,
                             ]);
                         }

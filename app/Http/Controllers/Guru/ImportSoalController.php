@@ -28,23 +28,29 @@ class ImportSoalController extends Controller
 
         // Header row
         $headers = [
-            'A1' => 'Tipe Soal (Pilihan Ganda / Multiple Choice / Essay / Audio)',
+            'A1' => 'Tipe Soal (Pilihan Ganda / Multiple Choice / Essay / Audio / Pilihan Ganda Audio / Pilihan Ganda Gambar)',
             'B1' => 'Teks Pertanyaan',
-            'C1' => 'Opsi A',
-            'D1' => 'Opsi B',
-            'E1' => 'Opsi C',
-            'F1' => 'Opsi D',
-            'G1' => 'Opsi E (Opsional)',
-            'H1' => 'Jawaban Benar (A / B / C / pisah koma jika Multiple)',
-            'I1' => 'File Audio (nama.mp3 — kosongkan jika bukan Choukai)',
-            'J1' => 'Poin / Bobot',
+            'C1' => 'Gambar Soal (Opsional, nama file ex: gambar.jpg)',
+            'D1' => 'Audio Soal (Opsional, nama file ex: choukai.mp3)',
+            'E1' => 'Opsi A (Teks)',
+            'F1' => 'Media Opsi A (Opsional)',
+            'G1' => 'Opsi B (Teks)',
+            'H1' => 'Media Opsi B (Opsional)',
+            'I1' => 'Opsi C (Teks)',
+            'J1' => 'Media Opsi C (Opsional)',
+            'K1' => 'Opsi D (Teks)',
+            'L1' => 'Media Opsi D (Opsional)',
+            'M1' => 'Opsi E (Teks opsional)',
+            'N1' => 'Media Opsi E (Opsional)',
+            'O1' => 'Jawaban Benar (A/B/C/D/E, pisah koma jika Multiple)',
+            'P1' => 'Poin / Bobot',
         ];
         foreach ($headers as $cell => $value) {
             $sheet->setCellValue($cell, $value);
         }
 
         // Header style
-        $sheet->getStyle('A1:J1')->applyFromArray([
+        $sheet->getStyle('A1:P1')->applyFromArray([
             'font' => [
                 'bold'  => true,
                 'color' => ['rgb' => 'FFFFFF'],
@@ -60,39 +66,47 @@ class ImportSoalController extends Controller
         ]);
         $sheet->getRowDimension(1)->setRowHeight(40);
 
-        foreach (range('A', 'J') as $col) {
+        foreach (range('A', 'P') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
         // Contoh baris 2 — Pilihan Ganda
         $sheet->fromArray([
-            'Pilihan Ganda', 'Apa arti kata "Gakkou"?',
-            'Rumah Tangga', 'Sekolah', 'Stasiun', 'Kantor', '',
-            'B', '', '10',
+            'Pilihan Ganda', 'Apa arti kata "Gakkou"?', '', '',
+            'Rumah Tangga', '', 'Sekolah', '', 'Stasiun', '', 'Kantor', '', '', '',
+            'B', '10',
         ], null, 'A2');
 
         // Contoh baris 3 — Multiple Choice
         $sheet->fromArray([
-            'Multiple Choice', 'Manakah yang termasuk kata benda dalam bahasa Jepang?',
-            'Nomi (飲む)', 'Hon (本)', 'Enpitsu (鉛筆)', 'Taberu (食べる)', '',
-            'B,C', '', '15',
+            'Multiple Choice', 'Manakah yang termasuk kata benda dalam bahasa Jepang?', '', '',
+            'Nomi (飲む)', '', 'Hon (本)', '', 'Enpitsu (鉛筆)', '', 'Taberu (食べる)', '', '', '',
+            'B,C', '15',
         ], null, 'A3');
 
         // Contoh baris 4 — Essay
         $sheet->fromArray([
-            'Essay', 'Sebutkan 3 alat transportasi dalam bahasa Jepang!',
-            '', '', '', '', '', '', '', '20',
+            'Essay', 'Sebutkan 3 alat transportasi dalam bahasa Jepang!', '', '',
+            '', '', '', '', '', '', '', '', '', '',
+            '', '20',
         ], null, 'A4');
 
         // Contoh baris 5 — Audio/Choukai
         $sheet->fromArray([
-            'Audio', 'Dengarkan audio dan pilih jawaban yang tepat.',
-            'Pilih A', 'Pilih B', 'Pilih C', 'Pilih D', '',
-            'C', 'choukai-n4-part1.mp3', '10',
+            'Audio', 'Dengarkan audio dan pilih jawaban yang tepat.', '', 'choukai.mp3',
+            'Pilih A', '', 'Pilih B', '', 'Pilih C', '', 'Pilih D', '', '', '',
+            'C', '10',
         ], null, 'A5');
+        
+        // Contoh baris 6 - Pilihan Ganda Gambar
+        $sheet->fromArray([
+            'Pilihan Ganda Gambar', 'Manakah dari gambar berikut yang menunjukkan stasiun?', 'tanya.jpg', '',
+            '', 'stasiun.jpg', '', 'kantor.png', '', 'pasar.jpg', '', 'mall.png', '', '',
+            'A', '10',
+        ], null, 'A6');
 
         // Zebra row styling for example rows
-        $sheet->getStyle('A2:J5')->applyFromArray([
+        $sheet->getStyle('A2:P6')->applyFromArray([
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F1F5F9']],
         ]);
 

@@ -99,11 +99,53 @@
 </div>
 
 <script>
+    const wrapper = document.querySelector('.file-input-wrapper');
+    const inputElement = document.getElementById('file_excel');
+    
     function updateFileName(input) {
         const fileName = input.files[0] ? input.files[0].name : "Klik atau Drag file Excel ke sini";
-        document.getElementById('fileName').textContent = fileName;
-        document.querySelector('.file-input-wrapper').style.borderColor = "#2563eb";
-        document.querySelector('.file-input-wrapper').style.background = "#eff6ff";
+        document.getElementById('fileName').innerHTML = `<span style="color:#2563eb;font-weight:600;">File terpilih: ${fileName}</span>`;
+        wrapper.style.borderColor = "#2563eb";
+        wrapper.style.background = "#eff6ff";
+    }
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        wrapper.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        wrapper.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        wrapper.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        wrapper.style.borderColor = "#2563eb";
+        wrapper.style.background = "#eff6ff";
+    }
+
+    function unhighlight(e) {
+        wrapper.style.borderColor = "#e2e8f0";
+        wrapper.style.background = "#f8fafc";
+    }
+
+    wrapper.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        
+        if (files.length > 0) {
+            inputElement.files = files;
+            updateFileName(inputElement);
+        }
     }
 </script>
 
