@@ -163,18 +163,20 @@ class SoalController extends Controller
     // ── Import Soal ───────────────────────────────────────────
     public function import()
     {
-        return view('admin.soal.import');
+        $paketSoals = PaketSoal::orderBy('nama')->get();
+        return view('admin.soal.import', compact('paketSoals'));
     }
 
     public function storeImport(Request $request)
     {
         $request->validate([
-            'file_excel' => 'required|mimes:xlsx,xls,csv|max:5120',
+            'paket_soal_id' => 'required|exists:paket_soals,id',
+            'file_excel'    => 'required|mimes:xlsx,xls,csv|max:5120',
         ]);
 
         try {
             $tmpPath = $request->file('file_excel')->getRealPath();
-            $import = new SoalImport();
+            $import = new SoalImport($request->paket_soal_id);
             $import->import($tmpPath);
             $summary = $import->getSummary();
 

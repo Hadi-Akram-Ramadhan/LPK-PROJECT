@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Imports\SoalImport;
+use App\Models\PaketSoal;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -14,7 +15,8 @@ class ImportSoalController extends Controller
 {
     public function index()
     {
-        return view('guru.import.index');
+        $paketSoals = PaketSoal::where('guru_id', auth()->id())->latest()->get();
+        return view('guru.import.index', compact('paketSoals'));
     }
 
     // ── Download Template ─────────────────────────────────────
@@ -108,18 +110,20 @@ class ImportSoalController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file_excel' => 'required|mimes:xlsx,xls,csv|max:5120',
+            'paket_soal_id' => 'required|exists:paket_soals,id',
+            'file_excel'    => 'required|mimes:xlsx,xls,csv|max:5120',
         ], [
-            'file_excel.required' => 'File Excel wajib diunggah.',
-            'file_excel.mimes'    => 'Format harus xlsx, xls, atau csv.',
-            'file_excel.max'      => 'Ukuran file maksimal 5 MB.',
+            'paket_soal_id.required' => 'Pilih paket soal tujuan.',
+            'file_excel.required'    => 'File Excel wajib diunggah.',
+            'file_excel.mimes'       => 'Format harus xlsx, xls, atau csv.',
+            'file_excel.max'         => 'Ukuran file maksimal 5 MB.',
         ]);
 
         try {
             // Simpan file ke temp path agar bisa dibaca PhpSpreadsheet
             $tmpPath = $request->file('file_excel')->getRealPath();
 
-            $import = new SoalImport();
+            $import = new SoalImport($request->paket_soal_id);
             $import->import($tmpPath);
 
             $summary = $import->getSummary();

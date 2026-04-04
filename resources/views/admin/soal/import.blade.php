@@ -60,6 +60,24 @@
 
     <form action="{{ route('admin.soal.storeImport') }}" method="POST" enctype="multipart/form-data" id="importForm">
         @csrf
+
+        {{-- Paket Soal Selection --}}
+        <div class="form-group">
+            <label class="form-label" for="paket_soal_id">Pilih Paket Soal Tujuan</label>
+            <select name="paket_soal_id" id="paket_soal_id" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff; font-size: 14px; outline: none; transition: border-color 0.15s;" required onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
+                <option value="">-- Pilih Paket --</option>
+                @foreach($paketSoals as $paket)
+                    <option value="{{ $paket->id }}" {{ request('paket') == $paket->id ? 'selected' : '' }}>
+                        {{ $paket->nama }} ({{ $paket->soals->count() }} soal)
+                    </option>
+                @endforeach
+            </select>
+            <p style="font-size: 11px; color: #64748b; margin-top: 6px;">Soal yang diimport akan otomatis dimasukkan ke paket ini.</p>
+            @error('paket_soal_id')
+                <div style="color: #dc2626; font-size: 12px; margin-top: 4px;">{{ $message }}</div>
+            @enderror
+        </div>
+
         <div class="form-group">
             <label class="form-label" for="file_excel">Upload File Excel</label>
             <div class="file-input-wrapper" onclick="document.getElementById('file_excel').click()">

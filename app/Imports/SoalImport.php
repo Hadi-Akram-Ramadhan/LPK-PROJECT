@@ -12,6 +12,12 @@ class SoalImport
 {
     private int $sukses = 0;
     private int $gagal  = 0;
+    private int $paketSoalId;
+
+    public function __construct(int $paketSoalId)
+    {
+        $this->paketSoalId = $paketSoalId;
+    }
 
     /**
      * Loop tiap baris dari file Excel yang diberikan (path sementara).
@@ -46,11 +52,12 @@ class SoalImport
             DB::beginTransaction();
             try {
                 $soal = Soal::create([
-                    'guru_id'    => auth()->id(),
-                    'tipe'       => $tipeEnum,
-                    'pertanyaan' => $pertanyaan,
-                    'poin'       => $poin,
-                    'audio_path' => $audioPath,
+                    'guru_id'       => auth()->id(),
+                    'paket_soal_id' => $this->paketSoalId,
+                    'tipe'          => $tipeEnum,
+                    'pertanyaan'    => $pertanyaan,
+                    'poin'          => $poin,
+                    'audio_path'    => $audioPath,
                 ]);
 
                 if ($tipeEnum !== 'essay') {

@@ -70,6 +70,22 @@
         <div class="p-6">
             <form action="{{ route('guru.import.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                
+                {{-- Target Package Selection --}}
+                <div class="mb-6">
+                    <label for="paket_soal_id" class="block text-sm font-bold text-slate-700 mb-2">Pilih Paket Soal Tujuan</label>
+                    <select name="paket_soal_id" id="paket_soal_id" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-accent-500 focus:ring-accent-500 sm:text-sm" required>
+                        <option value="">-- Pilih Paket --</option>
+                        @foreach($paketSoals as $paket)
+                            <option value="{{ $paket->id }}" {{ request('paket') == $paket->id ? 'selected' : '' }}>
+                                {{ $paket->nama }} ({{ $paket->soals_count ?? $paket->soals->count() }} soal)
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="mt-2 text-xs text-slate-500">Semua soal dalam file Excel akan dimasukkan ke dalam paket ini.</p>
+                    @error('paket_soal_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+
                 <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-md bg-slate-50 hover:bg-slate-100 transition-colors">
                     <div class="space-y-1 text-center">
                         <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
