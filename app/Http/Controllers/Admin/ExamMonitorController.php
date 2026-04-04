@@ -76,14 +76,27 @@ class ExamMonitorController extends Controller
         // Final Borders
         $sheet->getStyle('A1:G' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
-        $filename = "Nilai_Ujian_" . str_replace(' ', '_', $ujian->judul) . "_" . date('Y-m-d') . ".xlsx";
-        
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
+        // Sanitize the filename for safe delivery
+        $sanitizedJudul = preg_replace('/[^A-Za-z0-9_\-]/', '_', $ujian->judul);
+        $filename = "Nilai_Ujian_" . $sanitizedJudul . "_" . date('Y-m-d') . ".xlsx";
+        $tempPath = storage_path('app/public/' . $filename);
+
+        // Aggressive buffer clearing
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
+        $writer->save($tempPath);
+
+        if (!file_exists($tempPath)) {
+             return "Gagal membuat file export.";
+        }
+
+        return response()->download($tempPath, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'X-Content-Type-Options' => 'nosniff',
+            'Content-Transfer-Encoding' => 'binary',
+        ])->deleteFileAfterSend(true);
     }
 }
