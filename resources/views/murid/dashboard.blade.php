@@ -75,12 +75,12 @@
         </div>
         <div class="search-box">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <input type="text" placeholder="Cari ujian...">
+            <input type="text" id="search-input" placeholder="Cari judul ujian atau deskripsi...">
         </div>
     </div>
 
     <div class="exam-grid">
-        @forelse($ujianPesertas as $peserta)
+        @foreach($ujianPesertas as $peserta)
             @php
                 $ujian = $peserta->ujian;
                 $now = \Carbon\Carbon::now();
@@ -133,13 +133,13 @@
                 }
             @endphp
 
-            <div class="exam-card">
+            <div class="exam-card exam-card-wrapper">
                 <div class="card-top">
                     <span class="tag tag-category">{{ $ujian->kategori ?? 'UMUM' }}</span>
                     <span class="tag {{ $statusTag }}">{{ $statusLabel }}</span>
                 </div>
                 
-                <h3 class="exam-title">{{ $ujian->judul }}</h3>
+                <h3 class="exam-title exam-title-text">{{ $ujian->judul }}</h3>
                 <p class="exam-desc">{{ $ujian->deskripsi ?? 'Klik tombol di bawah untuk mengerjakan ujian ini sesuai instruksi.' }}</p>
                 
                 <div class="exam-meta">
@@ -166,7 +166,9 @@
                     @endif
                 @endif
             </div>
-        @empty
+        @endforeach
+
+        @if($ujianPesertas->isEmpty())
             <div class="empty-state">
                 <div class="empty-icon">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
@@ -174,7 +176,52 @@
                 <h3 style="font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 10px;">Belum ada ujian ditugaskan</h3>
                 <p style="color: #64748b; font-size: 15px;">Silakan hubungi pengelola LPK jika anda merasa seharusnya memiliki jadwal ujian hari ini.</p>
             </div>
-        @endforelse
+        @endif
+
+        {{-- No Search Results --}}
+        <div id="no-results" class="empty-state" style="display: none;">
+            <div class="empty-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <h3 style="font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 10px;">Ujian tidak ditemukan</h3>
+            <p style="color: #64748b; font-size: 15px;">Kami tidak menemukan hasil pencarian untuk kata kunci tersebut.</p>
+        </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        const examCards = document.querySelectorAll('.exam-card-wrapper');
+        const noResults = document.getElementById('no-results');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                let hasResults = false;
+
+                examCards.forEach(card => {
+                    const titleElement = card.querySelector('.exam-title-text');
+                    const descElement = card.querySelector('.exam-desc');
+                    
+                    if (titleElement && descElement) {
+                        const title = titleElement.textContent.toLowerCase();
+                        const desc = descElement.textContent.toLowerCase();
+                        
+                        if (title.includes(query) || desc.includes(query)) {
+                            card.style.display = 'flex';
+                            hasResults = true;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+
+                if (noResults) {
+                    noResults.style.display = hasResults || query === '' ? 'none' : 'block';
+                }
+            });
+        }
+    });
+</script>
 @endsection
