@@ -193,10 +193,9 @@ class UserController extends Controller
 
         $headers = [
             'A1' => 'Nama Siswa (Wajib)',
-            'B1' => 'Email / Username (Wajib & Unik)',
+            'B1' => 'Email (Wajib & Unik)',
             'C1' => 'Password (Wajib, Min 8 Karakter)',
-            'D1' => 'NIS (Opsional)',
-            'E1' => 'ID Kelas (Opsional, Lihat Sheet Bantuan)',
+            'D1' => 'ID Kelas (Opsional, Lihat Sheet Bantuan)',
         ];
         
         foreach ($headers as $cell => $value) {
@@ -204,13 +203,13 @@ class UserController extends Controller
         }
 
         // Header Styling
-        $sheet->getStyle('A1:E1')->applyFromArray([
+        $sheet->getStyle('A1:D1')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '10b981']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'wrapText' => true],
         ]);
         
-        foreach (range('A', 'E') as $col) {
+        foreach (range('A', 'D') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -218,7 +217,7 @@ class UserController extends Controller
         $sheet->setCellValue('A2', 'Andi Siswan');
         $sheet->setCellValue('B2', 'andi@lpk.com');
         $sheet->setCellValue('C2', 'lpk123456');
-        $sheet->setCellValue('D2', '2024001');
+        $sheet->setCellValue('D2', '1'); // Contoh ID kelas 1
 
         // --- Sheet 2: Reference (ID Kelas) ---
         $refSheet = $spreadsheet->createSheet();

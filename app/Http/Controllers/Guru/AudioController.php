@@ -36,12 +36,16 @@ class AudioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'audio_file'  => 'required|mimes:mp3,wav,ogg,zip|max:51200', // max 50MB for zip potentially
+            'audio_file'  => [
+                'required',
+                'extensions:mp3,mpeg,mpga,wav,ogg,zip',
+                'max:40000'
+            ],
             'custom_name' => 'nullable|string|max:100',
         ], [
             'audio_file.required' => 'Silakan pilih file audio atau ZIP terlebih dahulu.',
-            'audio_file.mimes'    => 'Format file harus berupa MP3, WAV, OGG, atau ZIP.',
-            'audio_file.max'      => 'Ukuran file maksimal 50MB.',
+            'audio_file.extensions' => 'Ekstensi file tidak valid. Gunakan MP3, WAV, OGG, atau ZIP.',
+            'audio_file.max'      => 'Ukuran file terlalu besar. Server Anda membatasi unggahan maksimal hingga 40MB.',
         ]);
 
         $file      = $request->file('audio_file');
@@ -53,6 +57,7 @@ class AudioController extends Controller
             
             if ($res === TRUE) {
                 $extractedCount = 0;
+                $skippedCount = 0;
                 $targetPath = storage_path('app/public/audio');
                 
                 if (!file_exists($targetPath)) {
@@ -63,27 +68,33 @@ class AudioController extends Controller
                     $filename = $zip->getNameIndex($i);
                     $fileInfo = pathinfo($filename);
                     
-                    // Skip MacOS _MACOSX or hidden files and check valid extension
                     if (strpos($filename, '__MACOSX') !== false || substr($fileInfo['basename'], 0, 1) === '.') {
                         continue;
                     }
 
                     $ext = strtolower($fileInfo['extension'] ?? '');
-                    if (in_array($ext, ['mp3', 'wav', 'ogg'])) {
-                        // Secure filename
+                    if (in_array($ext, ['mp3', 'mpeg', 'mpga', 'wav', 'ogg'])) {
                         $safeFilename = Str::slug($fileInfo['filename']) . '.' . $ext;
                         
-                        // Extract specific file to target directory
+                        // Check if exists
+                        if (file_exists($targetPath . '/' . $safeFilename)) {
+                            $skippedCount++;
+                            continue;
+                        }
+
                         copy("zip://".$file->getRealPath()."#".$filename, $targetPath.'/'.$safeFilename);
                         $extractedCount++;
                     }
                 }
                 $zip->close();
                 
+                $msg = "$extractedCount file audio berhasil diekstrak.";
+                if ($skippedCount > 0) $msg .= " ($skippedCount file dilewati karena sudah ada).";
+
                 if ($extractedCount > 0) {
-                    return back()->with('success', "$extractedCount file audio berhasil diekstrak dari ZIP.");
+                    return back()->with('success', $msg);
                 } else {
-                    return back()->with('error', 'ZIP tidak mengandung file audio yang valid (MP3, WAV, OGG).');
+                    return back()->with('error', $skippedCount > 0 ? "Gagal: Semua file ($skippedCount) sudah ada di server." : 'ZIP tidak mengandung file audio yang valid.');
                 }
             } else {
                 return back()->with('error', 'Gagal membuka file ZIP.');
@@ -97,6 +108,10 @@ class AudioController extends Controller
             $filename = time() . '_' . Str::slug(
                     pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
                 ) . '.' . $extension;
+        }
+
+        if (Storage::disk('public')->exists('audio/' . $filename)) {
+            return back()->with('error', "Gagal: File dengan nama \"$filename\" sudah ada. Silakan gunakan nama lain atau ubah nama file Anda.");
         }
 
         $file->storeAs('audio', $filename, 'public');

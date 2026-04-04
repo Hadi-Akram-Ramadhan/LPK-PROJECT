@@ -41,11 +41,11 @@
             Petunjuk Import
         </div>
         <ul class="help-list">
-            <li>Gunakan template Excel yang sudah disediakan di bawah untuk menghindari kesalahan format.</li>
-            <li><strong>Sheet Bantuan ID Kelas:</strong> Lihat sheet kedua pada Excel untuk daftar ID Kelas yang benar.</li>
-            <li><strong>NIS:</strong> Nomor Induk Siswa dapat diisi secara opsional.</li>
-            <li>Pastikan Email bersifat unik (belum terdaftar di sistem).</li>
-            <li>Password minimal 8 karakter.</li>
+            <li>Gunakan **Template Excel Terbaru** (kolom: Nama, Email, Password, ID Kelas) untuk menghindari kesalahan.</li>
+            <li><strong>Login via Email:</strong> Pastikan format email benar (mengandung @) karena akan digunakan siswa untuk login.</li>
+            <li><strong>Sheet Bantuan:</strong> Gunakan ID Kelas yang sesuai dengan daftar di sheet kedua.</li>
+            <li><strong>Data Duplikat:</strong> Sistem akan otomatis melewati baris jika Email sudah terdaftar sebelumnya.</li>
+            <li>Password minimal 8 karakter agar akun tetap aman.</li>
         </ul>
     </div>
 
@@ -64,11 +64,11 @@
         @csrf
         <div class="form-group">
             <label class="form-label" for="file_excel">Upload File Excel</label>
-            <div class="file-input-wrapper" onclick="document.getElementById('file_excel').click()">
+            <div id="dropZone" class="file-input-wrapper">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19h6m-3-3v3"/></svg>
                 <div class="file-input-text" id="fileName">Klik atau Drag file Excel ke sini</div>
                 <div class="file-input-sub">Format: .xlsx, .xls, .csv (Max 5MB)</div>
-                <input type="file" name="file_excel" id="file_excel" style="display: none" accept=".xlsx,.xls,.csv" onchange="updateFileName(this)">
+                <input type="file" name="file_excel" id="file_excel" style="display: none" accept=".xlsx,.xls,.csv">
             </div>
             @error('file_excel')
                 <div style="color: #dc2626; font-size: 12px; margin-top: 4px;">{{ $message }}</div>
@@ -83,12 +83,57 @@
 </div>
 
 <script>
-    function updateFileName(input) {
-        const fileName = input.files[0] ? input.files[0].name : "Klik atau Drag file Excel ke sini";
-        document.getElementById('fileName').textContent = fileName;
-        document.querySelector('.file-input-wrapper').style.borderColor = "#10b981";
-        document.querySelector('.file-input-wrapper').style.background = "#ecfdf5";
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('file_excel');
+        const fileNameText = document.getElementById('fileName');
+
+        // Click to select
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Drag events
+        ['dragover', 'dragenter'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#10b981';
+                dropZone.style.background = '#ecfdf5';
+            });
+        });
+
+        ['dragleave', 'dragend', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                if (eventName !== 'drop' && !fileInput.files.length) {
+                    dropZone.style.borderColor = '#e2e8f0';
+                    dropZone.style.background = '#f8fafc';
+                }
+            });
+        });
+
+        // Drop handle
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                fileInput.files = files;
+                updateDisplay(files[0].name);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) {
+                updateDisplay(fileInput.files[0].name);
+            }
+        });
+
+        function updateDisplay(name) {
+            fileNameText.textContent = name;
+            dropZone.style.borderColor = "#10b981";
+            dropZone.style.background = "#ecfdf5";
+            fileNameText.style.color = "#047857";
+            fileNameText.style.fontWeight = "600";
+        }
+    });
 </script>
 
 @endsection

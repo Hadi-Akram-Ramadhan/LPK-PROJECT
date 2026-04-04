@@ -25,21 +25,22 @@ class UserImport
 
         // Baris 0 = header, mulai dari baris 1
         foreach (array_slice($rows, 1) as $row) {
-            // Kolom: 0=Nama, 1=Email, 2=Password, 3=NIS, 4=IDKelas
+            // Kolom: 0=Nama, 1=Email, 2=Password, 3=IDKelas
             $name     = trim($row[0] ?? '');
             $email    = trim($row[1] ?? '');
             $password = trim($row[2] ?? '');
-            $nis      = trim($row[3] ?? '');
-            $kelasId  = $row[4] ?? null;
+            $kelasId  = $row[3] ?? null;
 
-            // Skip baris kosong atau tidak lengkap
+            // Skip baris kosong
             if (empty($name) || empty($email) || empty($password)) {
+                $this->gagal++;
                 continue;
             }
 
-            // Validasi format email sederhana
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL) && !Str::contains($email, '@')) {
-                // If it's just a username, we'll try to use it as is if it's unique
+            // Validasi format email wajib!
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $this->gagal++;
+                continue;
             }
 
             DB::beginTransaction();
@@ -56,7 +57,6 @@ class UserImport
                     'password' => Hash::make($password),
                     'role'     => 'murid',
                     'kelas_id' => $kelasId ? (int)$kelasId : null,
-                    'nis'      => $nis ?: null,
                 ]);
 
                 DB::commit();

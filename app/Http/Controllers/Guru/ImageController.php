@@ -55,6 +55,7 @@ class ImageController extends Controller
             
             if ($res === TRUE) {
                 $extractedCount = 0;
+                $skippedCount = 0;
                 $targetPath = storage_path('app/public/gambar');
                 
                 if (!file_exists($targetPath)) {
@@ -65,25 +66,25 @@ class ImageController extends Controller
                     $filename = $zip->getNameIndex($i);
                     $fileInfo = pathinfo($filename);
                     
-                    // Skip MacOS _MACOSX or hidden files and check valid extension
                     if (strpos($filename, '__MACOSX') !== false || substr($fileInfo['basename'], 0, 1) === '.') {
                         continue;
                     }
 
                     $ext = strtolower($fileInfo['extension'] ?? '');
                     if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
-                        // Secure filename
                         $safeFilename = Str::slug($fileInfo['filename']) . '.' . $ext;
-                        $tempExtractFile = $targetPath . '/temp_' . time() . '_' . $safeFilename;
                         $finalPath = $targetPath . '/' . $safeFilename;
                         
-                        // Extract specific file to temp target
+                        // Handle duplicates
+                        if (file_exists($finalPath)) {
+                            $skippedCount++;
+                            continue;
+                        }
+
+                        $tempExtractFile = $targetPath . '/temp_' . time() . '_' . $safeFilename;
+                        
                         copy("zip://".$file->getRealPath()."#".$filename, $tempExtractFile);
-                        
-                        // Compress and save correctly
                         $this->compressAndSaveImage($tempExtractFile, $finalPath);
-                        
-                        // Delete temp
                         @unlink($tempExtractFile);
 
                         $extractedCount++;
@@ -91,10 +92,13 @@ class ImageController extends Controller
                 }
                 $zip->close();
                 
+                $msg = "$extractedCount file gambar berhasil diekstrak.";
+                if ($skippedCount > 0) $msg .= " ($skippedCount file dilewati karena sudah ada).";
+
                 if ($extractedCount > 0) {
-                    return back()->with('success', "$extractedCount file gambar berhasil diekstrak dari ZIP.");
+                    return back()->with('success', $msg);
                 } else {
-                    return back()->with('error', 'ZIP tidak mengandung file gambar yang valid (JPG, PNG, WEBP).');
+                    return back()->with('error', $skippedCount > 0 ? "Gagal: Semua file ($skippedCount) sudah ada di server." : 'ZIP tidak mengandung file gambar yang valid.');
                 }
             } else {
                 return back()->with('error', 'Gagal membuka file ZIP.');
@@ -110,12 +114,15 @@ class ImageController extends Controller
                 ) . '.' . $extension;
         }
 
+        if (Storage::disk('public')->exists('gambar/' . $filename)) {
+            return back()->with('error', "Gagal: Gambar dengan nama \"$filename\" sudah ada. Silakan gunakan nama lain.");
+        }
+
         $targetPath = storage_path('app/public/gambar');
         if (!file_exists($targetPath)) {
             mkdir($targetPath, 0755, true);
         }
 
-        // Kompres dari file sistem tmp ke public storage
         $this->compressAndSaveImage($file->getRealPath(), $targetPath . '/' . $filename);
 
         return back()->with('success', "File gambar \"$filename\" berhasil diunggah dan dikompresi otomatis.");
