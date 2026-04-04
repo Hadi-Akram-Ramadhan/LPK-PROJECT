@@ -7,9 +7,18 @@
 <div class="card p-8" style="max-width: 800px; margin: 0 auto;">
     <form action="{{ route('admin.ujian.store') }}" method="POST">
         @csrf
-        <div class="mb-6">
-            <label class="block text-sm font-bold mb-2 text-slate-700">Judul Ujian</label>
-            <input type="text" name="judul" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" placeholder="Contoh: UTS Bahasa Korea Dasar" required>
+        <div class="grid-2 mb-6">
+            <div>
+                <label class="block text-sm font-bold mb-2 text-slate-700">Judul Ujian</label>
+                <input type="text" name="judul" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" placeholder="Contoh: UTS Bahasa Korea Dasar" required>
+            </div>
+            <div>
+                <label class="block text-sm font-bold mb-2 text-slate-700">Jenis Ujian</label>
+                <select name="jenis_ujian" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" required>
+                    <option value="reguler">Ujian Reguler</option>
+                    <option value="tryout">Try-Out</option>
+                </select>
+            </div>
         </div>
 
         <div class="mb-6">

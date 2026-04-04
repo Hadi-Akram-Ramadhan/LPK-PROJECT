@@ -7,7 +7,8 @@
     <title>Login - {{ config('app.name', 'LPK Urisowon') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -15,7 +16,7 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             min-height: 100vh;
             background: #fff;
             overflow: hidden;
@@ -225,7 +226,7 @@ ight: 1.7; }
             border-radius: 10px;
             font-size: 14px;
             color: #0f172a;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             outline: none;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
@@ -265,7 +266,7 @@ ight: 1.7; }
             color: #fff;
             font-size: 15px;
             font-weight: 700;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             border: none;
             border-radius: 10px;
             cursor: pointer;

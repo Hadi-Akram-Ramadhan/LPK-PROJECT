@@ -62,6 +62,14 @@
                     <input type="number" name="durasi" id="durasi" value="{{ old('durasi', 60) }}" required min="1" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">
                 </div>
 
+                <div>
+                    <label for="jenis_ujian" class="block text-sm font-medium text-slate-700 mb-1">Jenis Ujian <span class="text-red-500">*</span></label>
+                    <select name="jenis_ujian" id="jenis_ujian" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md" required>
+                        <option value="reguler" {{ old('jenis_ujian') == 'reguler' ? 'selected' : '' }}>Ujian Reguler</option>
+                        <option value="tryout" {{ old('jenis_ujian') == 'tryout' ? 'selected' : '' }}>Try-Out</option>
+                    </select>
+                </div>
+
                 <div class="bg-slate-50 p-4 border border-slate-200 rounded-lg space-y-4 relative overflow-hidden">
                     <div class="absolute top-0 right-0 -mt-2 -mr-2 bg-slate-200 rounded-full h-12 w-12 flex items-center justify-center opacity-50">
                         <svg class="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>

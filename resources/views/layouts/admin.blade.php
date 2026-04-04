@@ -21,10 +21,9 @@
             width: 260px; background: #111827; display: flex; flex-direction: column;
             flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; z-index: 50; overflow-y: auto;
         }
-        .side-brand { display: flex; align-items: center; padding: 28px 24px 12px; }
-        .side-brand-icon { width: 38px; height: 38px; border-radius: 10px; background: #1e293b; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; }
-        .side-brand-icon svg { width: 20px; height: 20px; color: #fff; }
-        .side-brand-text h1 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; }
+        .side-brand { display: flex; align-items: center; padding: 28px 20px 12px; }
+        .side-brand-logo { width: 42px; height: 42px; object-fit: contain; margin-right: 12px; flex-shrink: 0; }
+        .side-brand-text h1 { font-size: 16px; font-weight: 800; color: #fff; line-height: 1.2; letter-spacing: -0.2px; }
         .side-brand-text p { font-size: 10px; color: #60a5fa; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
 
         .side-profile { display: flex; align-items: center; padding: 20px 24px; margin-bottom: 6px; }
@@ -107,9 +106,7 @@
     <div class="adm-wrap">
         <aside class="adm-side">
             <div class="side-brand">
-                <div class="side-brand-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
-                </div>
+                <img src="{{ asset('logo.png') }}" alt="Logo" class="side-brand-logo">
                 <div class="side-brand-text">
                     <h1>LPK URISOWON</h1>
                     <p>Dashboard Admin</p>

@@ -29,12 +29,14 @@ class UjianController extends Controller
     {
         $request->validate([
             'judul' => 'required',
+            'jenis_ujian' => 'nullable|in:reguler,tryout',
             'durasi' => 'required|numeric',
             'kelas_id' => 'required',
         ]);
 
         $ujian = Ujian::create([
             'judul' => $request->judul,
+            'jenis_ujian' => $request->jenis_ujian ?? 'reguler',
             'deskripsi' => $request->deskripsi,
             'durasi' => $request->durasi,
             'mulai' => $request->mulai,

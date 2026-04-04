@@ -135,7 +135,7 @@
 
             <div class="exam-card exam-card-wrapper">
                 <div class="card-top">
-                    <span class="tag tag-category">{{ $ujian->kategori ?? 'UMUM' }}</span>
+                    <span class="tag tag-category">{{ $ujian->jenis_ujian === 'tryout' ? 'TRY-OUT' : 'UJIAN REGULER' }}</span>
                     <span class="tag {{ $statusTag }}">{{ $statusLabel }}</span>
                 </div>
                 

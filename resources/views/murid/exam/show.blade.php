@@ -9,6 +9,7 @@
     <script>
         window.EXAM_ID = {{ $ujian_peserta->id }};
         window.TIMER_SECONDS = {{ $sisaDetik }};
+        window.IS_TRYOUT = {{ $ujian->jenis_ujian === 'tryout' ? 'true' : 'false' }};
         window.AUTO_SAVE_URL = "{{ route('murid.exam.autoSave', $ujian_peserta, false) }}";
         window.REPORT_CHEAT_URL = "{{ route('murid.exam.reportCheat', $ujian_peserta, false) }}";
         window.FINISH_URL = "{{ route('murid.exam.finish', $ujian_peserta, false) }}";
@@ -632,14 +633,16 @@
         });
         document.getElementById('finish-form').addEventListener('submit', () => { isNavigating = true; });
 
-        document.addEventListener("visibilitychange", function() {
-            if (document.hidden && !isNavigating) triggerAntiCheatLog();
-        });
-        window.addEventListener('blur', function() {
-            // Abaikan blur jika user sedang klik dalam window/iframe
-            if (document.activeElement !== document.body && document.activeElement.tagName === 'IFRAME') return;
-            if (!isNavigating) triggerAntiCheatLog();
-        });
+        if (!window.IS_TRYOUT) {
+            document.addEventListener("visibilitychange", function() {
+                if (document.hidden && !isNavigating) triggerAntiCheatLog();
+            });
+            window.addEventListener('blur', function() {
+                // Abaikan blur jika user sedang klik dalam window/iframe
+                if (document.activeElement !== document.body && document.activeElement.tagName === 'IFRAME') return;
+                if (!isNavigating) triggerAntiCheatLog();
+            });
+        }
 
         let cheatReported = false;
         function triggerAntiCheatLog() {

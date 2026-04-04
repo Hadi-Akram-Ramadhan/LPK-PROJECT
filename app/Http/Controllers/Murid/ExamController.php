@@ -18,9 +18,28 @@ class ExamController extends Controller
     public function index()
     {
         $userId = auth()->id();
-        $ujianPesertas = UjianPeserta::with(['ujian' => function ($query) {
-                // Jangan load semua relasi ujian di awal, cuma modelnya saja
-            }])
+
+        // RESET LOGIC: Hapus hasil ujian Try-Out yang sudah selesai saat balik ke dashboard
+        // Agar murid bisa mengulang try-out kapan saja dari awal.
+        $finishedTryouts = UjianPeserta::where('user_id', $userId)
+            ->where('status', 'selesai')
+            ->whereHas('ujian', function($q) {
+                $q->where('jenis_ujian', 'tryout');
+            })->get();
+
+        foreach($finishedTryouts as $tp) {
+            // Hapus jawaban-jawabannya dulu
+            JawabanMurid::where('ujian_peserta_id', $tp->id)->delete();
+            // Reset status jadi belum
+            $tp->update([
+                'status' => 'belum',
+                'mulai_at' => null,
+                'selesai_at' => null,
+                'skor' => 0
+            ]);
+        }
+
+        $ujianPesertas = UjianPeserta::with(['ujian'])
             ->where('user_id', $userId)
             ->latest()
             ->get();
@@ -252,12 +271,15 @@ class ExamController extends Controller
             $status = strtolower($ujian_peserta->status);
             if ($status !== 'mengerjakan' && $status !== 'diblokir') {
                 \Illuminate\Support\Facades\Log::error("Anti-Cheat 403: Status mismatch. Status: {$ujian_peserta->status}");
-                // Jika mereka di status lain (misal "belum_mulai"), paksa jadikan mengerjakan lalu blokir.
-                // Atau biarkan saja dan beritahu user.
                 return response()->json(['success' => false, 'message' => "Status ujian tidak valid: {$ujian_peserta->status}"], 403);
             }
 
-            // Blokir ujian
+            // FITUR TRY-OUT: Jangan blokir jika jenis ujian adalah tryout
+            if ($ujian_peserta->ujian->jenis_ujian === 'tryout') {
+                return response()->json(['success' => true, 'message' => 'Try-out mode: tab switch allowed.']);
+            }
+
+            // Blokir ujian (Hanya untuk reguler)
             $ujian_peserta->update(['status' => 'diblokir']);
 
             // Cek apakah log sudah ada agar tidak tumpang tindih berulang kali

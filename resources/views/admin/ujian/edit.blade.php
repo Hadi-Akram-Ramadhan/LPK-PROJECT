@@ -9,9 +9,18 @@
         @csrf
         @method('PUT')
         
-        <div class="mb-6">
-            <label class="block text-sm font-bold mb-2 text-slate-700">Judul Ujian</label>
-            <input type="text" name="judul" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" value="{{ old('judul', $ujian->judul) }}" placeholder="Contoh: UTS Bahasa Korea Dasar" required>
+        <div class="grid-2 mb-6">
+            <div>
+                <label class="block text-sm font-bold mb-2 text-slate-700">Judul Ujian</label>
+                <input type="text" name="judul" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" value="{{ old('judul', $ujian->judul) }}" placeholder="Contoh: UTS Bahasa Korea Dasar" required>
+            </div>
+            <div>
+                <label class="block text-sm font-bold mb-2 text-slate-700">Jenis Ujian</label>
+                <select name="jenis_ujian" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" required>
+                    <option value="reguler" {{ old('jenis_ujian', $ujian->jenis_ujian ?? 'reguler') == 'reguler' ? 'selected' : '' }}>Ujian Reguler</option>
+                    <option value="tryout" {{ old('jenis_ujian', $ujian->jenis_ujian ?? 'reguler') == 'tryout' ? 'selected' : '' }}>Try-Out</option>
+                </select>
+            </div>
         </div>
 
         <div class="mb-6">

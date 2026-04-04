@@ -222,7 +222,7 @@
             border-radius: 10px;
             font-size: 14px;
             color: #0f172a;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             outline: none;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
@@ -260,7 +260,7 @@
             color: #fff;
             font-size: 15px;
             font-weight: 700;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             border: none;
             border-radius: 10px;
             cursor: pointer;

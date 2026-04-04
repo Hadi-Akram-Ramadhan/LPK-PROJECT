@@ -57,6 +57,7 @@ class UjianController extends Controller
             'soal_id' => 'required|array|min:1',
             'soal_id.*' => 'exists:soals,id',
             'acak_soal' => 'nullable|boolean',
+            'jenis_ujian' => 'nullable|in:reguler,tryout',
         ]);
 
         DB::beginTransaction();
@@ -69,6 +70,7 @@ class UjianController extends Controller
                 'mulai' => $request->mulai,
                 'selesai' => $request->selesai,
                 'acak_soal' => $request->has('acak_soal'),
+                'jenis_ujian' => $request->jenis_ujian ?? 'reguler',
             ]);
 
             // Sync Soal dengan Pivot
@@ -151,6 +153,7 @@ class UjianController extends Controller
             'soal_id' => 'required|array|min:1',
             'soal_id.*' => 'exists:soals,id',
             'acak_soal' => 'nullable|boolean',
+            'jenis_ujian' => 'nullable|in:reguler,tryout',
         ]);
 
         DB::beginTransaction();
@@ -162,6 +165,7 @@ class UjianController extends Controller
                 'mulai' => $request->mulai,
                 'selesai' => $request->selesai,
                 'acak_soal' => $request->has('acak_soal'),
+                'jenis_ujian' => $request->jenis_ujian ?? 'reguler',
             ]);
 
             // Sync Soal dengan Pivot

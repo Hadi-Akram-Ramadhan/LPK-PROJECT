@@ -52,6 +52,14 @@
                     <input type="number" name="durasi" id="durasi" value="{{ old('durasi', $ujian->durasi) }}" required min="1" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">
                 </div>
 
+                <div>
+                    <label for="jenis_ujian" class="block text-sm font-medium text-slate-700 mb-1">Jenis Ujian <span class="text-red-500">*</span></label>
+                    <select name="jenis_ujian" id="jenis_ujian" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md" required>
+                        <option value="reguler" {{ old('jenis_ujian', $ujian->jenis_ujian ?? 'reguler') == 'reguler' ? 'selected' : '' }}>Ujian Reguler</option>
+                        <option value="tryout" {{ old('jenis_ujian', $ujian->jenis_ujian ?? 'reguler') == 'tryout' ? 'selected' : '' }}>Try-Out</option>
+                    </select>
+                </div>
+
                 <div class="bg-slate-50 p-4 border border-slate-200 rounded-lg space-y-4">
                     <div>
                         <label for="mulai" class="block text-sm font-medium text-slate-700 mb-1">Jadwal Mulai Ujian (Opsional)</label>
