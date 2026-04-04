@@ -42,6 +42,7 @@
             </span>
         </div>
     </div>
+    @if($paketSoal->guru_id === auth()->id())
     <div style="display:flex;gap:10px;">
         <a href="{{ route('guru.soal.create', ['paket' => $paketSoal->id]) }}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#2563eb;color:#fff;">
             <svg style="width:15px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
@@ -52,6 +53,7 @@
             Import Excel
         </a>
     </div>
+    @endif
 </div>
 
 {{-- Soal List --}}
@@ -59,9 +61,11 @@
 <div style="background:#fff;border:1px dashed #e2e8f0;border-radius:14px;padding:48px;text-align:center;">
     <svg style="width:40px;height:40px;color:#cbd5e1;margin:0 auto 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
     <p style="color:#94a3b8;font-size:14px;margin:0 0 16px;">Belum ada soal dalam paket ini.</p>
+    @if($paketSoal->guru_id === auth()->id())
     <a href="{{ route('guru.soal.create', ['paket' => $paketSoal->id]) }}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#2563eb;color:#fff;">
         + Tambah Soal Pertama
     </a>
+    @endif
 </div>
 @else
 <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;">
@@ -118,6 +122,7 @@
                 </td>
                 <td style="padding:16px 20px;font-size:14px;font-weight:600;color:#334155;">{{ $soal->poin }}</td>
                 <td style="padding:16px 20px;">
+                    @if($paketSoal->guru_id === auth()->id())
                     <div style="display:flex;gap:6px;">
                         <a href="{{ route('guru.soal.edit', $soal) }}" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid #e2e8f0;color:#2563eb;text-decoration:none;">Edit</a>
                         <form action="{{ route('guru.soal.destroy', $soal) }}" method="POST" onsubmit="return confirm('Hapus soal ini?')">
@@ -125,6 +130,9 @@
                             <button type="submit" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;border:none;background:#fee2e2;color:#ef4444;cursor:pointer;">Hapus</button>
                         </form>
                     </div>
+                    @else
+                        <span style="font-size:12px;color:#94a3b8;font-style:italic;">Hanya Lihat</span>
+                    @endif
                 </td>
             </tr>
             @endforeach

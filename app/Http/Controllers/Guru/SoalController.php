@@ -50,6 +50,12 @@ class SoalController extends Controller
             'audio_path'    => 'nullable|string',
         ]);
 
+        // Security check: Ensure the guru owns the destination package
+        $paketSoal = PaketSoal::findOrFail($request->paket_soal_id);
+        if ($paketSoal->guru_id !== auth()->id()) {
+            return back()->with('error', 'Anda tidak memiliki akses ke paket soal ini.')->withInput();
+        }
+
         DB::beginTransaction();
         try {
             $soal = Soal::create([

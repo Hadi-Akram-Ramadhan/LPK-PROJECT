@@ -11,8 +11,8 @@ class PaketSoalController extends Controller
 {
     public function index()
     {
-        $pakets = PaketSoal::where('guru_id', auth()->id())
-            ->withCount('soals')
+        $pakets = PaketSoal::withCount('soals')
+            ->with('guru') // Load guru for 'Oleh' display
             ->latest()
             ->get();
 
@@ -43,10 +43,6 @@ class PaketSoalController extends Controller
 
     public function show(PaketSoal $paketSoal)
     {
-        // Pastikan guru hanya bisa lihat paket miliknya
-        if ($paketSoal->guru_id !== auth()->id()) {
-            abort(403);
-        }
         $soals = $paketSoal->soals()->with('pilihanJawabans')->latest()->get();
         return view('guru.paket_soal.show', compact('paketSoal', 'soals'));
     }
