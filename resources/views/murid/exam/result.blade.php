@@ -1,63 +1,208 @@
 @extends('layouts.murid')
 
 @section('header')
-<div class="flex items-center">
-    <svg class="h-6 w-6 text-slate-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-    <span>Rekap Hasil Ujian</span>
+<div style="display: flex; align-items: center; color: #64748b;">
+    <svg style="width: 24px; height: 24px; margin-right: 8px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <span style="font-weight: 600;">Hasil Ujian Anda</span>
 </div>
 @endsection
 
 @section('content')
 
-@if(session('success'))
-<div class="mb-6 bg-green-50 border-l-4 border-green-400 p-4 shadow-sm">
-    <div class="flex">
-        <div class="ml-3">
-            <p class="text-sm text-green-700 font-medium">{{ session('success') }}</p>
-        </div>
-    </div>
-</div>
-@endif
+<style>
+    .result-container {
+        padding: 40px 20px;
+        max-width: 950px;
+        margin: 0 auto;
+    }
+    .result-card {
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+        overflow: hidden;
+        display: flex;
+        min-height: 520px;
+        border: 1px solid #e2e8f0;
+    }
+    .result-left {
+        width: 42%;
+        background: #0f172a;
+        color: #ffffff;
+        padding: 60px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+    }
+    .result-right {
+        width: 58%;
+        padding: 60px 50px;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .score-badge {
+        background: #1e293b;
+        border-radius: 20px;
+        padding: 30px 40px;
+        margin: 24px 0;
+        width: 100%;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .score-value {
+        font-size: 80px;
+        font-weight: 900;
+        line-height: 1;
+        display: block;
+        margin-top: 8px;
+        color: #ffffff;
+    }
+    .status-pill {
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        padding: 6px 16px;
+        background: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+        border-radius: 40px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+    .btn-dashboard {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0f172a;
+        color: white;
+        text-decoration: none;
+        padding: 18px 30px;
+        border-radius: 16px;
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: 1px;
+        transition: transform 0.2s, background 0.2s;
+        margin-top: 20px;
+    }
+    .btn-dashboard:hover {
+        background: #000000;
+        transform: translateY(-2px);
+    }
+    .info-grid {
+        display: flex;
+        gap: 30px;
+        margin-top: 30px;
+    }
+    .info-item {
+        display: flex;
+        align-items: center;
+    }
+    .info-icon {
+        background: #f8fafc;
+        padding: 10px;
+        border-radius: 12px;
+        margin-right: 14px;
+        border: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .alert-box {
+        background: #fffbeb;
+        border: 1px solid #fef3c7;
+        padding: 20px;
+        border-radius: 16px;
+        margin-top: 30px;
+        display: flex;
+        gap: 14px;
+    }
 
-<div class="mt-8">
-    <div class="max-w-3xl mx-auto rounded-2xl shadow-xl overflow-hidden text-center justify-center p-0 flex flex-col items-center pb-8 border border-slate-200">
-        <div class="bg-gradient-to-r from-accent-600 to-accent-800 w-full py-16 text-white text-center">
-            <h1 class="text-xl md:text-3xl font-black uppercase tracking-widest opacity-90">Ujian Telah Selesai</h1>
-            <p class="mt-2 text-accent-100 font-medium max-w-lg mx-auto">{{ $ujian->judul }}</p>
-        </div>
+    @media (max-width: 768px) {
+        .result-card {
+            flex-direction: column;
+        }
+        .result-left, .result-right {
+            width: 100%;
+            padding: 40px 24px;
+        }
+        .result-left {
+            min-height: auto;
+        }
+    }
+</style>
+
+<div class="result-container">
+    <div class="result-card">
         
-        <div class="p-8 w-full">
+        {{-- Left Area --}}
+        <div class="result-left">
+            <div class="status-pill">Ujian Selesai</div>
+            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 10px; line-height: 1.3;">Terima Kasih Telah Mengerjakan!</h2>
             
-            <div class="bg-slate-50 border border-slate-200 p-6 rounded-xl mx-auto max-w-sm mb-6 -mt-16 relative z-10 shadow-md">
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Skor Akhir Anda</span>
-                <div class="mt-2 flex items-baseline justify-center">
-                    <span class="text-7xl font-black text-slate-900 tracking-tight">{{ $ujian_peserta->skor }}</span>
+            <div class="score-badge">
+                <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Skor Akhir Anda</span>
+                <span class="score-value">{{ $ujian_peserta->skor }}</span>
+            </div>
+            
+            <p style="font-size: 13px; color: #94a3b8; line-height: 1.6; max-width: 240px;">Poin ini dihitung secara otomatis oleh sistem kami.</p>
+        </div>
+
+        {{-- Right Area --}}
+        <div class="result-right">
+            <div>
+                <span style="font-size: 10px; font-weight: 800; color: #2563eb; background: #eff6ff; padding: 4px 12px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Ringkasan Sesi</span>
+                <h3 style="font-size: 28px; font-weight: 900; color: #0f172a; margin-top: 15px; margin-bottom: 30px; line-height: 1.2;">{{ $ujian->judul }}</h3>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <svg style="width: 20px; height: 20px; color: #94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <div>
+                            <p style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin: 0;">Waktu Akses</p>
+                            <p style="font-size: 13px; font-weight: 700; color: #334155; margin: 0;">{{ $ujian_peserta->mulai_at ? \Carbon\Carbon::parse($ujian_peserta->mulai_at)->format('H:i') : '-' }} - {{ $ujian_peserta->selesai_at ? \Carbon\Carbon::parse($ujian_peserta->selesai_at)->format('H:i') : '-' }}</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <svg style="width: 20px; height: 20px; color: #94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01m-.01 4h.01"></path></svg>
+                        </div>
+                        <div>
+                            <p style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin: 0;">Jumlah Soal</p>
+                            <p style="font-size: 13px; font-weight: 700; color: #334155; margin: 0;">{{ $ujian->soals()->count() }} Soal</p>
+                        </div>
+                    </div>
                 </div>
-                
+
                 @if($adaEssay)
-                <div class="mt-4 bg-yellow-50 text-yellow-800 border-l-4 border-yellow-400 p-3 text-left">
-                    <p class="text-xs italic">Catatan: Ujian ini mengandung soal Teks Praktik / Essay. Nilai yang Anda lihat saat ini mungkin bertambah setelah guru Anda menilai soal essay secara spesifik.</p>
+                <div class="alert-box">
+                    <svg style="width: 20px; height: 20px; color: #f59e0b; margin-top: 2px; flex-shrink: 0;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                    <div>
+                        <h4 style="font-size: 12px; font-weight: 800; color: #92400e; text-transform: uppercase; margin: 0 0 6px;">Informasi Nilai</h4>
+                        <p style="font-size: 13px; color: #b45309; line-height: 1.5; margin: 0; font-style: italic;">Ujian ini mengandung soal Essay. Skor akhir mungkin bertambah setelah guru menilai jawaban manual Anda.</p>
+                    </div>
                 </div>
                 @else
-                <div class="mt-4 text-xs text-slate-500">Nilai sudah final berdasarkan penilaian otomatis sistem (PG & MC).</div>
+                <div style="margin-top: 30px; padding: 16px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; color: #475569; font-size: 13px; font-style: italic; border: 1px solid #e2e8f0;">
+                    <svg style="width: 18px; height: 18px; margin-right: 10px; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    Skor ini bersifat final berdasarkan penilaian otomatis sistem.
+                </div>
                 @endif
             </div>
 
-            <div class="grid grid-cols-2 divide-x divide-slate-100 border-t border-b border-slate-100 mb-8 py-4 w-full">
-                <div class="px-4">
-                    <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Mulai Ujian</div>
-                    <div class="text-sm font-medium text-slate-700">{{ $ujian_peserta->mulai_at ? \Carbon\Carbon::parse($ujian_peserta->mulai_at)->format('H:i') : '-' }} WIB</div>
-                </div>
-                <div class="px-4">
-                    <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Selesai Ujian</div>
-                    <div class="text-sm font-medium text-slate-700">{{ $ujian_peserta->selesai_at ? \Carbon\Carbon::parse($ujian_peserta->selesai_at)->format('H:i') : '-' }} WIB</div>
-                </div>
-            </div>
-            
-            <a href="{{ route('murid.dashboard') }}" class="inline-flex justify-center w-full max-w-xs items-center px-4 py-3 shadow-md border border-transparent text-sm font-medium rounded-md text-white bg-slate-800 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-colors">
-                Kembali ke Dashboard
+            <a href="{{ route('murid.dashboard') }}" class="btn-dashboard">
+                KEMBALI KE DASHBOARD
+                <svg style="width: 18px; height: 18px; margin-left: 10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </a>
         </div>
+
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <p style="font-size: 13px; color: #94a3b8;">Ada masalah dengan hasil Anda? <a href="#" style="color: #2563eb; font-weight: 700; text-decoration: none;">Hubungi Admin LPK</a></p>
     </div>
 </div>
 

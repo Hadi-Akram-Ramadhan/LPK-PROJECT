@@ -79,6 +79,15 @@ class UjianController extends Controller
     public function update(Request $request, Ujian $ujian)
     {
         $ujian->update($request->all());
+        
+        // Sync Soal
+        $soalIds = $request->input('soal_ids', []);
+        $syncData = [];
+        foreach($soalIds as $index => $id) {
+            $syncData[$id] = ['urutan' => $index + 1];
+        }
+        $ujian->soals()->sync($syncData);
+
         return redirect()->route('admin.ujian.index')->with('success', 'Ujian berhasil diperbarui.');
     }
 

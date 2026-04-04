@@ -8,13 +8,13 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: #f0f4f8; color: #334155; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f4f8; color: #334155; font-size: 15px; }
         .adm-wrap { display: flex; min-height: 100vh; }
 
         .adm-side {
@@ -42,7 +42,7 @@
         .side-section-label { padding: 18px 14px 6px; font-size: 10px; font-weight: 700; color: #475569; letter-spacing: 1.5px; text-transform: uppercase; }
 
         .side-logout { padding: 20px 14px; margin-top: auto; }
-        .side-logout-btn { display: flex; align-items: center; width: 100%; padding: 11px 14px; background: transparent; border: none; color: #f87171; border-radius: 10px; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: background 0.15s; font-family: 'Inter', sans-serif; }
+        .side-logout-btn { display: flex; align-items: center; width: 100%; padding: 11px 14px; background: transparent; border: none; color: #f87171; border-radius: 10px; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: background 0.15s; font-family: 'Poppins', sans-serif; }
         .side-logout-btn:hover { background: rgba(248,113,113,0.1); }
         .side-logout-btn svg { width: 20px; height: 20px; margin-right: 14px; }
 
@@ -72,7 +72,7 @@
                 </div>
                 <div class="side-brand-text">
                     <h1>LPK URISOWON</h1>
-                    <p>Dashboard Admin</p>
+                    <p>Panel Guru</p>
                 </div>
             </div>
 
@@ -89,7 +89,7 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                     Dashboard
                 </a>
-                <a href="{{ route('guru.soal.index') }}" class="side-link {{ request()->routeIs('guru.soal.*') ? 'active' : '' }}">
+                <a href="{{ route('guru.paket-soal.index') }}" class="side-link {{ request()->is('guru/paket-soal*', 'guru/soal*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Bank Soal
                 </a>
