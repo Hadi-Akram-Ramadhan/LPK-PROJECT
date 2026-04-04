@@ -156,34 +156,36 @@
                             </div>
                         </div>
                         
-                        <div class="max-h-[500px] overflow-y-auto custom-scrollbar" id="soalListContainer">
+                        <div class="max-h-[400px] overflow-y-auto custom-scrollbar" id="soalListContainer">
                             @forelse($paketSoals as $paket)
                                 <div class="bg-slate-50/30 px-4 py-2 border-b border-slate-100 flex justify-between items-center group-header">
                                     <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{{ $paket->nama }}</span>
                                     <button type="button" class="btn-check-group text-[10px] font-bold text-accent-600 hover:text-accent-800 uppercase" data-target=".paket-id-{{ $paket->id }}">Centang Grup</button>
                                 </div>
-                                <ul class="divide-y divide-slate-100">
-                                    @foreach($paket->soals as $soal)
-                                        <li class="p-4 hover:bg-blue-50/30 transition-colors soal-item" data-package-id="{{ $paket->id }}">
-                                            <div class="flex items-start">
-                                                <div class="flex-shrink-0 pt-0.5">
+                                <table class="w-full text-left" style="border-collapse: collapse;">
+                                    <tbody class="divide-y divide-slate-100">
+                                        @foreach($paket->soals as $soal)
+                                            <tr class="hover:bg-blue-50/30 transition-colors soal-item" data-package-id="{{ $paket->id }}">
+                                                <td class="p-4 w-10">
                                                     <input id="soal_{{ $soal->id }}" name="soal_id[]" type="checkbox" value="{{ $soal->id }}" 
-                                                        class="item_soal paket-id-{{ $paket->id }} h-5 w-5 text-accent-600 focus:ring-accent-500 border-slate-300 rounded cursor-pointer transition-all" 
+                                                        class="item_soal paket-id-{{ $paket->id }} h-5 w-5 text-accent-600 focus:ring-accent-500 border-slate-300 rounded cursor-pointer" 
                                                         {{ (is_array(old('soal_id')) && in_array($soal->id, old('soal_id'))) ? 'checked' : '' }}>
-                                                </div>
-                                                <label for="soal_{{ $soal->id }}" class="ml-4 flex-1 flex flex-col cursor-pointer">
-                                                    <span class="text-sm font-medium text-slate-800 line-clamp-2 question-text leading-relaxed">{{ strip_tags($soal->pertanyaan) }}</span>
-                                                    <div class="mt-2 flex items-center space-x-3 text-xs">
-                                                        <span class="px-2 py-0.5 rounded-md font-bold {{ $soal->tipe == 'audio' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600' }}">
-                                                            {{ strtoupper(str_replace('_', ' ', $soal->tipe)) }}
-                                                        </span>
-                                                        <span class="text-slate-400 font-medium tracking-tight">{{ $soal->poin }} Poin</span>
-                                                    </div>
-                                                </label>
-                                            </div>
-                                        </li>
-                                    @endforeach
-                                </ul>
+                                                </td>
+                                                <td class="p-4 cursor-pointer" onclick="document.getElementById('soal_{{ $soal->id }}').click()">
+                                                    <label for="soal_{{ $soal->id }}" class="flex flex-col cursor-pointer">
+                                                        <span class="text-sm font-medium text-slate-800 line-clamp-2 question-text leading-relaxed">{{ strip_tags($soal->pertanyaan) }}</span>
+                                                        <div class="mt-2 flex items-center space-x-3 text-xs">
+                                                            <span class="px-2 py-0.5 rounded-md font-bold {{ $soal->tipe == 'audio' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600' }}">
+                                                                {{ strtoupper(str_replace('_', ' ', $soal->tipe)) }}
+                                                            </span>
+                                                            <span class="text-slate-400 font-medium tracking-tight">{{ $soal->poin }} Poin</span>
+                                                        </div>
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             @empty
                                 <div class="p-12 text-center">
                                     <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
@@ -198,11 +200,11 @@
             </div>
         </div>
 
-        <div class="pt-8 flex justify-end mt-8 border-t border-slate-200">
+        <div class="sticky bottom-0 bg-slate-50 border-t border-slate-200 p-4 -mx-8 -mb-8 mt-8 flex justify-end space-x-3 z-20">
             <a href="{{ route('guru.ujian.index') }}" class="bg-white border border-slate-300 rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500">
                 Batal
             </a>
-            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500">
+            <button type="submit" class="inline-flex justify-center py-2 px-8 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500">
                 Simpan & Distribusikan Ujian
             </button>
         </div>
@@ -294,9 +296,9 @@
             });
             
             // Hide/Show headers if all childs hidden
-            document.querySelectorAll('#soalListContainer ul').forEach(ul => {
-                const hasVisible = Array.from(ul.querySelectorAll('.soal-item')).some(li => li.style.display !== 'none');
-                const header = ul.previousElementSibling;
+            document.querySelectorAll('#soalListContainer table').forEach(table => {
+                const hasVisible = Array.from(table.querySelectorAll('.soal-item')).some(tr => tr.style.display !== 'none');
+                const header = table.previousElementSibling;
                 if (header && header.classList.contains('group-header')) {
                     header.style.display = hasVisible ? 'flex' : 'none';
                 }

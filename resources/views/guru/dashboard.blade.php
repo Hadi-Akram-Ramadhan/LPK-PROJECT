@@ -27,36 +27,62 @@
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200">
-            <h2 class="text-lg font-semibold text-slate-800">Jadwal Ujian Mendatang</h2>
-        </div>
-        <div class="p-6">
-            @if($upcomingUjian)
-            <div class="bg-slate-50 rounded-lg p-4 border border-slate-100 flex justify-between items-center mb-4">
-                <div>
-                    <h3 class="font-semibold text-slate-800 text-lg">{{ $upcomingUjian->judul }}</h3>
-                    <p class="text-slate-500 text-sm mt-1 flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        {{ $upcomingUjian->mulai->format('d M Y, H:i') }} ({{ $upcomingUjian->durasi }} Menit)
-                    </p>
+    <div class="lg:col-span-2 space-y-6">
+        {{-- Ujian yang Akan Datang --}}
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200">
+                <h2 class="text-lg font-semibold text-slate-800">Jadwal Ujian Mendatang</h2>
+            </div>
+            <div class="p-6">
+                @forelse($upcomingExams as $ujian)
+                <div class="bg-blue-50/50 rounded-lg p-4 border border-blue-100 flex justify-between items-center mb-4 last:mb-0">
+                    <div>
+                        <h3 class="font-semibold text-slate-800 text-lg">{{ $ujian->judul }}</h3>
+                        <p class="text-blue-600 text-sm mt-1 flex items-center font-medium">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            {{ \Carbon\Carbon::parse($ujian->mulai)->format('d M Y, H:i') }} ({{ $ujian->durasi }} Menit)
+                        </p>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">Mendatang</span>
                 </div>
-                <a href="{{ route('guru.ujian.edit', $upcomingUjian) }}" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900 px-4 py-2 rounded shadow-sm text-sm font-medium transition-colors">
-                    Edit
+                @empty
+                <div class="text-center py-6 border-2 border-dashed border-slate-200 rounded-lg text-slate-400 font-medium">
+                    Belum ada ujian mendatang
+                </div>
+                @endforelse
+                
+                <a href="{{ route('guru.ujian.create') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 w-full mt-4 transition-colors">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Buat Ujian Baru
                 </a>
             </div>
-            @else
-            <div class="text-center py-6 border-2 border-dashed border-slate-200 rounded-lg mb-4 text-slate-400 font-medium">
-                Belum ada ujian mendatang
+        </div>
+
+        {{-- Ujian Terbaru --}}
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-slate-800">Ujian Terbaru (Baru Dibuat)</h2>
+                <a href="{{ route('guru.ujian.index') }}" class="text-xs font-bold text-accent-600 uppercase tracking-widest hover:underline">Kelola</a>
             </div>
-            @endif
-            
-            <a href="{{ route('guru.ujian.create') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 w-full mt-2 transition-colors">
-                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Buat Ujian Baru
-            </a>
+            <div class="p-6">
+                @forelse($latestExams as $ujian)
+                <div class="bg-slate-50 rounded-lg p-4 border border-slate-100 flex justify-between items-center mb-4 last:mb-0">
+                    <div>
+                        <h3 class="font-semibold text-slate-800 text-lg">{{ $ujian->judul }}</h3>
+                        <p class="text-slate-500 text-sm mt-1 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Dibuat {{ $ujian->created_at->diffForHumans() }}
+                        </p>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center py-6 border-2 border-dashed border-slate-200 rounded-lg text-slate-400 font-medium">
+                    Belum ada ujian terbaru
+                </div>
+                @endforelse
+            </div>
         </div>
     </div>
     

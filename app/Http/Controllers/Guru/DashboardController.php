@@ -26,16 +26,20 @@ class DashboardController extends Controller
             $q->where('guru_id', $user->id);
         })->where('status', 'pengerjaan')->count();
         
-        // Ujian mendatang milik guru ini (Ambil 1 yang paling dekat)
-        $upcomingUjian = Ujian::where('guru_id', $user->id)
+        // Ujian mendatang milik guru ini (Ambil 5 yang paling dekat)
+        $upcomingExams = Ujian::where('guru_id', $user->id)
             ->where('mulai', '>', now())
             ->orderBy('mulai', 'asc')
-            ->first();
+            ->take(5)
+            ->get();
+
+        // Ujian Terbaru (Paling baru dibuat)
+        $latestExams = Ujian::where('guru_id', $user->id)
+            ->latest()
+            ->take(5)
+            ->get();
 
         // Perlu Dinilai (Essay yang belum ada nilainya di ujian milik guru ini)
-        // Kita hitung dari UjianPeserta yang statusnya 'selesai' namun belum ada grading
-        // Note: Implementasi grading spesifik mungkin berbeda tergantung skema LPK ini
-        // Untuk sekarang, kita hitung UjianPeserta 'selesai' yang dikelola guru ini
         $perluDinilai = UjianPeserta::whereHas('ujian', function($q) use ($user) {
             $q->where('guru_id', $user->id);
         })->where('status', 'selesai')->whereNull('skor')->count();
@@ -44,7 +48,8 @@ class DashboardController extends Controller
             'totalSoal', 
             'totalUjian', 
             'sedangUjianCount', 
-            'upcomingUjian',
+            'upcomingExams',
+            'latestExams',
             'perluDinilai'
         ));
     }

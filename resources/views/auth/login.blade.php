@@ -17,12 +17,11 @@
 
         body {
             font-family: 'Poppins', sans-serif;
+            font-size: 15px;
             min-height: 100vh;
             background: #fff;
             overflow: hidden;
         }
-
-ight: 1.7; }
 
         /* ─── SPLIT LAYOUT ─── */
         .login-wrapper {
