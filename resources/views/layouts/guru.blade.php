@@ -21,10 +21,9 @@
             width: 260px; background: #111827; display: flex; flex-direction: column;
             flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; z-index: 50; overflow-y: auto;
         }
-        .side-brand { display: flex; align-items: center; padding: 28px 24px 12px; }
-        .side-brand-icon { width: 38px; height: 38px; border-radius: 10px; background: #1e293b; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; }
-        .side-brand-icon svg { width: 20px; height: 20px; color: #fff; }
-        .side-brand-text h1 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; }
+        .side-brand { display: flex; align-items: center; padding: 28px 20px 12px; }
+        .side-brand-logo { width: 42px; height: 42px; object-fit: contain; margin-right: 12px; flex-shrink: 0; }
+        .side-brand-text h1 { font-size: 16px; font-weight: 800; color: #fff; line-height: 1.2; letter-spacing: -0.2px; }
         .side-brand-text p { font-size: 10px; color: #60a5fa; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
 
         .side-profile { display: flex; align-items: center; padding: 20px 24px; margin-bottom: 6px; }
@@ -67,7 +66,11 @@
     <div class="adm-wrap">
         <aside class="adm-side">
             <div class="side-brand">
+<<<<<<< HEAD
                 <img src="{{ asset('logo.png') }}" alt="Logo" class="side-brand-logo" style="width: 42px; height: 42px; object-fit: contain; margin-right: 12px; flex-shrink: 0;">
+=======
+                <img src="{{ asset('logo.png') }}" alt="Logo" class="side-brand-logo">
+>>>>>>> b90f6ff449e2a3fa195860fdcf2abb6ecdd92807
                 <div class="side-brand-text">
                     <h1 style="font-size: 16px; font-weight: 800; color: #fff; line-height: 1.2; letter-spacing: -0.2px;">LPK URISOWON</h1>
                     <p>Panel Guru</p>

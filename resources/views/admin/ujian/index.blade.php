@@ -26,6 +26,7 @@
         <thead>
             <tr>
                 <th>Judul Ujian</th>
+                <th>Jenis</th>
                 <th>Kelas</th>
                 <th>Durasi</th>
                 <th>Jumlah Soal</th>
@@ -39,6 +40,11 @@
                 <td>
                     <div style="font-weight: 600; color: #1e293b;">{{ $u->judul }}</div>
                     <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">{{ $u->kategori ?? 'Umum' }}</div>
+                </td>
+                <td>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase {{ $u->jenis_ujian === 'tryout' ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-purple-100 text-purple-800 border-purple-200' }}">
+                        {{ $u->jenis_ujian }}
+                    </span>
                 </td>
                 <td><span class="badge badge-blue">Semua Kelas</span></td>
                 <td><span class="badge badge-gray">{{ $u->durasi }} Menit</span></td>

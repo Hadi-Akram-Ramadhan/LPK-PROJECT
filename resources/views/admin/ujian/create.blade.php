@@ -14,9 +14,9 @@
             </div>
             <div>
                 <label class="block text-sm font-bold mb-2 text-slate-700">Jenis Ujian</label>
-                <select name="jenis_ujian" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" required>
+                <select name="jenis_ujian" id="jenis_ujian_selector" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" required>
                     <option value="reguler">Ujian Reguler</option>
-                    <option value="tryout">Try-Out</option>
+                    <option value="tryout">Try-Out (Akses Bebas)</option>
                 </select>
             </div>
         </div>
@@ -42,7 +42,7 @@
             </div>
         </div>
 
-        <div class="grid-2 mb-8">
+        <div class="grid-2 mb-8" id="time_restricted_section">
             <div>
                 <label class="block text-sm font-bold mb-2 text-slate-700">Waktu Mulai</label>
                 <input type="datetime-local" name="mulai" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500">
@@ -207,6 +207,21 @@
                     }
                 });
             });
+
+            // Logic to hide time for Tryout
+            const typeSelector = document.getElementById('jenis_ujian_selector');
+            const timeSection = document.getElementById('time_restricted_section');
+            
+            function toggleTimeSection() {
+                if (typeSelector.value === 'tryout') {
+                    timeSection.style.display = 'none';
+                } else {
+                    timeSection.style.display = 'grid';
+                }
+            }
+
+            typeSelector.addEventListener('change', toggleTimeSection);
+            toggleTimeSection(); // Initial call
         });
         </script>
 

@@ -27,7 +27,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Admin Routes
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+<<<<<<< HEAD
         Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+=======
+        Route::get('/dashboard', function () {
+            $totalSiswa = \App\Models\User::where('role', 'murid')->count();
+            $totalUjian = \App\Models\Ujian::count();
+            $totalSoal = \App\Models\Soal::count();
+            
+            // Hitung rata-rata nilai dari semua peserta yang sudah selesai
+            $avgScore = \App\Models\UjianPeserta::where('status', 'selesai')->avg('skor') ?? 0;
+            
+            $ujianTerbaru = \App\Models\Ujian::latest()->take(5)->get();
+            
+            return view('admin.dashboard', compact('totalSiswa', 'totalUjian', 'totalSoal', 'avgScore', 'ujianTerbaru'));
+        })->name('dashboard');
+>>>>>>> b90f6ff449e2a3fa195860fdcf2abb6ecdd92807
 
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
         Route::get('/import-users', [\App\Http\Controllers\Admin\UserController::class, 'import'])->name('users.import');
