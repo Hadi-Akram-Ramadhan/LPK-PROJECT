@@ -168,12 +168,12 @@ class ImageController extends Controller
             Storage::disk('public')->move($oldPath, $newPath);
 
             // Relational Sync ke Database Soals
-            \App\Models\Soal::where('gambar_path', $oldName)->update(['gambar_path' => $newName]);
+            \App\Models\Soal::where('gambar_path', 'gambar/' . $oldName)->update(['gambar_path' => 'gambar/' . $newName]);
             
             // Relational Sync ke Pilihan Jawabans
-            \App\Models\PilihanJawaban::where('media_path', $oldName)
+            \App\Models\PilihanJawaban::where('media_path', 'gambar/' . $oldName)
                 ->where('media_tipe', 'gambar')
-                ->update(['media_path' => $newName]);
+                ->update(['media_path' => 'gambar/' . $newName]);
 
             return back()->with('success', "Nama file berhasil diubah dari {$oldName} ke {$newName}. Data relasional pada soal juga berhasil disinkronisasi.");
         }

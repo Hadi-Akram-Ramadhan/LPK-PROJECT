@@ -452,7 +452,7 @@
                     </div>
                 </div>
 
-                @if($currentSoal->tipe === 'audio' && $currentSoal->audio_path)
+                @if($currentSoal->audio_path)
                     <div class="audio-wrapper">
                         <audio controls controlsList="nodownload" class="audio-player">
                             <source src="{{ asset('storage/' . $currentSoal->audio_path) }}" type="audio/mpeg">

@@ -154,12 +154,12 @@ class AudioController extends Controller
             Storage::disk('public')->move($oldPath, $newPath);
 
             // Relational Sync ke Database Soals
-            \App\Models\Soal::where('audio_path', $oldName)->update(['audio_path' => $newName]);
+            \App\Models\Soal::where('audio_path', 'audio/' . $oldName)->update(['audio_path' => 'audio/' . $newName]);
             
             // Relational Sync ke Pilihan Jawabans
-            \App\Models\PilihanJawaban::where('media_path', $oldName)
+            \App\Models\PilihanJawaban::where('media_path', 'audio/' . $oldName)
                 ->where('media_tipe', 'audio')
-                ->update(['media_path' => $newName]);
+                ->update(['media_path' => 'audio/' . $newName]);
 
             return back()->with('success', "Nama file Audio berhasil diubah dari {$oldName} ke {$newName}. Data relasional pada soal juga berhasil disinkronisasi.");
         }
