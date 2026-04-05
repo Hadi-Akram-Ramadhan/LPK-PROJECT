@@ -143,15 +143,47 @@
     .result-brand span { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: #fff; }
 
     @media (max-width: 768px) {
+        .result-container {
+            padding: 20px 15px;
+        }
         .result-card {
             flex-direction: column;
+            border-radius: 20px;
+            min-height: auto;
         }
         .result-left, .result-right {
             width: 100%;
-            padding: 40px 24px;
+            padding: 30px 24px;
         }
         .result-left {
-            min-height: auto;
+            padding-bottom: 35px;
+        }
+        .result-brand {
+            margin-bottom: 20px;
+        }
+        .result-brand img { width: 32px; height: 32px; }
+        .result-brand span { font-size: 15px; }
+        
+        .result-left h2 { font-size: 20px !important; }
+        .score-value { font-size: 64px; margin-top: 4px; }
+        .score-badge { padding: 20px; margin: 15px 0; border-radius: 16px; }
+        
+        .result-right { padding-top: 25px; }
+        .result-right h3 { font-size: 22px !important; margin-top: 10px !important; margin-bottom: 20px !important; }
+        
+        .info-grid {
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+        }
+        .btn-dashboard {
+            padding: 15px 20px;
+            font-size: 13px;
         }
     }
 
