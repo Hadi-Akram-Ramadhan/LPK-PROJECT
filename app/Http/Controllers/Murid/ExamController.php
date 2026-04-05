@@ -201,6 +201,29 @@ class ExamController extends Controller
         } else if ($soal->tipe === 'essay') {
             $dataUpdate['jawaban_text'] = $request->jawaban;
             // Essay dinilai manual oleh guru nanti.
+
+        } else if ($soal->tipe === 'short_answer') {
+            $jawabanMurid = trim(strtolower((string) $request->jawaban));
+            $dataUpdate['jawaban_text'] = $request->jawaban;
+            
+            // Multiple accepted keys separated by '|'
+            $kunciRaw  = $soal->jawaban_kunci ?? '';
+            $kunciList = array_filter(array_map('trim', explode('|', $kunciRaw)));
+
+            foreach ($kunciList as $kunci) {
+                $kunciNorm = strtolower($kunci);
+                // Exact match (case-insensitive)
+                if ($jawabanMurid === $kunciNorm) {
+                    $poinDidapat = $soal->poin;
+                    break;
+                }
+                // Fuzzy match — threshold 85%
+                similar_text($jawabanMurid, $kunciNorm, $percent);
+                if ($percent >= 85.0) {
+                    $poinDidapat = $soal->poin;
+                    break;
+                }
+            }
         }
 
         $dataUpdate['poin_didapat'] = $poinDidapat;

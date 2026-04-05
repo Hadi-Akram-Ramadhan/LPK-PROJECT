@@ -47,6 +47,8 @@ class SoalImport
                 $tipeEnum = 'pilihan_ganda_gambar';
             } elseif (Str::contains($tipeRaw, 'multiple')) {
                 $tipeEnum = 'multiple_choice';
+            } elseif (Str::contains($tipeRaw, 'short') || Str::contains($tipeRaw, 'singkat')) {
+                $tipeEnum = 'short_answer';
             } elseif (Str::contains($tipeRaw, 'essay') || Str::contains($tipeRaw, 'esai')) {
                 $tipeEnum = 'essay';
             } elseif (Str::contains($tipeRaw, 'audio') || Str::contains($tipeRaw, 'choukai')) {
@@ -58,10 +60,11 @@ class SoalImport
             // 4=Opsi A, 5=Media A, 6=Opsi B, 7=Media B, 8=Opsi C, 9=Media C, 10=Opsi D, 11=Media D, 12=Opsi E, 13=Media E,
             // 14=Jawaban Benar, 15=Poin
             
-            $poin      = max(1, (int) ($row[15] ?? 10));
-            $gambarRaw = trim($row[2] ?? '');
-            $audioRaw  = trim($row[3] ?? '');
-            
+            $poin         = max(1, (int) ($row[15] ?? 10));
+            $gambarRaw    = trim($row[2] ?? '');
+            $audioRaw     = trim($row[3] ?? '');
+            $jawabanKunci = trim($row[14] ?? ''); // Column O: used as kunci for short_answer
+
             $gambarPath = $gambarRaw !== '' ? 'gambar/' . $gambarRaw : null;
             $audioPath  = $audioRaw !== '' ? 'audio/' . $audioRaw : null;
 
@@ -75,9 +78,11 @@ class SoalImport
                     'poin'          => $poin,
                     'audio_path'    => $audioPath,
                     'gambar_path'   => $gambarPath,
+                    'jawaban_kunci' => $tipeEnum === 'short_answer' ? $jawabanKunci : null,
                 ]);
 
-                if ($tipeEnum !== 'essay') {
+                // Only create PilihanJawaban for types that use them (not essay or short_answer)
+                if (!in_array($tipeEnum, ['essay', 'short_answer'])) {
                     $opsi = [
                         'A' => ['teks' => trim($row[4] ?? ''),  'media' => trim($row[5] ?? '')],
                         'B' => ['teks' => trim($row[6] ?? ''),  'media' => trim($row[7] ?? '')],

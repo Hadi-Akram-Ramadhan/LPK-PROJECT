@@ -576,7 +576,19 @@
                 @elseif($currentSoal->tipe === 'essay')
                     <div style="padding: 35px; display: flex; flex-direction: column; height: 100%;">
                         <p style="font-size: 18px; margin-top: 0; color: #111;">Type Your Answer:</p>
-                        <textarea name="jawaban" form="answer-form" class="auto-save-trigger-typing" style="flex: 1; width: 100%; border: 1px solid #9ca3af; padding: 15px; font-size: 18px; resize: none; border-radius: 8px;"></textarea>
+                        <textarea name="jawaban" form="answer-form" class="auto-save-trigger-typing" style="flex: 1; width: 100%; border: 1px solid #9ca3af; padding: 15px; font-size: 18px; resize: none; border-radius: 8px;">{{ $jawabanSaatIni?->jawaban_text ?? '' }}</textarea>
+                    </div>
+                @elseif($currentSoal->tipe === 'short_answer')
+                    <div style="padding: 35px; display: flex; flex-direction: column; height: 100%;">
+                        <p style="font-size: 16px; margin-top: 0; color: #374151; font-weight: 600;">✏️ Jawaban Singkat:</p>
+                        <p style="font-size: 13px; color: #6b7280; margin-top: 0; margin-bottom: 16px;">Tulis jawaban Anda di bawah ini. Sistem akan menilai otomatis.<br>Tidak perlu khawatir soal huruf besar/kecil atau typo kecil.</p>
+                        <input type="text" name="jawaban" form="answer-form" 
+                            class="auto-save-trigger-typing"
+                            value="{{ $jawabanSaatIni?->jawaban_text ?? '' }}"
+                            autocomplete="off" autocorrect="off" spellcheck="false"
+                            placeholder="Ketik jawaban Anda di sini..."
+                            style="width: 100%; border: 2px solid #d1fae5; padding: 16px 18px; font-size: 18px; border-radius: 10px; outline: none; background: #f0fdf4; color: #065f46; font-weight: 500; transition: border-color 0.2s;"
+                            onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#d1fae5'">
                     </div>
                 @endif
             </div>

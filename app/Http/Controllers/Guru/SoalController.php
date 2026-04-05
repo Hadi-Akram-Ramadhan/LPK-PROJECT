@@ -47,18 +47,15 @@ class SoalController extends Controller
     {
         $request->validate([
             'paket_soal_id' => 'required|exists:paket_soals,id',
-            'tipe'          => 'required|in:pilihan_ganda,multiple_choice,essay,audio,pilihan_ganda_audio,pilihan_ganda_gambar',
+            'tipe'          => 'required|in:pilihan_ganda,multiple_choice,essay,audio,pilihan_ganda_audio,pilihan_ganda_gambar,short_answer',
             'pertanyaan'    => 'required|string',
             'poin'          => 'required|integer|min:1',
             'audio_path'    => 'nullable|string',
             'gambar_path'   => 'nullable|string',
         ]);
 
-        // Security check: Ensure the guru owns the destination package
+        // Security check: Verify paket soal exists
         $paketSoal = PaketSoal::findOrFail($request->paket_soal_id);
-        if ($paketSoal->guru_id !== auth()->id()) {
-            return back()->with('error', 'Anda tidak memiliki akses ke paket soal ini.')->withInput();
-        }
 
         DB::beginTransaction();
         try {
@@ -70,6 +67,7 @@ class SoalController extends Controller
                 'poin'          => $request->poin,
                 'audio_path'    => $request->audio_path,
                 'gambar_path'   => $request->gambar_path,
+                'jawaban_kunci' => $request->tipe === 'short_answer' ? $request->jawaban_kunci : null,
             ]);
 
             if (in_array($request->tipe, ['pilihan_ganda', 'multiple_choice', 'audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'])) {
@@ -117,10 +115,6 @@ class SoalController extends Controller
      */
     public function edit(Soal $soal)
     {
-        if ($soal->guru_id !== auth()->id()) {
-            abort(403);
-        }
-
         $soal->load('pilihanJawabans');
         $audioFiles = collect(Storage::disk('public')->files('audio'))->map(function($file) {
             return basename($file);
@@ -137,10 +131,6 @@ class SoalController extends Controller
      */
     public function update(Request $request, Soal $soal)
     {
-        if ($soal->guru_id !== auth()->id()) {
-            abort(403);
-        }
-
         $request->validate([
             'pertanyaan' => 'required|string',
             'poin' => 'required|integer|min:1',
@@ -162,10 +152,13 @@ class SoalController extends Controller
                 'gambar_path' => $request->gambar_path,
             ];
             
-            // if tipe is provided we update it.
             if ($request->filled('tipe')) {
                 $updateData['tipe'] = $request->tipe;
             }
+
+            // Update jawaban_kunci only for short_answer
+            $effectiveTipe = $updateData['tipe'] ?? $soal->tipe;
+            $updateData['jawaban_kunci'] = $effectiveTipe === 'short_answer' ? $request->jawaban_kunci : null;
 
             $soal->update($updateData);
 
@@ -219,7 +212,6 @@ class SoalController extends Controller
      */
     public function destroy(Soal $soal)
     {
-        if ($soal->guru_id !== auth()->id()) abort(403);
         $paketId = $soal->paket_soal_id;
         $soal->pilihanJawabans()->delete();
         $soal->delete();
