@@ -14,6 +14,7 @@
             <thead class="bg-slate-50">
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Judul Ujian</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Dibuat Oleh</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Durasi</th>
                     <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Peserta/Murid</th>
                     <th scope="col" class="relative px-6 py-3">
@@ -32,6 +33,14 @@
                             @else
                                 <span class="italic">Tanpa Jadwal Spesifik</span>
                             @endif
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="h-7 w-7 rounded-full bg-accent-100 flex items-center justify-center text-accent-700 text-[10px] font-bold mr-2">
+                                {{ strtoupper(substr($ujian->guru->name ?? 'A', 0, 1)) }}
+                            </div>
+                            <span class="text-xs text-slate-700 font-medium">{{ $ujian->guru->name ?? 'Admin' }}</span>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">

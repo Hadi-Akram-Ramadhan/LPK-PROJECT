@@ -42,6 +42,7 @@
             <thead class="bg-slate-50">
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Judul & Deskripsi</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Dibuat Oleh</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Durasi</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Jadwal (Mulai - Selesai)</th>
                     <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Jumlah Soal</th>
@@ -56,6 +57,14 @@
                     <td class="px-6 py-4">
                         <div class="text-sm font-bold text-slate-900 break-words max-w-sm">{{ $ujian->judul }}</div>
                         <div class="text-xs text-slate-500 mt-1 max-w-sm truncate">{{ $ujian->deskripsi ?? 'Tidak ada deskripsi' }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="h-7 w-7 rounded-full bg-accent-100 flex items-center justify-center text-accent-700 text-[10px] font-bold mr-2">
+                                {{ strtoupper(substr($ujian->guru->name ?? 'A', 0, 1)) }}
+                            </div>
+                            <span class="text-sm text-slate-700 font-medium">{{ $ujian->guru->name ?? 'Admin' }}</span>
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">

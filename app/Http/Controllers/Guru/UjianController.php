@@ -16,7 +16,7 @@ class UjianController extends Controller
      */
     public function index()
     {
-        $ujians = Ujian::where('guru_id', auth()->id())
+        $ujians = Ujian::with(['guru'])
             ->withCount('soals')
             ->latest()
             ->paginate(10);
@@ -116,9 +116,6 @@ class UjianController extends Controller
      */
     public function edit(Ujian $ujian)
     {
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(403);
-        }
 
         $ujian->load('soals');
         $selectedSoal = $ujian->soals->pluck('id')->toArray();
@@ -136,9 +133,6 @@ class UjianController extends Controller
      */
     public function update(Request $request, Ujian $ujian)
     {
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(403);
-        }
 
         $request->validate([
             'judul' => 'required|string|max:255',
@@ -188,9 +182,6 @@ class UjianController extends Controller
      */
     public function destroy(Ujian $ujian)
     {
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(403);
-        }
 
         $ujian->delete();
         return redirect()->route('guru.ujian.index')->with('success', 'Ujian berhasil dihapus.');
