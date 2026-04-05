@@ -10,10 +10,22 @@
 @section('content')
 
 <style>
+    /* Global overrides to isolate the result card */
+    .murid-nav, footer { display: none !important; }
+    .main-content { 
+        padding: 0 !important; 
+        margin: 0 !important; 
+        max-width: none !important; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        min-height: 100vh !important; 
+    }
+
     .result-container {
         padding: 40px 20px;
-        max-width: 950px;
-        margin: 0 auto;
+        max-width: 1080px; /* Increased from 950px */
+        width: 100%;
     }
     .result-card {
         background: #ffffff;
@@ -21,7 +33,7 @@
         box-shadow: 0 10px 40px rgba(0,0,0,0.12);
         overflow: hidden;
         display: flex;
-        min-height: 520px;
+        min-height: 580px; /* Increased from 520px */
         border: 1px solid #e2e8f0;
     }
     .result-left {
@@ -120,6 +132,16 @@
         gap: 14px;
     }
 
+    .result-brand { 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 12px; 
+        margin-bottom: 30px; 
+    }
+    .result-brand img { width: 40px; height: 40px; object-fit: contain; }
+    .result-brand span { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: #fff; }
+
     @media (max-width: 768px) {
         .result-card {
             flex-direction: column;
@@ -132,6 +154,75 @@
             min-height: auto;
         }
     }
+
+    /* RESPONSIVE LANDSCAPE MOBILE */
+    @media screen and (max-height: 500px) {
+        body { overflow: hidden !important; }
+        
+        .result-container {
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 98vh; /* Prevent address bar issues somewhat */
+        }
+        .result-card {
+            flex-direction: row !important;
+            min-height: auto !important;
+            height: 92vh;
+            width: 96vw;
+        }
+        .result-left {
+            width: 45% !important;
+            padding: 10px 20px !important;
+        }
+        .result-right {
+            width: 55% !important;
+            padding: 10px 20px !important;
+            justify-content: center;
+        }
+        .score-value { font-size: 36px !important; margin-top: 5px !important; }
+        .score-badge { padding: 10px !important; margin: 10px 0 !important; }
+        .status-pill { font-size: 8px !important; padding: 4px 10px !important; margin-bottom: 5px !important; }
+        .result-left h2 { font-size: 14px !important; margin-bottom: 5px !important; line-height: 1.2 !important; }
+        .result-left p { font-size: 10px !important; line-height: 1.3 !important; }
+        
+        .result-right h3 { font-size: 16px !important; margin: 6px 0 10px !important; }
+        .result-right > div > span { font-size: 8px !important; padding: 2px 8px !important; }
+        
+        .info-grid { margin-top: 8px !important; gap: 10px !important; }
+        .info-item p { font-size: 10px !important; margin: 0 !important; }
+        .info-item > div > p:first-child { font-size: 8px !important; margin-bottom: 2px !important; }
+        .info-icon { padding: 6px !important; margin-right: 10px !important; }
+        .info-icon svg { width: 14px !important; height: 14px !important; }
+        
+        .alert-box { 
+            margin-top: 10px !important; 
+            padding: 10px !important; 
+            gap: 10px !important;
+        }
+        .alert-box h4 { font-size: 10px !important; margin-bottom: 2px !important; }
+        .alert-box p { font-size: 10px !important; line-height: 1.2 !important; }
+        
+        .result-right > div:last-of-type:not(.btn-dashboard):not(.alert-box) { /* Untuk div "skor ini final" */
+            margin-top: 10px !important;
+            padding: 10px !important;
+            font-size: 10px !important;
+        }
+        
+        .btn-dashboard { 
+            margin-top: 12px !important; 
+            padding: 10px 15px !important; 
+            font-size: 11px !important; 
+        }
+        
+        .result-brand { margin-bottom: 10px !important; gap: 8px !important; }
+        .result-brand img { width: 24px !important; height: 24px !important; }
+        .result-brand span { font-size: 12px !important; }
+        
+        .bottom-contact { display: none !important; }
+        header { display: none !important; } /* Hide layout header */
+    }
 </style>
 
 <div class="result-container">
@@ -139,6 +230,11 @@
         
         {{-- Left Area --}}
         <div class="result-left">
+            <div class="result-brand">
+                <img src="{{ asset('logo.png') }}" alt="Logo LPK">
+                <span>LPK URISOWON</span>
+            </div>
+            
             <div class="status-pill">Ujian Selesai</div>
             <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 10px; line-height: 1.3;">Terima Kasih Telah Mengerjakan!</h2>
             
@@ -201,7 +297,7 @@
 
     </div>
     
-    <div style="text-align: center; margin-top: 30px;">
+    <div class="bottom-contact" style="text-align: center; margin-top: 30px;">
         <p style="font-size: 13px; color: #94a3b8;">Ada masalah dengan hasil Anda? <a href="#" style="color: #2563eb; font-weight: 700; text-decoration: none;">Hubungi Admin LPK</a></p>
     </div>
 </div>

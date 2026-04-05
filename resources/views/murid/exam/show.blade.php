@@ -301,9 +301,9 @@
         }
         .grid-btn:hover { background-color: #f3f4f6; }
         .grid-btn.answered {
-            background-color: #3b82f6;
-            color: #fff;
-            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #1d4ed8;
+            border-color: #93c5fd;
         }
         .grid-btn.current {
             border: 3px solid #111;
@@ -382,64 +382,68 @@
         /* RESPONSIVE LANDSCAPE MOBILE (MODIFIKASI DISINI) */
         @media screen and (max-height: 500px) {
             .cbt-container {
-                height: 100vh !important;
-                width: 100vw !important;
+                height: 90vh !important;
+                width: 96vw !important;
                 max-width: none !important;
-                border: none !important;
+                border: 1px solid #000 !important;
                 min-height: 0 !important;
-                display: flex !important;
-                flex-direction: column !important;
             }
             .cbt-header, .cbt-footer {
-                height: 35px !important;
-                flex-shrink: 0 !important;
+                height: 45px !important;
             }
-            .hdr-timer, .hdr-val, .hdr-btn-finish { font-size: 11px !important; }
-            .hdr-label { display: none !important; }
+            .hdr-timer, .hdr-val, .hdr-btn-finish { font-size: 14px !important; }
+            .hdr-label { display: inline-block !important; font-size: 10px !important; margin-right: 5px !important; }
             
-            .cbt-main {
-                flex-direction: row !important;
-                height: calc(100vh - 70px) !important;
-                overflow: hidden !important;
-            }
             .cbt-left {
-                flex: 1 !important;
-                width: 50% !important;
-                border-right: 1px solid #000 !important;
-                padding: 10px !important;
-                overflow-y: auto !important;
-                font-size: 13px !important;
-            }
-            .cbt-right {
-                flex: 1 !important;
-                width: 50% !important;
-                padding: 10px !important;
-                overflow-y: auto !important;
+                padding: 15px 25px !important;
             }
             .opt-body {
-                padding: 4px 10px !important;
+                padding: 10px 25px !important;
             }
             .opt-circle {
-                width: 20px !important;
-                height: 20px !important;
-                margin-right: 8px !important;
-                font-size: 10px !important;
+                width: 32px !important;
+                height: 32px !important;
+                margin-right: 15px !important;
+                font-size: 14px !important;
             }
-            .opt-text { font-size: 12px !important; }
-            .question-flex { font-size: 13px !important; margin-bottom: 5px !important; }
+            .opt-text { font-size: 16px !important; }
+            .question-flex { font-size: 16px !important; margin-bottom: 20px !important; }
             
             /* Essay adjustment */
             .cbt-right textarea {
                 height: calc(100% - 25px) !important;
-                min-height: 100px !important;
-                font-size: 13px !important;
-                padding: 8px !important;
+                min-height: 80px !important;
+                font-size: 14px !important;
+                padding: 10px !important;
             }
             .cbt-right > div {
-                padding: 0 !important;
+                padding: 15px !important;
                 height: 100% !important;
             }
-            .ftr-btn { font-size: 11px !important; }
+            .ftr-btn { font-size: 12px !important; }
+            
+            /* Modal Show All Adjustments */
+            .modal-overlay {
+                padding: 0 !important;
+            }
+            .modal-box {
+                height: 90vh !important;
+                width: 96vw !important;
+                max-width: none !important;
+                border: 1px solid #000 !important;
+            }
+            .grid-nums {
+                gap: 8px !important;
+            }
+            .grid-btn {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 14px !important;
+                margin: 0 auto !important;
+            }
+            .bottom-text {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -608,7 +612,7 @@
                 <button id="btn-close-modal" style="background:none; border:none; color:#2563eb; cursor:pointer;">&lt; BACK</button>
                 <div style="display: flex; gap: 20px; font-size: 13px; color: #4b5563;">
                     <div style="display:flex; align-items:center;">
-                        <span style="display:inline-block; width:12px; height:12px; background:#3b82f6; border-radius:50%; margin-right:6px;"></span>
+                        <span style="display:inline-block; width:12px; height:12px; background:rgba(59, 130, 246, 0.2); border:1px solid #93c5fd; border-radius:50%; margin-right:6px;"></span>
                         Answered ({{ count($answeredSoalIds) }})
                     </div>
                     <div style="display:flex; align-items:center;">

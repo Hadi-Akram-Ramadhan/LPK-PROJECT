@@ -54,10 +54,49 @@
         .adm-header-clock .divider { margin: 0 10px; color: #cbd5e1; }
         .adm-content { padding: 28px 32px; flex: 1; }
 
-        @media (max-width: 768px) {
-            .adm-side { width: 220px; }
-            .adm-main { margin-left: 220px; }
+        /* Mobile Responsive Navigation */
+        .sidebar-overlay { 
+            display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5); 
+            z-index: 40; opacity: 0; transition: opacity 0.3s; pointer-events: none; 
+        }
+        .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+        #mobile-menu-btn { 
+            display: none; background: transparent; border: none; 
+            cursor: pointer; color: #1e293b; padding: 4px; margin-right: 12px; 
+            flex-shrink: 0;
+        }
+
+        /* Hide header logo on desktop because sidebar already has it */
+        @media (min-width: 1025px) {
+            .header-brand-section { display: none !important; }
+        }
+
+        @media (max-width: 1024px) {
+            .adm-side { 
+                transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+                width: 260px; box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            }
+            .adm-side.open { transform: translateX(0); }
+            .adm-main { margin-left: 0; width: 100%; transition: margin-left 0.3s; }
+            #mobile-menu-btn { display: block; }
+            .adm-header { padding: 0 16px; }
             .adm-content { padding: 20px 16px; }
+            
+            .adm-header-title { font-size: 15px; }
+            .adm-header-sub { font-size: 11px; }
+        }
+        @media (max-width: 640px) {
+            .adm-header-clock { display: none; }
+            .adm-header { height: 60px; }
+            .header-brand-text { display: none; }
+        }
+        @media screen and (max-height: 500px) and (orientation: landscape) {
+            .adm-side { transform: translateX(-100%); transition: transform 0.3s; width: 260px; z-index: 50; }
+            .adm-side.open { transform: translateX(0); }
+            .adm-main { margin-left: 0; width: 100%; }
+            #mobile-menu-btn { display: block; }
+            .adm-header { height: 50px; padding: 0 15px; }
+            .adm-content { padding: 15px; }
         }
 
         /* ===== SHARED UTILITY CLASSES (backward compat) ===== */
@@ -103,6 +142,7 @@
     @yield('extra-css')
 </head>
 <body>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
     <div class="adm-wrap">
         <aside class="adm-side">
             <div class="side-brand">
@@ -177,10 +217,13 @@
 
         <main class="adm-main">
             <header class="adm-header">
-                <div style="display: flex; align-items: center; gap: 24px;">
-                    <div style="display: flex; align-items: center; gap: 10px; padding-right: 24px; border-right: 1px solid #e2e8f0;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <button id="mobile-menu-btn">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 10px; padding-right: 16px; border-right: 1px solid #e2e8f0;" class="header-brand-section">
                         <img src="{{ asset('logo.png') }}" alt="Logo" style="width: 32px; height: 32px; object-fit: contain;">
-                        <span style="font-size: 14px; font-weight: 800; color: #1e293b; letter-spacing: -0.3px;">LPK URISOWON</span>
+                        <span class="header-brand-text" style="font-size: 14px; font-weight: 800; color: #1e293b; letter-spacing: -0.3px;">LPK URISOWON</span>
                     </div>
                     <div>
                         <div class="adm-header-title">@yield('header', 'Dashboard')</div>
@@ -255,6 +298,25 @@
                     confirmButtonText: 'Tutup'
                 });
             };
+        });
+    </script>
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var menuBtn = document.getElementById('mobile-menu-btn');
+            var overlay = document.getElementById('sidebar-overlay');
+            var sidebar = document.querySelector('.adm-side');
+            
+            if(menuBtn && overlay && sidebar) {
+                menuBtn.addEventListener('click', function() {
+                    sidebar.classList.add('open');
+                    overlay.classList.add('open');
+                });
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('open');
+                });
+            }
         });
     </script>
     @yield('extra-js')
