@@ -90,14 +90,11 @@
                         @if($log->status === 'pending')
                         <div class="flex justify-center space-x-2">
                             {{-- Terima --}}
-                            <form action="{{ route('guru.cheat-logs.approve', $log) }}" method="POST" onsubmit="return confirm('Terima dan buka blokir ujian murid ini?')">
+                            <form action="{{ route('guru.cheat-logs.approve', $log) }}" method="POST" class="inline ajax-form" data-id="{{ $log->id }}" data-status="approved">
                                 @csrf
                                 <input type="hidden" name="status" value="approved">
-                                <button type="submit"
-                                    style="display:inline-flex;align-items:center;padding:6px 16px;border:none;border-radius:6px;font-size:12px;font-weight:600;background:#16a34a;color:#fff;cursor:pointer;gap:6px;">
-                                    <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                    </svg>
+                                <button type="submit" class="inline-flex items-center px-4 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-green-600 hover:bg-green-700 transition-colors">
+                                    <svg class="mr-1 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                     Terima
                                 </button>
                             </form>
@@ -135,15 +132,85 @@
 <script>
 // Real-time WebSocket for new cheat log notifications
 document.addEventListener('DOMContentLoaded', function() {
+    const ajaxForms = document.querySelectorAll('.ajax-form');
+    
+    ajaxForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const logId = this.dataset.id;
+            const status = this.dataset.status;
+            const actionUrl = this.getAttribute('action');
+            const token = this.querySelector('[name="_token"]').value;
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            if(!confirm('Apakah Anda yakin ingin menerima log ini dan membuka blokir ujian murid?')) {
+                return;
+            }
+            
+            // Loading state
+            const originalHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+            
+            fetch(actionUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const actionCell = document.getElementById('row-action-' + logId);
+                    if (actionCell) {
+                        actionCell.innerHTML = '<span class="text-slate-300">Selesai</span>';
+                    }
+                    
+                    const row = document.querySelector(`tr[data-log-id="${logId}"]`) || (actionCell ? actionCell.closest('tr') : null);
+                    if (row) {
+                        row.classList.remove('bg-red-50/30');
+                        const statusCell = row.querySelectorAll('td')[3];
+                        statusCell.innerHTML = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">✓ Diizinkan</span>';
+                    }
+                } else {
+                    alert('Gagal: ' + (data.message || 'Terjadi kesalahan sistem.'));
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Terjadi kesalahan jaringan.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHtml;
+            });
+        });
+    });
+
     if (window.Echo) {
+        console.log("Listening for new cheat logs (Guru)...");
         window.Echo.channel('cheat-logs')
             .listen('.CheatLogReportedEvent', (e) => {
-                const bannerId = 'new-log-banner';
+                console.log("New cheat log received (Guru):", e);
+                const bannerId = 'new-log-banner-guru';
                 if (!document.getElementById(bannerId)) {
                     const banner = document.createElement('div');
                     banner.id = bannerId;
-                    banner.style.cssText = 'position:fixed;top:80px;right:16px;z-index:9999;background:#dc2626;color:#fff;padding:16px 24px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.2);display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;font-weight:600;';
-                    banner.innerHTML = '<svg style="width:20px;height:20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> Pelanggaran Baru! Klik untuk muat ulang.';
+                    banner.className = 'fixed top-20 right-4 z-[9999] bg-red-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-4 animate-bounce cursor-pointer';
+                    banner.innerHTML = `
+                        <div class="bg-white/20 p-2 rounded-lg">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm">Ada Pelanggaran Baru!</p>
+                            <p class="text-xs opacity-90">Klik di sini untuk memuat ulang tabel.</p>
+                        </div>
+                    `;
                     banner.onclick = () => window.location.reload();
                     document.body.appendChild(banner);
                 }

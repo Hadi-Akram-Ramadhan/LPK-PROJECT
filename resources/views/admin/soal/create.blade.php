@@ -40,7 +40,8 @@
                     <select id="tipe" name="tipe" required class="mt-1 shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md bg-slate-50">
                         <option value="pilihan_ganda" {{ old('tipe') == 'pilihan_ganda' ? 'selected' : '' }}>Pilihan Ganda (Tunggal)</option>
                         <option value="multiple_choice" {{ old('tipe') == 'multiple_choice' ? 'selected' : '' }}>Multiple Choice (Lebih dari 1 Jawaban)</option>
-                        <option value="essay" {{ old('tipe') == 'essay' ? 'selected' : '' }}>Essay (Teks Bebas)</option>
+                        <option value="essay" {{ old('tipe') == 'essay' ? 'selected' : '' }}>Essay (Teks Bebas, Dinilai Manual)</option>
+                        <option value="short_answer" {{ old('tipe') == 'short_answer' ? 'selected' : '' }}>Short Answer (Jawaban Singkat, Dinilai Otomatis)</option>
                         <option value="audio" {{ old('tipe') == 'audio' ? 'selected' : '' }}>Listening / Choukai (Audio & Pilihan Ganda)</option>
                         <option value="pilihan_ganda_audio" {{ old('tipe') == 'pilihan_ganda_audio' ? 'selected' : '' }}>Pilihan Ganda Audio (Jawaban berupa Audio)</option>
                         <option value="pilihan_ganda_gambar" {{ old('tipe') == 'pilihan_ganda_gambar' ? 'selected' : '' }}>Pilihan Ganda Gambar (Jawaban berupa Gambar)</option>
@@ -82,17 +83,35 @@
                         <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         Pilih Gambar Pendukung (Opsional)
                     </label>
-                    <select id="gambar_path" name="gambar_path" class="mt-1 shadow-sm focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm border-orange-300 rounded-md text-slate-700">
+                    <select id="gambar_path" name="gambar_path" class="mt-1 shadow-sm focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm border-orange-300 rounded-md text-slate-700" onchange="previewMainImage(this)">
                         <option value="">-- Tanpa Gambar --</option>
                         @foreach($imageFiles as $image)
                             <option value="gambar/{{ $image }}" {{ old('gambar_path') == 'gambar/'.$image ? 'selected' : '' }}>{{ $image }}</option>
                         @endforeach
                     </select>
+                    <div id="main_image_preview_container" class="mt-3 text-center" style="{{ old('gambar_path') ? 'display:block;' : 'display:none;' }}">
+                        <img id="main_image_preview" src="{{ old('gambar_path') ? asset('storage/' . old('gambar_path')) : '' }}" class="max-h-48 mx-auto rounded-md border border-orange-200 object-contain">
+                    </div>
                     <p class="text-xs text-orange-600 mt-2">Gambar ini akan disisipkan tepat di atas teks pertanyaan.</p>
                 </div>
             </div>
 
-            <!-- Pilihan Jawaban Section -->
+            {{-- Kunci Jawaban (Short Answer Only) --}}
+            <div id="kunci_jawaban_section" class="bg-green-50 border border-green-200 rounded-lg p-5" style="display:none;">
+                <label for="jawaban_kunci" class="block text-sm font-medium text-green-800 flex items-center mb-2">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                    Kunci Jawaban
+                </label>
+                <textarea id="jawaban_kunci" name="jawaban_kunci" rows="2"
+                    class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-green-300 rounded-md"
+                    placeholder="Contoh: Tokyo  atau jika ada beberapa jawaban: Tokyo|Tokio|東京">{{ old('jawaban_kunci') }}</textarea>
+                <p class="text-xs text-green-600 mt-2">
+                    💡 Untuk <strong>beberapa jawaban yang diterima</strong>, pisahkan dengan <code class="bg-green-100 px-1 rounded">|</code> (garis tegak). Contoh: <strong>Tokyo|Tokio|東京</strong>.<br>
+                    Sistem otomatis mengabaikan huruf besar/kecil dan menoleransi typo ringan (≥85% kemiripan).
+                </p>
+            </div>
+
+            {{-- Pilihan Jawaban Section --}}
             <div id="pilihan_section">
                 <div class="flex items-center justify-between mb-4">
                     <label class="block text-sm font-medium text-slate-700">Pilihan Jawaban</label>
@@ -123,10 +142,13 @@
                                         <option value="">-- Pilih Audio Opsi {{ chr(65 + $i) }} --</option>
                                         @foreach($audioFiles as $f) <option value="audio/{{$f}}">{{$f}}</option> @endforeach
                                     </select>
-                                    <select name="pilihan_media[{{$i}}]" class="image-select bg-orange-50 border-orange-200 focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled>
+                                    <select name="pilihan_media[{{$i}}]" class="image-select bg-orange-50 border-orange-200 focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled onchange="previewOptionImage(this, '{{$i}}')">
                                         <option value="">-- Pilih Gambar Opsi {{ chr(65 + $i) }} --</option>
                                         @foreach($imageFiles as $f) <option value="gambar/{{$f}}">{{$f}}</option> @endforeach
                                     </select>
+                                </div>
+                                <div id="option_image_preview_container_{{$i}}" class="mt-2 text-center" style="display:none;">
+                                    <img id="option_image_preview_{{$i}}" src="" class="max-h-32 mx-auto rounded-md border border-orange-200 object-contain">
                                 </div>
                             </div>
                             <button type="button" class="remove-pilihan text-slate-400 hover:text-red-500 pt-3 transition-colors">
@@ -166,6 +188,8 @@
         
         function updateUIBasedOnType() {
             const val = tipeSelect.value;
+            const kunciSection = document.getElementById('kunci_jawaban_section');
+            const kunciInput   = document.getElementById('jawaban_kunci');
             
             // Toggle Audio Section
             if (val === 'audio' || val === 'pilihan_ganda_audio') {
@@ -174,11 +198,19 @@
                 audioSection.style.display = 'none';
                 document.getElementById('audio_path').value = '';
             }
+
+            // Toggle Kunci Jawaban Section (short_answer only)
+            if (val === 'short_answer') {
+                kunciSection.style.display = 'block';
+                kunciInput.required = true;
+            } else {
+                kunciSection.style.display = 'none';
+                kunciInput.required = false;
+            }
             
             // Toggle Pilihan Section
-            if (val === 'essay') {
+            if (val === 'essay' || val === 'short_answer') {
                 pilihanSection.style.display = 'none';
-                // disable all inputs
                 document.querySelectorAll('#pilihan_container input').forEach(el => el.disabled = true);
                 document.querySelectorAll('#pilihan_container select').forEach(el => el.disabled = true);
             } else {
@@ -257,9 +289,12 @@
                             <select name="pilihan_media[${optionCount}]" class="audio-select bg-blue-50 border-blue-200 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled>
                                 ${audioOpts}
                             </select>
-                            <select name="pilihan_media[${optionCount}]" class="image-select bg-orange-50 border-orange-200 focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled>
+                            <select name="pilihan_media[${optionCount}]" class="image-select bg-orange-50 border-orange-200 focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled onchange="previewOptionImage(this, '${optionCount}')">
                                 ${imageOpts}
                             </select>
+                        </div>
+                        <div id="option_image_preview_container_${optionCount}" class="mt-2 text-center" style="display:none;">
+                            <img id="option_image_preview_${optionCount}" src="" class="max-h-32 mx-auto rounded-md border border-orange-200 object-contain">
                         </div>
                     </div>
                     <button type="button" class="remove-pilihan text-slate-400 hover:text-red-500 pt-3 transition-colors">

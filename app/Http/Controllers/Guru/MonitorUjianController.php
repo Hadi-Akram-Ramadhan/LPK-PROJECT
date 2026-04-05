@@ -13,7 +13,7 @@ class MonitorUjianController extends Controller
 {
     public function index()
     {
-        $ujians = Ujian::where('guru_id', auth()->id())
+        $ujians = Ujian::with(['guru'])
             ->withCount('pesertas')
             ->latest()
             ->paginate(10);
@@ -23,9 +23,6 @@ class MonitorUjianController extends Controller
 
     public function show(Ujian $ujian)
     {
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(403);
-        }
 
         $pesertas = UjianPeserta::with(['user', 'cheatLogs'])
             ->where('ujian_id', $ujian->id)
@@ -41,9 +38,6 @@ class MonitorUjianController extends Controller
     public function grade(UjianPeserta $ujian_peserta)
     {
         $ujian = $ujian_peserta->ujian;
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(403);
-        }
 
         // Ambil soal essay saja
         $soalEssays = $ujian->soals()->where('tipe', 'essay')->get();
@@ -64,9 +58,6 @@ class MonitorUjianController extends Controller
     public function storeGrade(Request $request, UjianPeserta $ujian_peserta)
     {
         $ujian = $ujian_peserta->ujian;
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(403);
-        }
 
         $request->validate([
             'poin' => 'required|array',
@@ -102,10 +93,6 @@ class MonitorUjianController extends Controller
 
     public function export(Ujian $ujian)
     {
-        // Pastikan hanya guru pemilik ujian yang bisa export
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(403);
-        }
 
         $pesertas = UjianPeserta::with('user.kelas')
             ->where('ujian_id', $ujian->id)

@@ -23,7 +23,8 @@
                     <select id="tipe" name="tipe" required class="mt-1 shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md bg-slate-50">
                         <option value="pilihan_ganda" {{ old('tipe', $soal->tipe) == 'pilihan_ganda' ? 'selected' : '' }}>Pilihan Ganda (Tunggal)</option>
                         <option value="multiple_choice" {{ old('tipe', $soal->tipe) == 'multiple_choice' ? 'selected' : '' }}>Multiple Choice (Lebih dari 1 Jawaban)</option>
-                        <option value="essay" {{ old('tipe', $soal->tipe) == 'essay' ? 'selected' : '' }}>Essay (Teks Bebas)</option>
+                        <option value="essay" {{ old('tipe', $soal->tipe) == 'essay' ? 'selected' : '' }}>Essay (Teks Bebas, Dinilai Manual)</option>
+                        <option value="short_answer" {{ old('tipe', $soal->tipe) == 'short_answer' ? 'selected' : '' }}>Short Answer (Jawaban Singkat, Dinilai Otomatis)</option>
                         <option value="audio" {{ old('tipe', $soal->tipe) == 'audio' ? 'selected' : '' }}>Listening / Choukai (Audio & Pilihan Ganda)</option>
                         <option value="pilihan_ganda_audio" {{ old('tipe', $soal->tipe) == 'pilihan_ganda_audio' ? 'selected' : '' }}>Pilihan Ganda Audio (Jawaban berupa Audio)</option>
                         <option value="pilihan_ganda_gambar" {{ old('tipe', $soal->tipe) == 'pilihan_ganda_gambar' ? 'selected' : '' }}>Pilihan Ganda Gambar (Jawaban berupa Gambar)</option>
@@ -63,13 +64,31 @@
                         <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         Pilih Gambar Pendukung
                     </label>
-                    <select id="gambar_path" name="gambar_path" class="mt-1 shadow-sm focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm border-orange-300 rounded-md text-slate-700">
+                    <select id="gambar_path" name="gambar_path" class="mt-1 shadow-sm focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm border-orange-300 rounded-md text-slate-700" onchange="previewMainImage(this)">
                         <option value="">-- Tanpa Gambar --</option>
                         @foreach($imageFiles as $image)
                             <option value="gambar/{{ $image }}" {{ old('gambar_path', $soal->gambar_path) == 'gambar/'.$image ? 'selected' : '' }}>{{ $image }}</option>
                         @endforeach
                     </select>
+                    <div id="main_image_preview_container" class="mt-3 text-center" style="{{ old('gambar_path', $soal->gambar_path) ? 'display:block;' : 'display:none;' }}">
+                        <img id="main_image_preview" src="{{ old('gambar_path', $soal->gambar_path) ? asset('storage/' . old('gambar_path', $soal->gambar_path)) : '' }}" class="max-h-48 mx-auto rounded-md border border-orange-200 object-contain">
+                    </div>
                 </div>
+            </div>
+
+            {{-- Kunci Jawaban (Short Answer Only) --}}
+            <div id="kunci_jawaban_section" class="bg-green-50 border border-green-200 rounded-lg p-5" style="display:none;">
+                <label for="jawaban_kunci" class="block text-sm font-medium text-green-800 flex items-center mb-2">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                    Kunci Jawaban
+                </label>
+                <textarea id="jawaban_kunci" name="jawaban_kunci" rows="2"
+                    class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-green-300 rounded-md"
+                    placeholder="Contoh: Tokyo  atau beberapa: Tokyo|Tokio|東京">{{ old('jawaban_kunci', $soal->jawaban_kunci) }}</textarea>
+                <p class="text-xs text-green-600 mt-2">
+                    💡 Pisahkan beberapa jawaban yang diterima dengan <code class="bg-green-100 px-1 rounded">|</code>. Contoh: <strong>Tokyo|Tokio|東京</strong>.<br>
+                    Sistem otomatis mengabaikan huruf besar/kecil dan menoleransi typo ringan (≥85% kemiripan).
+                </p>
             </div>
 
             <!-- Pilihan Jawaban Section -->
@@ -85,14 +104,22 @@
                 <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
                     <p class="text-xs text-slate-500 mb-4" id="pilihan_help">Buat pilihan jawaban dan pilih kotak radio (<span class="font-bold">Jawaban Benar</span>) di sebelah opsi yang benar.</p>
                     <div id="pilihan_container" class="space-y-4">
-                        @php $i = 0; @endphp
-                        @forelse($soal->pilihanJawabans as $index => $pilihan)
+                        @php 
+                            $opsiCount = max(4, $soal->pilihanJawabans->count()); 
+                        @endphp
+                        @for($i = 0; $i < $opsiCount; $i++)
+                        @php
+                            $pilihan = $soal->pilihanJawabans->get($i);
+                            $teks = $pilihan ? $pilihan->teks : '';
+                            $media_path = $pilihan ? $pilihan->media_path : '';
+                            $is_benar = $pilihan ? $pilihan->is_benar : ($i == 0);
+                        @endphp
                         <div class="flex items-start space-x-3 pilihan-item">
                             <div class="pt-3">
                                 @if($soal->tipe == 'multiple_choice')
-                                    <input type="checkbox" id="jawaban_benar_{{$i}}" name="jawaban_benar[]" value="{{$i}}" class="jawaban-selector h-5 w-5 text-accent-600 focus:ring-accent-500 border-slate-300 rounded" {{ $pilihan->is_benar ? 'checked' : '' }}>
+                                    <input type="checkbox" id="jawaban_benar_{{$i}}" name="jawaban_benar[]" value="{{$i}}" class="jawaban-selector h-5 w-5 text-accent-600 focus:ring-accent-500 border-slate-300 rounded" {{ $is_benar ? 'checked' : '' }}>
                                 @else
-                                    <input type="radio" id="jawaban_benar_{{$i}}" name="jawaban_benar" value="{{$i}}" class="jawaban-selector h-5 w-5 text-accent-600 focus:ring-accent-500 border-slate-300" {{ $pilihan->is_benar ? 'checked' : '' }}>
+                                    <input type="radio" id="jawaban_benar_{{$i}}" name="jawaban_benar" value="{{$i}}" class="jawaban-selector h-5 w-5 text-accent-600 focus:ring-accent-500 border-slate-300" {{ $is_benar ? 'checked' : '' }}>
                                 @endif
                             </div>
                             <div class="flex-1 space-y-2">
@@ -100,56 +127,27 @@
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <span class="text-slate-500 sm:text-sm font-bold">{{ chr(65 + $i) }}.</span>
                                     </div>
-                                    <input type="text" name="pilihan[{{$i}}]" class="focus:ring-accent-500 focus:border-accent-500 block w-full pl-8 sm:text-sm border-slate-300 rounded-md py-2" placeholder="Opsi jawaban teks (jika perlu)..." value="{{ $pilihan->teks }}">
+                                    <input type="text" name="pilihan[{{$i}}]" class="focus:ring-accent-500 focus:border-accent-500 block w-full pl-8 sm:text-sm border-slate-300 rounded-md py-2" placeholder="Opsi jawaban teks (jika perlu)..." value="{{ $teks }}">
                                 </div>
                                 <div class="media-input-wrapper flex gap-2 w-full" style="display:none;">
                                     <select name="pilihan_media[{{$i}}]" class="audio-select bg-blue-50 border-blue-200 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled>
                                         <option value="">-- Pilih Audio Opsi {{ chr(65 + $i) }} --</option>
-                                        @foreach($audioFiles as $f) <option value="audio/{{$f}}" {{ $pilihan->media_path == 'audio/'.$f ? 'selected' : '' }}>{{$f}}</option> @endforeach
+                                        @foreach($audioFiles as $f) <option value="audio/{{$f}}" {{ $media_path == 'audio/'.$f ? 'selected' : '' }}>{{$f}}</option> @endforeach
                                     </select>
-                                    <select name="pilihan_media[{{$i}}]" class="image-select bg-orange-50 border-orange-200 focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled>
+                                    <select name="pilihan_media[{{$i}}]" class="image-select bg-orange-50 border-orange-200 focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled onchange="previewOptionImage(this, '{{$i}}')">
                                         <option value="">-- Pilih Gambar Opsi {{ chr(65 + $i) }} --</option>
-                                        @foreach($imageFiles as $f) <option value="gambar/{{$f}}" {{ $pilihan->media_path == 'gambar/'.$f ? 'selected' : '' }}>{{$f}}</option> @endforeach
+                                        @foreach($imageFiles as $f) <option value="gambar/{{$f}}" {{ $media_path == 'gambar/'.$f ? 'selected' : '' }}>{{$f}}</option> @endforeach
                                     </select>
+                                </div>
+                                <div id="option_image_preview_container_{{$i}}" class="mt-2 text-center" style="{{ ($media_path && str_starts_with($media_path, 'gambar/')) ? 'display:block;' : 'display:none;' }}">
+                                    <img id="option_image_preview_{{$i}}" src="{{ ($media_path && str_starts_with($media_path, 'gambar/')) ? asset('storage/' . $media_path) : '' }}" class="max-h-32 mx-auto rounded-md border border-orange-200 object-contain">
                                 </div>
                             </div>
                             <button type="button" class="remove-pilihan text-slate-400 hover:text-red-500 pt-3 transition-colors">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
-                        @php $i++; @endphp
-                        @empty
-                        {{-- Fallback empty state if changing from essay --}}
-                        @for($j = 0; $j < 4; $j++)
-                        <div class="flex items-start space-x-3 pilihan-item">
-                            <div class="pt-3">
-                                <input type="radio" id="jawaban_benar_{{$j}}" name="jawaban_benar" value="{{$j}}" class="jawaban-selector h-5 w-5 text-accent-600 focus:ring-accent-500 border-slate-300" {{ $j == 0 ? 'checked' : '' }}>
-                            </div>
-                            <div class="flex-1 space-y-2">
-                                <div class="relative rounded-md shadow-sm">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span class="text-slate-500 sm:text-sm font-bold">{{ chr(65 + $j) }}.</span>
-                                    </div>
-                                    <input type="text" name="pilihan[{{$j}}]" class="focus:ring-accent-500 focus:border-accent-500 block w-full pl-8 sm:text-sm border-slate-300 rounded-md py-2" placeholder="Opsi jawaban teks (jika perlu)..." value="">
-                                </div>
-                                <div class="media-input-wrapper flex gap-2 w-full" style="display:none;">
-                                    <select name="pilihan_media[{{$j}}]" class="audio-select bg-blue-50 border-blue-200 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled>
-                                        <option value="">-- Pilih Audio Opsi {{ chr(65 + $j) }} --</option>
-                                        @foreach($audioFiles as $f) <option value="audio/{{$f}}">{{$f}}</option> @endforeach
-                                    </select>
-                                    <select name="pilihan_media[{{$j}}]" class="image-select bg-orange-50 border-orange-200 focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled>
-                                        <option value="">-- Pilih Gambar Opsi {{ chr(65 + $j) }} --</option>
-                                        @foreach($imageFiles as $f) <option value="gambar/{{$f}}">{{$f}}</option> @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="button" class="remove-pilihan text-slate-400 hover:text-red-500 pt-3 transition-colors">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
-                        </div>
-                        @php $i++; @endphp
                         @endfor
-                        @endforelse
                     </div>
                 </div>
             </div>
@@ -166,14 +164,18 @@
                     
                     function updateUIBasedOnType() {
                         const val = tipeSelect.value;
+                        const kunciSection = document.getElementById('kunci_jawaban_section');
                         
                         if (val === 'audio' || val === 'pilihan_ganda_audio') {
                             audioSection.style.display = 'block';
                         } else {
                             audioSection.style.display = 'none';
                         }
+
+                        // Toggle Kunci Jawaban (short_answer only)
+                        kunciSection.style.display = (val === 'short_answer') ? 'block' : 'none';
                         
-                        if (val === 'essay') {
+                        if (val === 'essay' || val === 'short_answer') {
                             pilihanSection.style.display = 'none';
                             document.querySelectorAll('#pilihan_container input').forEach(el => el.disabled = true);
                             document.querySelectorAll('#pilihan_container select').forEach(el => el.disabled = true);
@@ -250,9 +252,12 @@
                                         <select name="pilihan_media[${optionCount}]" class="audio-select bg-blue-50 border-blue-200 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled>
                                             ${audioOpts}
                                         </select>
-                                        <select name="pilihan_media[${optionCount}]" class="image-select bg-orange-50 border-orange-200 focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled>
+                                        <select name="pilihan_media[${optionCount}]" class="image-select bg-orange-50 border-orange-200 focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled onchange="previewOptionImage(this, '${optionCount}')">
                                             ${imageOpts}
                                         </select>
+                                    </div>
+                                    <div id="option_image_preview_container_${optionCount}" class="mt-2 text-center" style="display:none;">
+                                        <img id="option_image_preview_${optionCount}" src="" class="max-h-32 mx-auto rounded-md border border-orange-200 object-contain">
                                     </div>
                                 </div>
                                 <button type="button" class="remove-pilihan text-slate-400 hover:text-red-500 pt-3 transition-colors">
@@ -279,6 +284,30 @@
                     }
                     attachRemoveListeners();
                 });
+                
+                function previewMainImage(selectEl) {
+                    const container = document.getElementById('main_image_preview_container');
+                    const img = document.getElementById('main_image_preview');
+                    if (selectEl.value && selectEl.value.startsWith('gambar/')) {
+                        img.src = '/storage/' + selectEl.value;
+                        container.style.display = 'block';
+                    } else {
+                        img.src = '';
+                        container.style.display = 'none';
+                    }
+                }
+                
+                function previewOptionImage(selectEl, idx) {
+                    const container = document.getElementById('option_image_preview_container_' + idx);
+                    const img = document.getElementById('option_image_preview_' + idx);
+                    if (selectEl.value && selectEl.value.startsWith('gambar/')) {
+                        img.src = '/storage/' + selectEl.value;
+                        container.style.display = 'block';
+                    } else {
+                        img.src = '';
+                        container.style.display = 'none';
+                    }
+                }
             </script>
         </div>
 

@@ -14,12 +14,7 @@ class CheatLogController extends Controller
      */
     public function index()
     {
-        $ujianIds = Ujian::where('guru_id', auth()->id())->pluck('id');
-
         $logs = CheatLog::with(['ujianPeserta.user', 'ujianPeserta.ujian', 'approvedBy'])
-            ->whereHas('ujianPeserta', function ($q) use ($ujianIds) {
-                $q->whereIn('ujian_id', $ujianIds);
-            })
             ->latest()
             ->paginate(20);
 
@@ -31,14 +26,6 @@ class CheatLogController extends Controller
      */
     public function approve(Request $request, CheatLog $cheatLog)
     {
-        // Pastikan log ini milik ujian yang dibuat guru ini
-        $ujianIds       = Ujian::where('guru_id', auth()->id())->pluck('id');
-        $pesertaUjianId = optional($cheatLog->ujianPeserta)->ujian_id;
-
-        if (!$ujianIds->contains($pesertaUjianId)) {
-            abort(403, 'Anda tidak berhak memproses log ini.');
-        }
-
         $request->validate([
             'status' => 'required|in:approved,rejected',
         ]);

@@ -84,22 +84,52 @@
                     <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;color:#334155;">
                         {!! strip_tags($soal->pertanyaan) !!}
                     </div>
-                    @if($soal->audio_path)
-                    <span style="font-size:11px;color:#2563eb;display:flex;align-items:center;gap:4px;margin-top:4px;">
-                        <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728"/></svg>
-                        Ada Audio
-                    </span>
-                    @endif
+                    <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
+                        @if($soal->audio_path)
+                        <span style="font-size:11px;color:#2563eb;display:flex;align-items:center;gap:4px;background:#eff6ff;padding:2px 8px;border-radius:12px;border:1px solid #bfdbfe;">
+                            <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                            Audio Soal
+                        </span>
+                        @endif
+                        @if($soal->gambar_path)
+                        <span style="font-size:11px;color:#ea580c;display:flex;align-items:center;gap:4px;background:#fff7ed;padding:2px 8px;border-radius:12px;border:1px solid #fed7aa;">
+                            <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            Gambar Soal
+                        </span>
+                        @endif
+                        @php
+                            $adaOpsiAudio = $soal->pilihanJawabans->where('media_tipe', 'audio')->isNotEmpty();
+                            $adaOpsiGambar = $soal->pilihanJawabans->where('media_tipe', 'gambar')->isNotEmpty();
+                        @endphp
+                        @if($adaOpsiAudio)
+                        <span style="font-size:11px;color:#7c3aed;display:flex;align-items:center;gap:4px;background:#f5f3ff;padding:2px 8px;border-radius:12px;border:1px solid #ddd6fe;">
+                            <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M8 12h.01M12 12h.01M16 12h.01M9 16H5a2 2 0 01-2-2V10a2 2 0 012-2h4l5-5v18l-5-5z"/></svg>
+                            Opsi Audio
+                        </span>
+                        @endif
+                        @if($adaOpsiGambar)
+                        <span style="font-size:11px;color:#059669;display:flex;align-items:center;gap:4px;background:#ecfdf5;padding:2px 8px;border-radius:12px;border:1px solid #a7f3d0;">
+                            <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            Opsi Gambar
+                        </span>
+                        @endif
+                    </div>
                 </td>
                 <td style="padding:16px 20px;">
                     @if($soal->tipe === 'pilihan_ganda')
-                        <span style="background:#dbeafe;color:#2563eb;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">PG</span>
+                        <span style="background:#dbeafe;color:#2563eb;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">PG (Teks)</span>
                     @elseif($soal->tipe === 'multiple_choice')
                         <span style="background:#ede9fe;color:#7c3aed;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">MC</span>
                     @elseif($soal->tipe === 'audio')
-                        <span style="background:#fef3c7;color:#d97706;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">Audio</span>
+                        <span style="background:#fef3c7;color:#d97706;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">PG Audio</span>
+                    @elseif($soal->tipe === 'pilihan_ganda_audio')
+                        <span style="background:#ffedd5;color:#c2410c;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">PG (Opsi Audio)</span>
+                    @elseif($soal->tipe === 'pilihan_ganda_gambar')
+                        <span style="background:#ccfbf1;color:#0f766e;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">PG (Opsi Gambar)</span>
+                    @elseif($soal->tipe === 'short_answer')
+                        <span style="background:#e0e7ff;color:#4338ca;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">Short Answer</span>
                     @else
-                        <span style="background:#dcfce7;color:#16a34a;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">Essay</span>
+                        <span style="background:#e2e8f0;color:#475569;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">Essay</span>
                     @endif
                 </td>
                 <td style="padding:16px 20px;">
@@ -109,7 +139,22 @@
                         $letter = $benarIdx !== null ? chr(65 + $benarIdx) : '-';
                     @endphp
                     @if($soal->tipe === 'essay')
-                        <span style="font-size:12px;color:#94a3b8;">Esai</span>
+                        <span style="font-size:12px;color:#94a3b8;">Dinilai Manual</span>
+                    @elseif($soal->tipe === 'short_answer')
+                        @php $firstKey = explode('|', $soal->jawaban_kunci ?? '')[0] ?? '-'; @endphp
+                        <span style="background:#e0e7ff;color:#4f46e5;font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;max-width:150px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $soal->jawaban_kunci }}">{{ $firstKey }}</span>
+                    @elseif($soal->tipe === 'multiple_choice')
+                        @php
+                            $benarLetters = [];
+                            foreach($soal->pilihanJawabans as $pIdx => $pJawab) {
+                                if($pJawab->is_benar) $benarLetters[] = chr(65 + $pIdx);
+                            }
+                        @endphp
+                        @if(count($benarLetters) > 0)
+                            <span style="background:#ede9fe;color:#7c3aed;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;">{{ implode(', ', $benarLetters) }}</span>
+                        @else
+                            <span style="color:#94a3b8;font-size:13px;">-</span>
+                        @endif
                     @elseif($benar)
                         <span style="background:#dcfce7;color:#16a34a;font-size:13px;font-weight:700;padding:4px 12px;border-radius:20px;">{{ $letter }}</span>
                     @else
