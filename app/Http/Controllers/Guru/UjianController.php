@@ -29,10 +29,8 @@ class UjianController extends Controller
      */
     public function create()
     {
-        // Ambil Paket Soal milik guru ini atau admin (umum)
-        $paketSoals = \App\Models\PaketSoal::where('guru_id', auth()->id())
-            ->orWhereNull('guru_id')
-            ->with(['soals' => function($q) {
+        // Ambil Semua Paket Soal (termasuk milik admin dan guru lain yang tampil di sistem)
+        $paketSoals = \App\Models\PaketSoal::with(['soals' => function($q) {
                 $q->orderBy('id', 'asc');
             }])
             ->get();
@@ -125,9 +123,7 @@ class UjianController extends Controller
         $ujian->load('soals');
         $selectedSoal = $ujian->soals->pluck('id')->toArray();
         
-        $paketSoals = \App\Models\PaketSoal::where('guru_id', auth()->id())
-            ->orWhereNull('guru_id')
-            ->with(['soals' => function($q) {
+        $paketSoals = \App\Models\PaketSoal::with(['soals' => function($q) {
                 $q->orderBy('id', 'asc');
             }])
             ->get();
