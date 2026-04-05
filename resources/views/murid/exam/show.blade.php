@@ -454,8 +454,8 @@
 
                 @if($currentSoal->audio_path)
                     <div class="audio-wrapper">
-                        <audio controls controlsList="nodownload" class="audio-player">
-                            <source src="{{ asset('storage/' . $currentSoal->audio_path) }}" type="audio/mpeg">
+                        <audio controls controlsList="nodownload" class="audio-player" preload="none">
+                            <source src="{{ asset('storage/' . $currentSoal->audio_path) }}?v={{ $currentSoal->id }}" type="audio/mpeg">
                         </audio>
                     </div>
                 @endif
@@ -483,8 +483,8 @@
                                 @if($opsi->media_tipe === 'audio' && $opsi->media_path)
                                     <!-- Stop propagation on audio play so the radio button isn't toggled incorrectly on some devices -->
                                     <div onclick="event.stopPropagation()">
-                                        <audio controls controlsList="nodownload" style="height: 40px; max-width: 220px; outline:none;">
-                                            <source src="{{ asset('storage/' . $opsi->media_path) }}" type="audio/mpeg">
+                                        <audio controls controlsList="nodownload" preload="none" style="height: 40px; max-width: 220px; outline:none;">
+                                            <source src="{{ asset('storage/' . $opsi->media_path) }}?v={{ $opsi->id }}" type="audio/mpeg">
                                         </audio>
                                     </div>
                                 @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
@@ -509,8 +509,8 @@
                                 
                                 @if($opsi->media_tipe === 'audio' && $opsi->media_path)
                                     <div onclick="event.stopPropagation()">
-                                        <audio controls controlsList="nodownload" style="height: 40px; max-width: 220px; outline:none;">
-                                            <source src="{{ asset('storage/' . $opsi->media_path) }}" type="audio/mpeg">
+                                        <audio controls controlsList="nodownload" preload="none" style="height: 40px; max-width: 220px; outline:none;">
+                                            <source src="{{ asset('storage/' . $opsi->media_path) }}?v={{ $opsi->id }}" type="audio/mpeg">
                                         </audio>
                                     </div>
                                 @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
