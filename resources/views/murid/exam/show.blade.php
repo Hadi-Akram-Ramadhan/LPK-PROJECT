@@ -339,6 +339,46 @@
             100% { transform: rotate(0deg); }
         }
 
+        /* WATERMARK & PROTECTION */
+        .cbt-container {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        textarea {
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        .watermark-container {
+            position: relative;
+            display: inline-block;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+            max-width: 100%;
+        }
+        .watermark-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            pointer-events: none;
+            color: rgba(255,255,255,0.3); /* dibuat lebih samar (transparent) */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4); /* bayangan diperhalus agar tidak terlalu tebal */
+            font-size: 24px;
+            font-weight: 600; /* dikurangi ketebalannya */
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transform: rotate(-20deg);
+            white-space: nowrap;
+            overflow: hidden;
+            z-index: 10;
+        }
+        .watermark-overlay.small {
+            font-size: 14px;
+        }
+
         /* RESPONSIVE LANDSCAPE MOBILE (MODIFIKASI DISINI) */
         @media screen and (max-height: 500px) {
             .cbt-container {
@@ -462,7 +502,10 @@
                 
                 @if($currentSoal->gambar_path)
                     <div style="text-align: center; margin-top: 20px;">
-                        <img src="{{ asset('storage/' . $currentSoal->gambar_path) }}" style="max-width: 100%; border: 1px solid #d1d5db; padding: 4px; border-radius: 8px;">
+                        <div class="watermark-container">
+                            <img src="{{ asset('storage/' . $currentSoal->gambar_path) }}" style="max-width: 100%; border: 1px solid #d1d5db; padding: 4px; border-radius: 8px;" oncontextmenu="return false;" draggable="false">
+                            <div class="watermark-overlay">Property of Urisowon</div>
+                        </div>
                     </div>
                 @endif
             </div>
@@ -488,7 +531,10 @@
                                         </audio>
                                     </div>
                                 @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
-                                    <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 120px; border-radius: 6px; border: 1px solid #e5e7eb; padding: 2px; max-width: 100%; object-fit: contain;">
+                                    <div class="watermark-container">
+                                        <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 120px; border-radius: 6px; border: 1px solid #e5e7eb; padding: 2px; max-width: 100%; object-fit: contain;" oncontextmenu="return false;" draggable="false">
+                                        <div class="watermark-overlay small">Property of Urisowon</div>
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -514,7 +560,10 @@
                                         </audio>
                                     </div>
                                 @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
-                                    <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 120px; border-radius: 6px; border: 1px solid #e5e7eb; padding: 2px; max-width: 100%; object-fit: contain;">
+                                    <div class="watermark-container">
+                                        <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 120px; border-radius: 6px; border: 1px solid #e5e7eb; padding: 2px; max-width: 100%; object-fit: contain;" oncontextmenu="return false;" draggable="false">
+                                        <div class="watermark-overlay small">Property of Urisowon</div>
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -625,6 +674,34 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         
+        // ANTI SCREENSHOT & RIGHT CLICK
+        document.addEventListener('contextmenu', event => event.preventDefault()); // Prevent right-click
+        
+        document.addEventListener('keydown', (e) => {
+            // Prevent PrintScreen, F12, Ctrl+S, Ctrl+P, Ctrl+U, Ctrl+Shift+I, Win+Shift+S (Meta+Shift+S)
+            if (
+                e.key === 'PrintScreen' ||
+                e.key === 'F12' ||
+                (e.ctrlKey && ['s', 'p', 'u', 'S', 'P', 'U'].includes(e.key)) ||
+                (e.ctrlKey && e.shiftKey && ['i', 'I', 's', 'S', 'c', 'C'].includes(e.key)) ||
+                (e.metaKey && e.shiftKey && ['s', 'S'].includes(e.key))
+            ) {
+                e.preventDefault();
+                try {
+                    navigator.clipboard.writeText("Tindakan ini dilarang selama ujian berlangsung.");
+                } catch(err) {}
+                alert("Perhatian: Tindakan mengambil gambar, menyimpan, atau membuka panel pengembang sangat dilarang!");
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'PrintScreen') {
+                try {
+                    navigator.clipboard.writeText("Tindakan ini dilarang selama ujian berlangsung.");
+                } catch(err) {}
+            }
+        });
+
         // MODAL
         const modal = document.getElementById('modal-show-all');
         document.getElementById('btn-show-all').addEventListener('click', () => modal.style.display = 'flex');
