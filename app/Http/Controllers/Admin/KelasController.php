@@ -42,6 +42,18 @@ class KelasController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(Kelas $kela)
+    {
+        $kela->load(['users' => function($q) {
+            $q->where('role', 'murid')->latest();
+        }]);
+        
+        return view('admin.kelas.show', ['kelas' => $kela, 'students' => $kela->users]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Kelas $kela) // Note: route parameter might be $kela because of singularization

@@ -113,6 +113,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Cheat Logs (Guru — hanya ujian milik guru ini)
         Route::get('/cheat-logs', [\App\Http\Controllers\Guru\CheatLogController::class, 'index'])->name('cheat-logs.index');
         Route::post('/cheat-logs/{cheatLog}/approve', [\App\Http\Controllers\Guru\CheatLogController::class, 'approve'])->name('cheat-logs.approve');
+
+        // Daftar Kelas & Murid
+        Route::get('/kelas', [\App\Http\Controllers\Guru\KelasController::class, 'index'])->name('kelas.index');
+        Route::get('/kelas/{kelas}', [\App\Http\Controllers\Guru\KelasController::class, 'show'])->name('kelas.show');
     });
 
     // Profile Routes (All Authenticated Users)
