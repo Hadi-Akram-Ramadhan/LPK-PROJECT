@@ -31,7 +31,7 @@ class UjianController extends Controller
             'judul' => 'required',
             'jenis_ujian' => 'nullable|in:reguler,tryout',
             'durasi' => 'required|numeric',
-            'kelas_id' => 'required',
+            'kelas_id' => 'required|array',
         ]);
 
         $ujian = Ujian::create([
@@ -46,7 +46,7 @@ class UjianController extends Controller
 
         // Otomatis daftarkan semua siswa di kelas ini ke ujian
         $siswas = \App\Models\User::where('role', 'murid')
-            ->where('kelas_id', $request->kelas_id)
+            ->whereIn('kelas_id', $request->kelas_id)
             ->get();
 
         foreach($siswas as $s) {
