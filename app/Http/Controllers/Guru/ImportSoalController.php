@@ -28,22 +28,22 @@ class ImportSoalController extends Controller
 
         // Header row
         $headers = [
-            'A1' => 'Tipe Soal',
-            'B1' => 'Teks Pertanyaan',
-            'C1' => 'Gambar Soal (nama file, ex: tanya.jpg)',
-            'D1' => 'Audio Soal (nama file, ex: dengar.mp3)',
-            'E1' => 'Opsi A (Teks)',
-            'F1' => 'Media Opsi A (nama file)',
-            'G1' => 'Opsi B (Teks)',
-            'H1' => 'Media Opsi B (nama file)',
-            'I1' => 'Opsi C (Teks)',
-            'J1' => 'Media Opsi C (nama file)',
-            'K1' => 'Opsi D (Teks)',
-            'L1' => 'Media Opsi D (nama file)',
-            'M1' => 'Opsi E (Teks opsional)',
-            'N1' => 'Media Opsi E (nama file)',
-            'O1' => 'Jawaban Benar / Kunci Jawaban',
-            'P1' => 'Poin / Bobot',
+            'A1' => 'Tipe Soal (Wajib)',
+            'B1' => 'Tuliskan Pertanyaan / Soalnya',
+            'C1' => 'Nama File Gambar (Opsional)',
+            'D1' => 'Nama File Audio/Suara (Opsional)',
+            'E1' => 'Jawaban A (Teks)',
+            'F1' => 'Media Jawaban A (Opsional)',
+            'G1' => 'Jawaban B (Teks)',
+            'H1' => 'Media Jawaban B (Opsional)',
+            'I1' => 'Jawaban C (Teks)',
+            'J1' => 'Media Jawaban C (Opsional)',
+            'K1' => 'Jawaban D (Teks)',
+            'L1' => 'Media Jawaban D (Opsional)',
+            'M1' => 'Jawaban E (Teks)',
+            'N1' => 'Media Jawaban E (Opsional)',
+            'O1' => 'Kunci Jawaban Benar',
+            'P1' => 'Nilai Point (Angka)',
         ];
         foreach ($headers as $cell => $value) {
             $sheet->setCellValue($cell, $value);
@@ -72,44 +72,44 @@ class ImportSoalController extends Controller
 
         // Contoh baris 2 — Pilihan Ganda
         $sheet->fromArray([
-            'Pilihan Ganda', 'Apa arti kata "Gakkou"?', '', '',
+            'Pilihan Ganda', 'Apa arti kata "Hakgyo"?', '', '',
             'Rumah Tangga', '', 'Sekolah', '', 'Stasiun', '', 'Kantor', '', '', '',
             'B', '10',
         ], null, 'A2');
 
         // Contoh baris 3 — Multiple Choice
         $sheet->fromArray([
-            'Multiple Choice', 'Manakah yang termasuk kata benda dalam bahasa Jepang?', '', '',
-            'Nomi (飲む)', '', 'Hon (本)', '', 'Enpitsu (鉛筆)', '', 'Taberu (食べる)', '', '', '',
+            'Multiple Choice', 'Manakah yang termasuk kata benda dalam bahasa Korea?', '', '',
+            'Mokta (먹다)', '', 'Chaek (책)', '', 'Yeonpil (연필)', '', 'Masida (마시다)', '', '', '',
             'B,C', '15',
         ], null, 'A3');
 
         // Contoh baris 4 — Essay
         $sheet->fromArray([
-            'Essay', 'Sebutkan 3 alat transportasi dalam bahasa Jepang!', '', '',
+            'Essay', 'Sebutkan 3 alat transportasi dalam bahasa Korea!', '', '',
             '', '', '', '', '', '', '', '', '', '',
             '', '20',
         ], null, 'A4');
 
         // Contoh baris 5 — Audio/Choukai
         $sheet->fromArray([
-            'Audio', 'Dengarkan audio dan pilih jawaban yang tepat.', '', 'choukai.mp3',
+            'Audio', 'Dengarkan audio dan pilih jawaban yang tepat.', '', 'suara-soal-10.mp3',
             'Pilih A', '', 'Pilih B', '', 'Pilih C', '', 'Pilih D', '', '', '',
             'C', '10',
         ], null, 'A5');
         
         // Contoh baris 6 - Pilihan Ganda Gambar
         $sheet->fromArray([
-            'Pilihan Ganda Gambar', 'Manakah dari gambar berikut yang menunjukkan stasiun?', 'tanya.jpg', '',
+            'Pilihan Ganda Gambar', 'Manakah dari gambar berikut yang menunjukkan stasiun?', 'gambar-tanya.jpg', '',
             '', 'stasiun.jpg', '', 'kantor.png', '', 'pasar.jpg', '', 'mall.png', '', '',
             'A', '10',
         ], null, 'A6');
 
         // Contoh baris 7 — Short Answer (NEW)
         $sheet->fromArray([
-            'Short Answer', 'Apa nama ibukota Jepang?', '', '',
+            'Short Answer', 'Apa nama ibukota Korea Selatan?', '', '',
             '', '', '', '', '', '', '', '', '', '',
-            'Tokyo|Tokio|東京', '15',
+            'Seoul|Seol|서울', '15',
         ], null, 'A7');
 
         // Zebra row styling for example rows
@@ -124,58 +124,38 @@ class ImportSoalController extends Controller
 
         // ── Sheet 2: PANDUAN ──────────────────────────────────────
         $guide = $spreadsheet->createSheet();
-        $guide->setTitle('Panduan Import');
+        $guide->setTitle('CARA BACA PANDUAN');
 
         $guideRows = [
-            ['PANDUAN LENGKAP IMPORT SOAL – LPK CBT SYSTEM'],
+            ['BACA INI DULU SEBELUM MENGISI SOAL!'],
             [''],
-            ['--- PENJELASAN KOLOM ---'],
-            ['Kolom', 'Nama Kolom', 'Keterangan'],
-            ['A', 'Tipe Soal', '(WAJIB) Lihat daftar tipe valid di bawah'],
-            ['B', 'Teks Pertanyaan', '(WAJIB) Teks soal. Boleh berisi HTML sederhana (<b>, <br>)'],
-            ['C', 'Gambar Soal', '(Opsional) Nama file gambar yg sudah diupload, ex: tanya.jpg'],
-            ['D', 'Audio Soal', '(Opsional) Nama file audio yg sudah diupload, ex: dengar.mp3'],
-            ['E-F', 'Opsi A (Teks + Media)', '(Opsional untuk Essay/Short Answer) Teks dan nama file media opsi A'],
-            ['G-H', 'Opsi B (Teks + Media)', 'Sama seperti Opsi A'],
-            ['I-J', 'Opsi C (Teks + Media)', 'Sama seperti Opsi A'],
-            ['K-L', 'Opsi D (Teks + Media)', 'Sama seperti Opsi A'],
-            ['M-N', 'Opsi E (Teks + Media)', '(Opsional) Opsi kelima jika diperlukan'],
-            ['O', 'Jawaban Benar / Kunci', 'Lihat penjelasan per-tipe di bawah'],
-            ['P', 'Poin / Bobot', '(WAJIB) Angka bulat, ex: 10, 15, 20'],
+            ['CARA MENGISI SETIAP KOLOM (Sangat Penting):'],
+            ['Kolom A (Tipe Soal)', 'WAJIB DIISI! Ketik sesuai tipe yang dimau (contoh: Pilihan Ganda, Essay, Audio, dll). Lihat daftar valid di bawah.'],
+            ['Kolom B (Pertanyaan)', 'Ketik pertanyaan soal di sini. Boleh ditarik memanjang.'],
+            ['Kolom C & D (Gambar / Audio)', 'OPSIONAL. Jika soal bergambar atau bersuara, ketik *Nama File*-nya secara persis. Contoh: "soal1.jpg" atau "suara2.mp3". Ingat! Anda HARUS sudah meng-upload file zip audionya ke sistem melalui dashboard.'],
+            ['Kolom E, G, I, K, M', 'Tuliskan teks jawaban A, B, C, D, E.'],
+            ['Kolom F, H, J, L, N', 'OPSIONAL. Isikan *Nama File* hanya jika opsi jawabannya berupa gambar/audio.'],
+            ['Kolom O (Kunci Jawaban)', 'Ketik HURUF dari jawaban yang benar (misal: A, B, atau C).'],
+            ['Kolom P (Poin Nilai)', 'WAJIB DIISI! Ketik angka saja tanpa huruf (contoh: 10 atau 20).'],
             [''],
-            ['--- DAFTAR TIPE SOAL YANG VALID ---'],
-            ['Tipe di Kolom A', 'Keterangan', 'Cara Isi Kolom O (Jawaban)'],
-            ['Pilihan Ganda', '1 jawaban benar dari pilihan', 'Huruf opsi: A, B, C, D, atau E'],
-            ['Multiple Choice', 'Lebih dari 1 jawaban benar', 'Huruf opsi dipisah koma: B,C atau A,C,D'],
-            ['Essay', 'Jawaban teks bebas, dinilai manual oleh Guru', 'KOSONGKAN kolom O'],
-            ['Short Answer', 'Jawaban singkat, dinilai OTOMATIS oleh sistem', 'Isi jawaban benar (lihat panduan khusus di bawah)'],
-            ['Audio', 'Soal Listening. Kolom D WAJIB diisi nama file audio', 'Huruf opsi: A, B, C, D, atau E'],
-            ['Pilihan Ganda Audio', 'Opsi jawaban berupa file audio (Kolom F,H,J,L,N)', 'Huruf opsi: A, B, C, D, atau E'],
-            ['Pilihan Ganda Gambar', 'Opsi jawaban berupa file gambar (Kolom F,H,J,L,N)', 'Huruf opsi: A, B, C, D, atau E'],
+            ['--- PILIHAN KATA UNTUK KOLOM "TIPE SOAL" (Kolom A) ---'],
+            ['=> Ketik "Pilihan Ganda" jika soal biasa (Hanya ada 1 jawaban benar). Kunci Jawaban: A, B, C, D, atau E.'],
+            ['=> Ketik "Multiple Choice" jika ada banyak jawaban yang diklik. Kunci Jawaban isi berjejer pisah koma: A,B,C'],
+            ['=> Ketik "Essay" jika jawaban bebas dari murid dan dinilai guru manual. Kunci Jawaban: KOSONGKAN/HAPUS.'],
+            ['=> Ketik "Short Answer" jika isian singkat yang dinilai sistem otomatis. Kunci Jawaban: lihat bantuan di bawah.'],
+            ['=> Ketik "Audio" jika ini soal Listening. Kolom D wajib diisi nama file mp3. Kunci Jawaban: A, B, C, D, atau E.'],
+            ['=> Ketik "Pilihan Ganda Gambar" jika opsi A/B/C/D isinya gambar semua. Kunci Jawaban: A, B, C, D, atau E.'],
             [''],
-            ['--- PANDUAN KHUSUS TIPE SHORT ANSWER ---'],
-            ['Sistem menilai jawaban murid secara OTOMATIS dengan 2 logika gabungan:'],
+            ['--- BANTUAN UNTUK SOAL ISIAN SINGKAT (Short Answer) ---'],
+            ['Terkadang anak bisa typo/salah ketik! Oleh karena itu di Isian Singkat: '],
+            ['1. Kalau hurufnya besar / kecil tidak akan disalahkan (contoh murid ketik seoul atau SEOUL tetap benar).'],
+            ['2. Kalau murid beda 1-2 huruf tok, misal "Seol" padahal kuncinya "Seoul", maka sistem masih menganggapnya BENAR otomatis.'],
+            ['3. Agar lebih aman, jika Anda punya banyak versi jawaban, MENGHUBUNGKANNYA cukup pakai garis lurus bertingkat | (ada di atas tombol enter).'],
+            ['   Contoh ketik di Kolom O Kunci Jawaban: Seoul|Seol|서울'],
             [''],
-            ['Logika 1: CASE-INSENSITIVE'],
-            ['  Huruf besar/kecil diabaikan sepenuhnya.'],
-            ['  Contoh: "tokyo", "TOKYO", "Tokyo" semuanya dianggap SAMA dan BENAR.'],
-            [''],
-            ['Logika 2: FUZZY MATCHING (Toleransi Typo)'],
-            ['  Sistem menghitung kemiripan teks jawaban murid dengan kunci jawaban.'],
-            ['  Jika kemiripan >= 85%, jawaban dianggap BENAR meskipun ada typo kecil.'],
-            ['  Contoh BENAR:  "Tokio"  vs kunci "Tokyo"  => kemiripan ~89% => BENAR'],
-            ['  Contoh SALAH:  "Tkoyo"  vs kunci "Tokyo"  => kemiripan ~67% => SALAH'],
-            [''],
-            ['KUNCI JAWABAN GANDA:'],
-            ['  Pisahkan jawaban yang diterima dengan tanda | (pipe/garis tegak vertikal).'],
-            ['  Kolom O contoh: Tokyo|Tokio|東京'],
-            ['  Sistem akan cocokkan ke SEMUA kunci. Jika ada 1 yg cocok >= 85% => BENAR.'],
-            [''],
-            ['--- CATATAN PENTING ---'],
-            ['1. File gambar & audio HARUS sudah diupload via menu Media di dashboard Admin/Guru.'],
-            ['2. Nama file bersifat case-sensitive: "soal1.jpg" beda dengan "Soal1.jpg".'],
-            ['3. Baris dengan tipe atau pertanyaan kosong akan dilewati (tidak diimport).'],
-            ['4. Sheet Panduan ini TIDAK dibaca oleh sistem. Sistem hanya membaca sheet pertama.'],
+            ['--- CATATAN AKHIR ---'],
+            ['1. Jangan lupa hapus baris yang berwarna abu-abu (baris 2 sampai 7) sebelum ditaruh data soal asli.'],
+            ['2. Huruf besar-kecil pada penamaan file gambar/audio "SANGAT BERPENGARUH". "mobil.jpg" beda dengan "Mobil.jpg".'],
         ];
 
         foreach ($guideRows as $i => $rowData) {
@@ -184,28 +164,19 @@ class ImportSoalController extends Controller
 
         // Style guide sheet
         $guide->getStyle('A1')->applyFromArray([
-            'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '4F46E5']],
+            'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => 'E11D48']],
         ]);
-        foreach (['A3', 'A17', 'A27', 'A47'] as $hCell) {
+        foreach (['A3', 'A12', 'A20', 'A27'] as $hCell) {
             $guide->getStyle($hCell)->applyFromArray([
-                'font' => ['bold' => true, 'size' => 12],
+                'font' => ['bold' => true, 'size' => 12, 'color' => ['rgb' => '0F172A']],
             ]);
         }
-        $guide->getStyle('A4:C4')->applyFromArray([
+        $guide->getStyle('A4:A10')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '374151']],
         ]);
-        $guide->getStyle('A18:C18')->applyFromArray([
-            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '374151']],
-        ]);
-        $guide->getStyle('A22:C22')->applyFromArray([
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'EFF6FF']],
-            'font' => ['bold' => true, 'color' => ['rgb' => '4F46E5']],
-        ]);
-        $guide->getColumnDimension('A')->setWidth(25);
-        $guide->getColumnDimension('B')->setWidth(55);
-        $guide->getColumnDimension('C')->setWidth(70);
+        $guide->getColumnDimension('A')->setWidth(35);
+        $guide->getColumnDimension('B')->setWidth(75);
 
         $spreadsheet->setActiveSheetIndex(0);
 

@@ -192,10 +192,10 @@ class UserController extends Controller
         $sheet->setTitle('Template Import');
 
         $headers = [
-            'A1' => 'Nama Siswa (Wajib)',
-            'B1' => 'Email (Wajib & Unik)',
-            'C1' => 'Password (Wajib, Min 8 Karakter)',
-            'D1' => 'ID Kelas (Opsional, Lihat Sheet Bantuan)',
+            'A1' => 'Nama Murid (Wajib diisi)',
+            'B1' => 'Alamat Email (Wajib diisi, harus beda tiap murid)',
+            'C1' => 'Password / Kata Sandi (Wajib diisi, minimal 8 huruf/angka)',
+            'D1' => 'Nomor ID Kelas (Kosongkan jika belum ada kelas)',
         ];
         
         foreach ($headers as $cell => $value) {
@@ -204,9 +204,9 @@ class UserController extends Controller
 
         // Header Styling
         $sheet->getStyle('A1:D1')->applyFromArray([
-            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF'], 'size' => 12],
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '10b981']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'wrapText' => true],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'wrapText' => false],
         ]);
         
         foreach (range('A', 'D') as $col) {
@@ -214,32 +214,77 @@ class UserController extends Controller
         }
 
         // Sample Row
-        $sheet->setCellValue('A2', 'Andi Siswan');
-        $sheet->setCellValue('B2', 'andi@lpk.com');
-        $sheet->setCellValue('C2', 'lpk123456');
+        $sheet->setCellValue('A2', 'Budi Santoso');
+        $sheet->setCellValue('B2', 'budi123@gmail.com');
+        $sheet->setCellValue('C2', 'rahasia123');
         $sheet->setCellValue('D2', '1'); // Contoh ID kelas 1
+        
+        $sheet->setCellValue('A3', 'Siti Aminah');
+        $sheet->setCellValue('B3', 'siti@yahoo.com');
+        $sheet->setCellValue('C3', 'sandisiti99');
+        $sheet->setCellValue('D3', ''); 
 
-        // --- Sheet 2: Reference (ID Kelas) ---
+        $sheet->getStyle('A2:D3')->applyFromArray([
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F1F5F9']],
+        ]);
+
+        // --- Sheet 2: Reference (Panduan & ID Kelas) ---
         $refSheet = $spreadsheet->createSheet();
-        $refSheet->setTitle('Bantuan ID Kelas');
+        $refSheet->setTitle('CARA BACA & BANTUAN');
         
-        $refSheet->setCellValue('A1', 'ID');
-        $refSheet->setCellValue('B1', 'Nama Kelas');
-        
-        $refSheet->getStyle('A1:B1')->applyFromArray([
+        $panduan = [
+            ['PANDUAN MUDAH MENGISI DATA MURID BARU'],
+            [''],
+            ['--- CARA MENGISI ---'],
+            ['1. Buka sheet "Template Import" yang ada di sebelah kiri bawah layar Anda.'],
+            ['2. Baris yang berwarna abu-abu (Budi & Siti) HANYA CONTOH. Silakan dihapus saja.'],
+            ['3. Ketik nama murid di Kolom A.'],
+            ['4. Ketik email mereka di Kolom B (ingat: email tidak boleh sama dengan murid lain).'],
+            ['5. Ketik password/sandi di Kolom C (wajib minimal 8 karakter/huruf/angka).'],
+            ['6. Jika Anda ingin langsung memasukkan murid ke sebuah kelas, isi angka Nomor ID Kelas di Kolom D.'],
+            ['7. Lihat daftar Nomor ID Kelas resmi di bawah ini (bukan nama kelasnya, tapi ketik ANGKANYA saja).'],
+            [''],
+            ['--- DAFTAR NOMOR ID KELAS SAAT INI ---'],
+            ['Nomor ID Kelas', 'Nama Kelas aslinya'],
+        ];
+
+        $rowNum = 1;
+        foreach ($panduan as $row) {
+            if (count($row) == 1) {
+                $refSheet->setCellValue('A' . $rowNum, $row[0]);
+            } else {
+                $refSheet->setCellValue('A' . $rowNum, $row[0]);
+                $refSheet->setCellValue('B' . $rowNum, $row[1]);
+            }
+            $rowNum++;
+        }
+
+        // Apply styles to Guide
+        $refSheet->getStyle('A1')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'E11D48'], 'size' => 14],
+        ]);
+        $refSheet->getStyle('A3')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => '0F172A'], 'size' => 12],
+        ]);
+        $refSheet->getStyle('A12')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => '0F172A'], 'size' => 12],
+        ]);
+        $refSheet->getStyle('A13:B13')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '3b82f6']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '2563EB']],
         ]);
 
         $kelas = \App\Models\Kelas::all();
-        $rowNum = 2;
         foreach ($kelas as $k) {
             $refSheet->setCellValue('A' . $rowNum, $k->id);
             $refSheet->setCellValue('B' . $rowNum, $k->nama);
+            
+            // Format center ID
+            $refSheet->getStyle('A'.$rowNum)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $rowNum++;
         }
-        $refSheet->getColumnDimension('A')->setAutoSize(true);
-        $refSheet->getColumnDimension('B')->setAutoSize(true);
+        $refSheet->getColumnDimension('A')->setWidth(35);
+        $refSheet->getColumnDimension('B')->setWidth(50);
 
         $spreadsheet->setActiveSheetIndex(0); // Go back to first sheet
 
