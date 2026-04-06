@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>EPS-TOPIK CBT Simulator - {{ $ujian->judul }}</title>
-    
+    <title>{{ $ujian->judul }} - UBT Learning LPK URISOWON</title>
+    <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
     <script>
         window.EXAM_ID = {{ $ujian_peserta->id }};
         window.TIMER_SECONDS = {{ $sisaDetik }};
@@ -18,15 +18,15 @@
     <style>
         /* RESET & BASE */
         * { box-sizing: border-box; }
-        body { 
-            background-color: #f3f4f6; 
-            margin: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            height: 100vh; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            flex-direction: column; 
+        body {
+            background-color: #f3f4f6;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
             font-weight: normal;
         }
 
@@ -119,7 +119,7 @@
         .question-text {
             flex: 1;
         }
-        
+
         /* Audio Player Styling */
         .audio-wrapper {
             margin-top: 20px;
@@ -393,7 +393,7 @@
             }
             .hdr-timer, .hdr-val, .hdr-btn-finish { font-size: 14px !important; }
             .hdr-label { display: inline-block !important; font-size: 10px !important; margin-right: 5px !important; }
-            
+
             .cbt-left {
                 padding: 15px 25px !important;
             }
@@ -408,7 +408,7 @@
             }
             .opt-text { font-size: 16px !important; }
             .question-flex { font-size: 16px !important; margin-bottom: 20px !important; }
-            
+
             /* Essay adjustment */
             .cbt-right textarea {
                 height: calc(100% - 25px) !important;
@@ -421,7 +421,7 @@
                 height: 100% !important;
             }
             .ftr-btn { font-size: 12px !important; }
-            
+
             /* Modal Show All Adjustments */
             .modal-overlay {
                 padding: 0 !important;
@@ -454,11 +454,11 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
         </svg>
         <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 15px; letter-spacing: -0.5px;">Gunakan Mode Landscape</h2>
-        <p style="font-size: 15px; color: #94a3b8; max-width: 300px; line-height: 1.6;">Ujian simulator CBT tidak dapat dikerjakan dalam mode layar potrait. Mohon putar ponsel Anda ke posisi landscape untuk melanjutkan.</p>
+        <p style="font-size: 15px; color: #94a3b8; max-width: 300px; line-height: 1.6;">Ujian Ubiquitous Base Test tidak dapat dikerjakan dalam mode layar potrait. Mohon putar ponsel Anda ke posisi landscape untuk melanjutkan.</p>
     </div>
 
     <div class="cbt-container">
-        
+
         <!-- HEADER -->
         <header class="cbt-header">
             <div class="hdr-col">
@@ -503,7 +503,7 @@
                         </audio>
                     </div>
                 @endif
-                
+
                 @if($currentSoal->gambar_path)
                     <div style="text-align: center; margin-top: 20px;">
                         <div class="watermark-container">
@@ -526,7 +526,7 @@
                                 @if($opsi->teks)
                                     <span>{{ $opsi->teks }}</span>
                                 @endif
-                                
+
                                 @if($opsi->media_tipe === 'audio' && $opsi->media_path)
                                     <!-- Stop propagation on audio play so the radio button isn't toggled incorrectly on some devices -->
                                     <div onclick="event.stopPropagation()">
@@ -556,7 +556,7 @@
                                 @if($opsi->teks)
                                     <span>{{ $opsi->teks }}</span>
                                 @endif
-                                
+
                                 @if($opsi->media_tipe === 'audio' && $opsi->media_path)
                                     <div onclick="event.stopPropagation()">
                                         <audio controls controlsList="nodownload" preload="none" style="height: 40px; max-width: 220px; outline:none;">
@@ -582,7 +582,7 @@
                     <div style="padding: 35px; display: flex; flex-direction: column; height: 100%;">
                         <p style="font-size: 16px; margin-top: 0; color: #374151; font-weight: 600;">✏️ Jawaban Singkat:</p>
                         <p style="font-size: 13px; color: #6b7280; margin-top: 0; margin-bottom: 16px;">Tulis jawaban Anda di bawah ini. Sistem akan menilai otomatis.<br>Tidak perlu khawatir soal huruf besar/kecil atau typo kecil.</p>
-                        <input type="text" name="jawaban" form="answer-form" 
+                        <input type="text" name="jawaban" form="answer-form"
                             class="auto-save-trigger-typing"
                             value="{{ $jawabanSaatIni?->jawaban_text ?? '' }}"
                             autocomplete="off" autocorrect="off" spellcheck="false"
@@ -601,9 +601,9 @@
             @else
                 <div class="ftr-btn ftr-prev">&lt; Prev</div>
             @endif
-            
+
             <button id="btn-show-all" class="ftr-btn ftr-mid">QUESTIONS LIST</button>
-            
+
             @if($page < $totalSoal)
                 <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $page + 1]) }}" class="ftr-btn ftr-next">Next &gt;</a>
             @else
@@ -613,13 +613,13 @@
     </div>
 
     <!-- BOTTOM TEXT -->
-    <div class="bottom-text">EPS-TOPIK CBT Simulator Interface</div>
+    <div class="bottom-text">UBT Learning LPK URISOWON</div>
 
 
     <!-- MODAL SHOW ALL QUESTIONS -->
     <div id="modal-show-all" class="modal-overlay">
         <div class="modal-box">
-            
+
             <div class="modal-header">
                 <button id="btn-close-modal" style="background:none; border:none; color:#2563eb; cursor:pointer;">&lt; BACK</button>
                 <div style="display: flex; gap: 20px; font-size: 13px; color: #4b5563;">
@@ -689,10 +689,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        
+
         // ANTI SCREENSHOT & RIGHT CLICK
         document.addEventListener('contextmenu', event => event.preventDefault()); // Prevent right-click
-        
+
         document.addEventListener('keydown', (e) => {
             // Prevent PrintScreen, F12, Ctrl+S, Ctrl+P, Ctrl+U, Ctrl+Shift+I, Win+Shift+S (Meta+Shift+S)
             if (
@@ -727,28 +727,28 @@
         // TIMER
         let timeRemaining = window.TIMER_SECONDS;
         const timerDisplay = document.getElementById('countdown_timer');
-        
+
         function updateTimer() {
             if (timeRemaining <= 0) {
                 timerDisplay.innerText = "00:00";
                 document.getElementById('finish-form').submit();
                 return;
             }
-            
+
             // Format 59:58 (MM:SS)
             const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
             const s = Math.floor(timeRemaining % 60).toString().padStart(2, '0');
-            
+
             timerDisplay.innerText = `${m}:${s}`;
             timeRemaining--;
         }
-        
+
         updateTimer();
         setInterval(updateTimer, 1000);
-        
+
         // ANTI CHEAT & TAB DETECTION
         let isNavigating = false;
-        
+
         // Hanya elemen yang memindahkan halaman yang mematikan cheat detector
         document.querySelectorAll('a[href], button[onclick*="submit"]').forEach(el => {
             el.addEventListener('click', () => { isNavigating = true; });
@@ -801,9 +801,9 @@
                 }
                 return data;
             })
-            .then(data => { 
+            .then(data => {
                 if(data.redirect) {
-                    window.location.replace(data.redirect); 
+                    window.location.replace(data.redirect);
                 } else {
                     alert("Akses diblokir (Response tidak lengkap).");
                 }
@@ -815,7 +815,7 @@
             });
         }
 
-        // AUTO SAVE 
+        // AUTO SAVE
         let saveTimeout = null;
         function submitAnswer(dataObj) {
             fetch(window.AUTO_SAVE_URL, {

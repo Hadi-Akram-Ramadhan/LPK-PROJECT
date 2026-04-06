@@ -6,13 +6,13 @@
     .header-section { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
     .page-title { font-size: 32px; font-weight: 800; color: #1e293b; margin-bottom: 8px; letter-spacing: -0.5px; }
     .page-subtitle { font-size: 15px; color: #64748b; line-height: 1.6; }
-    
+
     .nav-tabs-container { margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; align-items: center; justify-content: space-between; }
     .nav-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
     .nav-tab { padding: 10px 20px; border-radius: 12px; font-size: 14px; font-weight: 700; color: #64748b; background: transparent; border: 2px solid transparent; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
     .nav-tab:hover { background: #f1f5f9; color: #1e293b; }
     .nav-tab.active { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
-    
+
     .search-box { position: relative; width: 300px; }
     .search-box input { width: 100%; padding: 12px 16px 12px 40px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 14px; outline: none; transition: 0.2s; background: #fff; }
     .search-box input:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
@@ -26,13 +26,13 @@
     .exam-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.05); border-color: #2563eb44; }
     .exam-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: #111827; transition: 0.3s; }
     .exam-card[data-type="tryout"]::before { background: #2563eb; }
-    
+
     .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap:10px; }
     .tag { padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid transparent; }
-    
+
     .tag-category-reguler { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
     .tag-category-tryout { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
-    
+
     .tag-available { background: #ecfdf5; color: #10b981; }
     .tag-finished { background: #f1f5f9; color: #475569; }
     .tag-doing { background: #fffbeb; color: #d97706; border-color: #fef3c7; }
@@ -41,11 +41,11 @@
 
     .exam-title { font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 16px; line-height: 1.2; }
     .exam-desc { font-size: 16px; color: #64748b; line-height: 1.6; margin-bottom: 30px; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    
+
     .exam-meta { background: #f8fafc; border-radius: 14px; padding: 18px 22px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-bottom: 30px; border: 1px solid #f1f5f9; }
     .meta-item { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #475569; }
     .meta-item svg { width: 18px; height: 18px; color: #3b82f6; flex-shrink: 0; }
-    
+
     .btn-action { width: 100%; padding: 16px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; border: none; text-align: center; text-decoration: none; display: inline-block; }
     .btn-primary { background: #111827; color: #fff; }
     .btn-primary:hover { background: #1e293b; transform: scale(1.01); }
@@ -64,14 +64,14 @@
     @media (max-width: 640px) {
         .page-title { font-size: 24px; }
         .page-subtitle { font-size: 14px; }
-        
+
         .header-section { flex-direction: column; align-items: flex-start; gap: 15px; }
         .search-box { width: 100%; }
-        
+
         .nav-tabs { width: 100%; justify-content: space-between; gap: 5px; }
         .nav-tab { flex: 1; justify-content: center; padding: 12px 10px; font-size: 12px; text-align: center; border-radius: 8px; flex-direction: column; gap: 4px; }
         .nav-tab svg { width: 20px; height: 20px; }
-        
+
         .exam-card { padding: 24px 20px; }
         .exam-title { font-size: 22px; }
         .exam-desc { font-size: 14px; margin-bottom: 20px; }
@@ -97,7 +97,7 @@
         <div>
             <h1 class="page-title">Halo, {{ auth()->user()->name }} 👋</h1>
             <p class="page-subtitle">
-                Selamat datang di sistem manajemen ujian LPK URISOWON.<br>
+                Selamat datang di UBT Learning LPK URISOWON.<br>
                 Terdapat <strong>{{ $ujianPesertas->count() }} Jadwal Ujian</strong> yang ditugaskan untuk Anda saat ini.
             </p>
         </div>
@@ -119,7 +119,7 @@
                 Ujian Try-Out
             </button>
         </div>
-        
+
         <div class="search-box">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input type="text" id="search-input" placeholder="Cari judul ujian...">
@@ -133,7 +133,7 @@
                 $now = \Carbon\Carbon::now();
                 $isBelumWaktunya = $ujian->mulai && $now->lt(\Carbon\Carbon::parse($ujian->mulai));
                 $isTerlambat = $ujian->selesai && $now->gt(\Carbon\Carbon::parse($ujian->selesai)) && $peserta->status == 'belum_mulai';
-                
+
                 $statusTag = '';
                 $statusLabel = '';
                 $btnColor = 'btn-primary';
@@ -185,10 +185,10 @@
                     <span class="tag {{ $ujian->jenis_ujian === 'tryout' ? 'tag-category-tryout' : 'tag-category-reguler' }}">{{ $ujian->jenis_ujian === 'tryout' ? 'TRY-OUT' : 'REGULER' }}</span>
                     <span class="tag {{ $statusTag }}">{{ $statusLabel }}</span>
                 </div>
-                
+
                 <h3 class="exam-title exam-title-text">{{ $ujian->judul }}</h3>
                 <p class="exam-desc">{{ $ujian->deskripsi ?? 'Pilih ujian ini untuk meraba kemampuan dan persiapan evaluasi akhir.' }}</p>
-                
+
                 <div class="exam-meta">
                     <div class="meta-item">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -242,24 +242,24 @@
         const examCards = document.querySelectorAll('.exam-card-wrapper');
         const noResults = document.getElementById('no-results');
         const tabs = document.querySelectorAll('.nav-tab');
-        
+
         let currentFilter = 'all';
         let currentSearch = '';
 
         function runFilter() {
             let hasResults = false;
-            
+
             examCards.forEach(card => {
-                const type = card.getAttribute('data-type') || 'reguler'; // fallback 
+                const type = card.getAttribute('data-type') || 'reguler'; // fallback
                 const titleElement = card.querySelector('.exam-title-text');
                 const descElement = card.querySelector('.exam-desc');
-                
+
                 const titleMatch = titleElement && titleElement.textContent.toLowerCase().includes(currentSearch);
                 const descMatch = descElement && descElement.textContent.toLowerCase().includes(currentSearch);
                 const searchMatch = currentSearch === '' || titleMatch || descMatch;
-                
+
                 const typeMatch = currentFilter === 'all' || type === currentFilter;
-                
+
                 if (searchMatch && typeMatch) {
                     card.style.display = 'flex';
                     hasResults = true;
@@ -280,14 +280,14 @@
                 runFilter();
             });
         }
-        
+
         // Tab Listeners
         tabs.forEach(tab => {
             tab.addEventListener('click', function() {
                 // Update active class
                 tabs.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
-                
+
                 // Update filter and run
                 currentFilter = this.getAttribute('data-filter');
                 runFilter();
