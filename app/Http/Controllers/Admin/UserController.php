@@ -174,10 +174,19 @@ class UserController extends Controller
             $import->import($tmpPath);
             $summary = $import->getSummary();
 
-            if ($summary['sukses'] > 0) {
-                return redirect()->route('admin.users.index')->with('success', "{$summary['sukses']} siswa berhasil diimport.");
+            $msg = "Import selesai. ";
+            $msg .= "Berhasil: {$summary['sukses']} siswa. ";
+            if ($summary['terlewati'] > 0) {
+                $msg .= "Dilewati (Sudah ada): {$summary['terlewati']}. ";
             }
-            return back()->with('error', 'Tidak ada data siswa yang berhasil diimport.');
+            if ($summary['gagal'] > 0) {
+                $msg .= "Gagal: {$summary['gagal']}. ";
+            }
+
+            if ($summary['sukses'] > 0 || $summary['terlewati'] > 0) {
+                return redirect()->route('admin.users.index')->with('success', $msg);
+            }
+            return back()->with('error', 'Tidak ada data siswa yang berhasil diimport. ' . $msg);
         } catch (\Throwable $e) {
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }

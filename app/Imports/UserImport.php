@@ -11,8 +11,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class UserImport
 {
-    private int $sukses = 0;
-    private int $gagal  = 0;
+    private int $sukses    = 0;
+    private int $terlewati = 0;
+    private int $gagal     = 0;
 
     /**
      * Loop tiap baris dari file Excel yang diberikan (path sementara).
@@ -43,14 +44,15 @@ class UserImport
                 continue;
             }
 
+            // Cek apakah user sudah terdaftar di sistem (untuk skip daripada error)
+            $existing = User::where('email', $email)->first();
+            if ($existing) {
+                $this->terlewati++;
+                continue; // Lanjut ke user berikutnya tanpa error
+            }
+
             DB::beginTransaction();
             try {
-                // Check if user already exists
-                $existing = User::where('email', $email)->first();
-                if ($existing) {
-                    throw new \Exception("Email already exists");
-                }
-
                 User::create([
                     'name'     => $name,
                     'email'    => $email,
@@ -70,6 +72,10 @@ class UserImport
 
     public function getSummary(): array
     {
-        return ['sukses' => $this->sukses, 'gagal' => $this->gagal];
+        return [
+            'sukses'    => $this->sukses,
+            'terlewati' => $this->terlewati,
+            'gagal'     => $this->gagal
+        ];
     }
 }
