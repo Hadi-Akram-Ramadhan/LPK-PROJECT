@@ -34,7 +34,7 @@
 <div class="page-toolbar">
     <div class="toolbar-search">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input type="text" placeholder="Cari soal...">
+        <input type="text" id="searchInput" placeholder="Cari soal...">
     </div>
     <div style="display: flex; gap: 10px;">
         <a href="{{ route('guru.import.index') }}" style="display:inline-flex;align-items:center;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#fff;color:#2563eb;border:1.5px solid #2563eb;">
@@ -43,7 +43,7 @@
         </a>
         <a href="{{ route('guru.soal.create') }}" style="display:inline-flex;align-items:center;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#16a34a;color:#fff;border:none;">
             <svg style="width:16px;height:16px;margin-right:6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-            + Buat Soal Manual
+            Buat Soal Manual
         </a>
     </div>
 </div>
@@ -125,3 +125,27 @@
 </div>
 @endsection
 
+@section('extra-js')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const term = this.value.toLowerCase().trim();
+                const rows = document.querySelectorAll('.soal-table tbody tr');
+                rows.forEach(row => {
+                    // Skip empty state row
+                    if (row.querySelector('td[colspan]')) return;
+                    
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(term)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+@endsection
