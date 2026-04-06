@@ -21,7 +21,7 @@
         </div>
         <form action="{{ route('admin.paket-soal.index') }}" method="GET" style="position:relative;">
             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama paket..." onchange="this.form.submit()" style="padding:10px 14px 10px 38px;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;width:240px;background:#fff;font-family:'Inter',sans-serif;">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama paket..." style="padding:10px 14px 10px 38px;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;width:240px;background:#fff;font-family:'Inter',sans-serif;">
         </form>
     </div>
     <a href="{{ route('admin.paket-soal.create') }}" style="display:inline-flex;align-items:center;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#2563eb;color:#fff;gap:8px;flex-shrink:0;">

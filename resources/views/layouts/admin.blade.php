@@ -299,6 +299,20 @@
                     confirmButtonText: 'Tutup'
                 });
             };
+
+            // 3. Global Debounce Search (Pencarian Otomatis)
+            let searchDebounceTimer;
+            document.querySelectorAll('input[name*="search"]').forEach(input => {
+                input.addEventListener('input', function() {
+                    const form = this.form;
+                    if (!form || form.method.toLowerCase() !== 'get') return;
+                    
+                    clearTimeout(searchDebounceTimer);
+                    searchDebounceTimer = setTimeout(() => {
+                        form.submit();
+                    }, 700); // Tunggu 700ms setelah mengetik
+                });
+            });
         });
     </script>
     </script>

@@ -45,7 +45,7 @@
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <form action="{{ route('guru.paket-soal.show', $paketSoal) }}" method="GET" style="position:relative;">
             <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:#94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pertanyaan..." onchange="this.form.submit()" style="padding:8px 12px 8px 32px;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;width:200px;background:#f8fafc;">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pertanyaan..." style="padding:8px 12px 8px 32px;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;width:200px;background:#f8fafc;">
         </form>
         <a href="{{ route('guru.soal.create', ['paket' => $paketSoal->id]) }}" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#2563eb;color:#fff;">
             <svg style="width:15px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
