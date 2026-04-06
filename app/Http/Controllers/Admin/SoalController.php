@@ -356,6 +356,7 @@ class SoalController extends Controller
             ['--- CATATAN AKHIR ---'],
             ['1. Jangan lupa hapus baris yang berwarna abu-abu (baris 2 sampai 7) sebelum ditaruh data soal asli.'],
             ['2. Huruf besar-kecil pada penamaan file gambar/audio "SANGAT BERPENGARUH". "mobil.jpg" beda dengan "Mobil.jpg".'],
+            ['3. SATU FILE EXCEL UNTUK SATU UJIAN. Jangan campur soal Ujian Seoul dan soal Ujian Busan dalam satu file Excel yang sama.'],
         ];
 
         foreach ($guideRows as $i => $rowData) {

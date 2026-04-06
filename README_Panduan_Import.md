@@ -30,6 +30,8 @@ Tujuan dari file Excel ini: memasukkan puluhan atau ratusan siswa sekaligus ke s
 
 Tujuan dari Excel ini: agar guru tidak perlu ribet mengklik *Tambah Soal* berkali-kali di komputer. Anda bisa menyusun soal di Excel sambil santai ngopi, lalu sisanya otomatis.
 
+**PENTING:** Satu file Excel hanya untuk **SATU Ujian Saja**. Jangan mencampur soal Ujian Seoul dan soal Ujian Busan dalam satu file Excel yang sama. Buatlah file Excel terpisah untuk masing-masing tipe ujian agar tidak tertukar.
+
 ### Langkah-langkah:
 1. **Download (Unduh) Template Excel Soal** dari dashboard Guru atau Admin.
 2. Sama seperti file murid, **HAPUS baris nomor 2 sampai 7 (yang berwarna abu-abu & biru biru)** karena itu cuma contoh dari kami agar Anda lebih tergambar.
