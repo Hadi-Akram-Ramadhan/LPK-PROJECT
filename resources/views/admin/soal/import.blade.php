@@ -15,7 +15,7 @@
         transition: border-color 0.15s; cursor: pointer; background: #f8fafc;
     }
     .file-input-wrapper:hover { border-color: #2563eb; background: #eff6ff; }
-    .file-input-wrapper svg { width: 48px; height: 48px; color: #94a3b8; margin-bottom: 12px; }
+    .file-input-wrapper svg { width: 48px; height: 48px; color: #94a3b8; margin-bottom: 12px; display: block; margin-left: auto; margin-right: auto; }
     .file-input-text { font-size: 14px; color: #64748b; margin-bottom: 4px; }
     .file-input-sub { font-size: 12px; color: #94a3b8; }
     .help-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 16px; margin-bottom: 24px; }
