@@ -9,13 +9,15 @@ use Illuminate\Http\Request;
 
 class PaketSoalController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pakets = PaketSoal::withCount('soals')
-            ->with('guru') // Load guru for 'Oleh' display
-            ->latest()
-            ->get();
+        $query = PaketSoal::withCount('soals')->with('guru');
+        
+        if ($request->filled('search')) {
+            $query->where('nama', 'like', '%' . $request->search . '%');
+        }
 
+        $pakets = $query->latest()->paginate(15);
         return view('guru.paket_soal.index', compact('pakets'));
     }
 
@@ -41,9 +43,15 @@ class PaketSoalController extends Controller
             ->with('success', "Paket Soal \"{$request->nama}\" berhasil dibuat.");
     }
 
-    public function show(PaketSoal $paketSoal)
+    public function show(Request $request, PaketSoal $paketSoal)
     {
-        $soals = $paketSoal->soals()->with('pilihanJawabans')->latest()->get();
+        $query = $paketSoal->soals()->with('pilihanJawabans');
+        
+        if ($request->filled('search')) {
+            $query->where('pertanyaan', 'like', '%' . $request->search . '%');
+        }
+
+        $soals = $query->latest()->paginate(20);
         return view('guru.paket_soal.show', compact('paketSoal', 'soals'));
     }
 

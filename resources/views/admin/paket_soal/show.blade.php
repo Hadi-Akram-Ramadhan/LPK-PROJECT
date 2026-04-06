@@ -25,8 +25,8 @@
 @endif
 
 {{-- Info Header --}}
-<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
-    <div>
+<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:300px;">
         <h2 style="font-size:18px;font-weight:700;color:#1e293b;margin:0 0 4px;">{{ $paketSoal->nama }}</h2>
         @if($paketSoal->deskripsi)
         <p style="font-size:13px;color:#94a3b8;margin:0;">{{ $paketSoal->deskripsi }}</p>
@@ -34,22 +34,26 @@
         <div style="display:flex;gap:16px;margin-top:10px;">
             <span style="font-size:12px;color:#64748b;display:flex;align-items:center;gap:4px;">
                 <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                {{ $soals->count() }} Soal
+                {{ $soals->total() }} Soal Terdaftar
             </span>
             <span style="font-size:12px;color:#64748b;display:flex;align-items:center;gap:4px;">
                 <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                {{ $paketSoal->guru->name ?? 'Admin' }}
+                Pengelola: {{ $paketSoal->guru->name ?? 'Admin' }}
             </span>
         </div>
     </div>
-    <div style="display:flex;gap:10px;">
-        <a href="{{ route('admin.soal.create', ['paket' => $paketSoal->id]) }}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#2563eb;color:#fff;">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <form action="{{ route('admin.paket-soal.show', $paketSoal) }}" method="GET" style="position:relative;">
+            <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:#94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pertanyaan..." onchange="this.form.submit()" style="padding:8px 12px 8px 32px;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;width:200px;background:#f8fafc;">
+        </form>
+        <a href="{{ route('admin.soal.create', ['paket' => $paketSoal->id]) }}" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#2563eb;color:#fff;">
             <svg style="width:15px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
             Tambah Soal
         </a>
-        <a href="{{ route('admin.soal.import', ['paket' => $paketSoal->id]) }}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#fff;color:#2563eb;border:1.5px solid #2563eb;">
+        <a href="{{ route('admin.soal.import', ['paket' => $paketSoal->id]) }}" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#fff;color:#059669;border:1.5px solid #059669;">
             <svg style="width:15px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19h6m-3-3v3"/></svg>
-            Import Excel
+            Import
         </a>
     </div>
 </div>
@@ -79,7 +83,7 @@
         <tbody>
             @foreach($soals as $index => $soal)
             <tr style="border-top:1px solid #f1f5f9;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
-                <td style="padding:16px 20px;font-size:14px;color:#94a3b8;font-weight:600;">{{ $index + 1 }}</td>
+                <td style="padding:16px 20px;font-size:14px;color:#94a3b8;font-weight:600;">{{ $soals->firstItem() + $index }}</td>
                 <td style="padding:16px 20px;max-width:380px;">
                     <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;color:#334155;">
                         {!! strip_tags($soal->pertanyaan) !!}
@@ -175,8 +179,13 @@
             @endforeach
         </tbody>
     </table>
+    @if($soals->hasPages())
+    <div style="padding:16px 20px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+        {{ $soals->appends(request()->query())->links() }}
+    </div>
+    @endif
     <div style="padding:14px 20px;font-size:13px;color:#94a3b8;border-top:1px solid #f1f5f9;">
-        Total {{ $soals->count() }} soal · Total poin: {{ $soals->sum('poin') }}
+        Menampilkan {{ $soals->firstItem() }}-{{ $soals->lastItem() }} dari {{ $soals->total() }} soal
     </div>
 </div>
 @endif

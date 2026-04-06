@@ -11,9 +11,15 @@ class KelasController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $kelas = Kelas::withCount('users')->latest()->paginate(15);
+        $query = Kelas::withCount('users');
+        
+        if ($request->filled('search')) {
+            $query->where('nama', 'like', '%' . $request->search . '%');
+        }
+
+        $kelas = $query->latest()->paginate(15);
         return view('admin.kelas.index', compact('kelas'));
     }
 
