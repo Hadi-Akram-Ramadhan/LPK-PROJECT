@@ -30,7 +30,8 @@ class ExamMonitorController extends Controller
 
     public function export(Ujian $ujian)
     {
-        $pesertas = \App\Models\UjianPeserta::with('user.kelas')
+        // Eager load jawabanMurids.soal to calculate scores without N+1
+        $pesertas = \App\Models\UjianPeserta::with(['user.kelas', 'jawabanMurids.soal'])
             ->where('ujian_id', $ujian->id)
             ->get();
 
@@ -46,35 +47,46 @@ class ExamMonitorController extends Controller
         ];
 
         // Headers
-        $headers = ['No', 'Nama Murid', 'Kelas', 'Waktu Mulai', 'Waktu Selesai', 'Status', 'Skor'];
+        $headers = ['No', 'Nama Murid', 'Kelas', 'Waktu Mulai', 'Waktu Selesai', 'Status', 'Listening', 'Reading', 'Total Skor'];
         $column = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($column . '1', $header);
             $sheet->getColumnDimension($column)->setAutoSize(true);
             $column++;
         }
-        $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
+        $sheet->getStyle('A1:I1')->applyFromArray($headerStyle);
 
         // Data
         $row = 2;
         foreach ($pesertas as $index => $p) {
+            // Hitung rincian nilai
+            $listening = $p->jawabanMurids->filter(function($j) {
+                return $j->soal && $j->soal->tipe === 'audio';
+            })->sum('poin_didapat');
+
+            $reading = $p->jawabanMurids->filter(function($j) {
+                return $j->soal && $j->soal->tipe !== 'audio';
+            })->sum('poin_didapat');
+
             $sheet->setCellValue('A' . $row, $index + 1);
             $sheet->setCellValue('B' . $row, $p->user->name);
             $sheet->setCellValue('C' . $row, $p->user->kelas->nama ?? '-');
             $sheet->setCellValue('D' . $row, $p->mulai_at);
             $sheet->setCellValue('E' . $row, $p->selesai_at);
             $sheet->setCellValue('F' . $row, strtoupper($p->status));
-            $sheet->setCellValue('G' . $row, $p->skor);
+            $sheet->setCellValue('G' . $row, $listening);
+            $sheet->setCellValue('H' . $row, $reading);
+            $sheet->setCellValue('I' . $row, $p->skor);
             
             // Center alignment for some columns
             $sheet->getStyle('A' . $row . ':A' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('F' . $row . ':G' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('F' . $row . ':I' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             
             $row++;
         }
 
         // Final Borders
-        $sheet->getStyle('A1:G' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+        $sheet->getStyle('A1:I' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
         // Sanitize the filename for safe delivery
         $sanitizedJudul = preg_replace('/[^A-Za-z0-9_\-]/', '_', $ujian->judul);
