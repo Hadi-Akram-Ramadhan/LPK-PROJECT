@@ -481,7 +481,7 @@
             @csrf
         </form>
 
-        <form id="answer-form" style="display: none;">
+        <form id="answer-form" style="display: none;" onsubmit="event.preventDefault();">
             <input type="hidden" name="soal_id" value="{{ $currentSoal->id }}">
         </form>
 
@@ -636,42 +636,54 @@
 
             <div class="modal-body">
                 @php
-                    $halfPoint = floor($totalSoal / 2);
-                    if($halfPoint == 0) $halfPoint = $totalSoal;
+                    $readingSoals = [];
+                    $listeningSoals = [];
+                    foreach($soals as $index => $s) {
+                        $num = $index + 1;
+                        if (in_array($s->tipe, ['audio', 'pilihan_ganda_audio'])) {
+                            $listeningSoals[$num] = $s;
+                        } else {
+                            $readingSoals[$num] = $s;
+                        }
+                    }
                 @endphp
 
-                <!-- Sesi 1 -->
+                <!-- Sesi Reading / General -->
+                @if(count($readingSoals) > 0)
                 <div class="modal-section">
-                    <div style="font-size: 18px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">Session 1: Reading</div>
+                    <div style="font-size: 18px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
+                        {{ count($listeningSoals) > 0 ? 'Session 1: Reading' : 'Questions List' }}
+                    </div>
                     <div class="grid-nums">
-                        @for ($i = 1; $i <= $halfPoint; $i++)
+                        @foreach ($readingSoals as $num => $s)
                             @php
-                                $isAnsw = in_array($soals[$i-1]->id, $answeredSoalIds);
-                                $isCurr = $i == $page;
+                                $isAnsw = in_array($s->id, $answeredSoalIds);
+                                $isCurr = $num == $page;
                                 $cls = "grid-btn " . ($isAnsw ? 'answered ' : '') . ($isCurr ? 'current ' : '');
                             @endphp
-                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $i]) }}" class="{{ $cls }}">
-                                {{ $i }}
+                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $num]) }}" class="{{ $cls }}">
+                                {{ $num }}
                             </a>
-                        @endfor
+                        @endforeach
                     </div>
                 </div>
+                @endif
 
-                <!-- Sesi 2 -->
-                @if($totalSoal > $halfPoint)
+                <!-- Sesi Listening -->
+                @if(count($listeningSoals) > 0)
                 <div class="modal-section">
                     <div style="font-size: 18px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">Session 2: Listening</div>
                     <div class="grid-nums">
-                        @for ($i = $halfPoint + 1; $i <= $totalSoal; $i++)
+                        @foreach ($listeningSoals as $num => $s)
                             @php
-                                $isAnsw = in_array($soals[$i-1]->id, $answeredSoalIds);
-                                $isCurr = $i == $page;
+                                $isAnsw = in_array($s->id, $answeredSoalIds);
+                                $isCurr = $num == $page;
                                 $cls = "grid-btn " . ($isAnsw ? 'answered ' : '') . ($isCurr ? 'current ' : '');
                             @endphp
-                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $i]) }}" class="{{ $cls }}">
-                                {{ $i }}
+                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $num]) }}" class="{{ $cls }}">
+                                {{ $num }}
                             </a>
-                        @endfor
+                        @endforeach
                     </div>
                 </div>
                 @endif
