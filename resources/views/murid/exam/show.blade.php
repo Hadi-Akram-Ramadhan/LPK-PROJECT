@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>EPS-TOPIK CBT Simulator - {{ $ujian->judul }}</title>
-    
+    <title>{{ $ujian->judul }} - UBT Learning LPK URISOWON</title>
+    <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
     <script>
         window.EXAM_ID = {{ $ujian_peserta->id }};
         window.TIMER_SECONDS = {{ $sisaDetik }};
+        window.IS_TRYOUT = {{ $ujian->jenis_ujian === 'tryout' ? 'true' : 'false' }};
         window.AUTO_SAVE_URL = "{{ route('murid.exam.autoSave', $ujian_peserta, false) }}";
         window.REPORT_CHEAT_URL = "{{ route('murid.exam.reportCheat', $ujian_peserta, false) }}";
         window.FINISH_URL = "{{ route('murid.exam.finish', $ujian_peserta, false) }}";
@@ -17,15 +18,15 @@
     <style>
         /* RESET & BASE */
         * { box-sizing: border-box; }
-        body { 
-            background-color: #f3f4f6; 
-            margin: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            height: 100vh; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            flex-direction: column; 
+        body {
+            background-color: #f3f4f6;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
             font-weight: normal;
         }
 
@@ -118,7 +119,7 @@
         .question-text {
             flex: 1;
         }
-        
+
         /* Audio Player Styling */
         .audio-wrapper {
             margin-top: 20px;
@@ -300,9 +301,9 @@
         }
         .grid-btn:hover { background-color: #f3f4f6; }
         .grid-btn.answered {
-            background-color: #3b82f6;
-            color: #fff;
-            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #1d4ed8;
+            border-color: #93c5fd;
         }
         .grid-btn.current {
             border: 3px solid #111;
@@ -338,67 +339,111 @@
             100% { transform: rotate(0deg); }
         }
 
+        /* WATERMARK & PROTECTION */
+        .cbt-container {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        textarea {
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        .watermark-container {
+            position: relative;
+            display: inline-block;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+            max-width: 100%;
+        }
+        .watermark-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            pointer-events: none;
+            color: rgba(255,255,255,0.3); /* dibuat lebih samar (transparent) */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4); /* bayangan diperhalus agar tidak terlalu tebal */
+            font-size: 24px;
+            font-weight: 600; /* dikurangi ketebalannya */
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transform: rotate(-20deg);
+            white-space: nowrap;
+            overflow: hidden;
+            z-index: 10;
+        }
+        .watermark-overlay.small {
+            font-size: 14px;
+        }
+
         /* RESPONSIVE LANDSCAPE MOBILE (MODIFIKASI DISINI) */
         @media screen and (max-height: 500px) {
             .cbt-container {
-                height: 100vh !important;
-                width: 100vw !important;
+                height: 90vh !important;
+                width: 96vw !important;
                 max-width: none !important;
-                border: none !important;
+                border: 1px solid #000 !important;
                 min-height: 0 !important;
-                display: flex !important;
-                flex-direction: column !important;
             }
             .cbt-header, .cbt-footer {
-                height: 35px !important;
-                flex-shrink: 0 !important;
+                height: 45px !important;
             }
-            .hdr-timer, .hdr-val, .hdr-btn-finish { font-size: 11px !important; }
-            .hdr-label { display: none !important; }
-            
-            .cbt-main {
-                flex-direction: row !important;
-                height: calc(100vh - 70px) !important;
-                overflow: hidden !important;
-            }
+            .hdr-timer, .hdr-val, .hdr-btn-finish { font-size: 14px !important; }
+            .hdr-label { display: inline-block !important; font-size: 10px !important; margin-right: 5px !important; }
+
             .cbt-left {
-                flex: 1 !important;
-                width: 50% !important;
-                border-right: 1px solid #000 !important;
-                padding: 10px !important;
-                overflow-y: auto !important;
-                font-size: 13px !important;
-            }
-            .cbt-right {
-                flex: 1 !important;
-                width: 50% !important;
-                padding: 10px !important;
-                overflow-y: auto !important;
+                padding: 15px 25px !important;
             }
             .opt-body {
-                padding: 4px 10px !important;
+                padding: 10px 25px !important;
             }
             .opt-circle {
-                width: 20px !important;
-                height: 20px !important;
-                margin-right: 8px !important;
-                font-size: 10px !important;
+                width: 32px !important;
+                height: 32px !important;
+                margin-right: 15px !important;
+                font-size: 14px !important;
             }
-            .opt-text { font-size: 12px !important; }
-            .question-flex { font-size: 13px !important; margin-bottom: 5px !important; }
-            
+            .opt-text { font-size: 16px !important; }
+            .question-flex { font-size: 16px !important; margin-bottom: 20px !important; }
+
             /* Essay adjustment */
             .cbt-right textarea {
                 height: calc(100% - 25px) !important;
-                min-height: 100px !important;
-                font-size: 13px !important;
-                padding: 8px !important;
+                min-height: 80px !important;
+                font-size: 14px !important;
+                padding: 10px !important;
             }
             .cbt-right > div {
-                padding: 0 !important;
+                padding: 15px !important;
                 height: 100% !important;
             }
-            .ftr-btn { font-size: 11px !important; }
+            .ftr-btn { font-size: 12px !important; }
+
+            /* Modal Show All Adjustments */
+            .modal-overlay {
+                padding: 0 !important;
+            }
+            .modal-box {
+                height: 90vh !important;
+                width: 96vw !important;
+                max-width: none !important;
+                border: 1px solid #000 !important;
+            }
+            .grid-nums {
+                gap: 8px !important;
+            }
+            .grid-btn {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 14px !important;
+                margin: 0 auto !important;
+            }
+            .bottom-text {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -409,11 +454,11 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
         </svg>
         <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 15px; letter-spacing: -0.5px;">Gunakan Mode Landscape</h2>
-        <p style="font-size: 15px; color: #94a3b8; max-width: 300px; line-height: 1.6;">Ujian simulator CBT tidak dapat dikerjakan dalam mode layar potrait. Mohon putar ponsel Anda ke posisi landscape untuk melanjutkan.</p>
+        <p style="font-size: 15px; color: #94a3b8; max-width: 300px; line-height: 1.6;">Ujian Ubiquitous Base Test tidak dapat dikerjakan dalam mode layar potrait. Mohon putar ponsel Anda ke posisi landscape untuk melanjutkan.</p>
     </div>
 
     <div class="cbt-container">
-        
+
         <!-- HEADER -->
         <header class="cbt-header">
             <div class="hdr-col">
@@ -436,7 +481,7 @@
             @csrf
         </form>
 
-        <form id="answer-form" style="display: none;">
+        <form id="answer-form" style="display: none;" onsubmit="event.preventDefault();">
             <input type="hidden" name="soal_id" value="{{ $currentSoal->id }}">
         </form>
 
@@ -447,34 +492,55 @@
                 <div class="question-flex">
                     <div class="question-number">{{ $page }}.</div>
                     <div class="question-text">
-                        {!! $currentSoal->pertanyaan !!}
+                        {!! \App\Helpers\HtmlSanitizer::clean($currentSoal->pertanyaan) !!}
                     </div>
                 </div>
 
-                @if($currentSoal->tipe === 'audio' && $currentSoal->audio_path)
+                @if($currentSoal->audio_path)
                     <div class="audio-wrapper">
-                        <audio controls controlsList="nodownload" class="audio-player">
-                            <source src="{{ asset('storage/' . $currentSoal->audio_path) }}" type="audio/mpeg">
+                        <audio controls controlsList="nodownload" class="audio-player" preload="none">
+                            <source src="{{ asset('storage/' . $currentSoal->audio_path) }}?v={{ $currentSoal->id }}" type="audio/mpeg">
                         </audio>
                     </div>
                 @endif
-                
-                @if(isset($currentSoal->gambar) && $currentSoal->gambar != "")
+
+                @if($currentSoal->gambar_path)
                     <div style="text-align: center; margin-top: 20px;">
-                        <img src="{{ asset('storage/'.$currentSoal->gambar) }}" style="max-width: 100%; border: 1px solid #d1d5db; padding: 4px;">
+                        <div class="watermark-container">
+                            <img src="{{ asset('storage/' . $currentSoal->gambar_path) }}" style="max-width: 100%; border: 1px solid #d1d5db; padding: 4px; border-radius: 8px;" oncontextmenu="return false;" draggable="false">
+                            <div class="watermark-overlay">Property of Urisowon</div>
+                        </div>
                     </div>
                 @endif
             </div>
 
             <!-- OPTIONS (RIGHT) -->
             <div class="cbt-right">
-                @if($currentSoal->tipe === 'pilihan_ganda' || $currentSoal->tipe === 'audio')
+                @if(in_array($currentSoal->tipe, ['pilihan_ganda', 'audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar']))
                     @foreach($currentSoal->pilihanJawabans as $index => $opsi)
                     <label class="opt-label">
                         <input type="radio" name="jawaban" value="{{ $opsi->id }}" form="answer-form" class="auto-save-trigger" {{ ($jawabanSaatIni && $jawabanSaatIni->pilihan_jawaban_id == $opsi->id) ? 'checked' : '' }}>
-                        <div class="opt-body">
-                            <div class="opt-circle">{{ $index + 1 }}</div>
-                            <div class="opt-text">{{ $opsi->teks }}</div>
+                        <div class="opt-body" style="padding-top: 15px; padding-bottom: 15px;">
+                            <div class="opt-circle">{{ chr(65 + $index) }}</div>
+                            <div class="opt-text" style="display:flex; flex-direction:column; gap:8px;">
+                                @if($opsi->teks)
+                                    <span>{{ $opsi->teks }}</span>
+                                @endif
+
+                                @if($opsi->media_tipe === 'audio' && $opsi->media_path)
+                                    <!-- Stop propagation on audio play so the radio button isn't toggled incorrectly on some devices -->
+                                    <div onclick="event.stopPropagation()">
+                                        <audio controls controlsList="nodownload" preload="none" style="height: 40px; max-width: 220px; outline:none;">
+                                            <source src="{{ asset('storage/' . $opsi->media_path) }}?v={{ $opsi->id }}" type="audio/mpeg">
+                                        </audio>
+                                    </div>
+                                @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
+                                    <div class="watermark-container">
+                                        <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 120px; border-radius: 6px; border: 1px solid #e5e7eb; padding: 2px; max-width: 100%; object-fit: contain;" oncontextmenu="return false;" draggable="false">
+                                        <div class="watermark-overlay small">Property of Urisowon</div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </label>
                     @endforeach
@@ -484,16 +550,45 @@
                     @php $isChecked = in_array($opsi->id, $checkedMultiple); @endphp
                     <label class="opt-label">
                         <input type="checkbox" name="jawaban[]" value="{{ $opsi->id }}" form="answer-form" class="auto-save-trigger-mc" {{ $isChecked ? 'checked' : '' }}>
-                        <div class="opt-body">
-                            <div class="opt-circle" style="border-radius: 4px;">{{ chr(65+$index) }}</div>
-                            <div class="opt-text">{{ $opsi->teks }}</div>
+                        <div class="opt-body" style="padding-top: 15px; padding-bottom: 15px;">
+                            <div class="opt-circle" style="border-radius: 4px;">{{ chr(65 + $index) }}</div>
+                            <div class="opt-text" style="display:flex; flex-direction:column; gap:8px;">
+                                @if($opsi->teks)
+                                    <span>{{ $opsi->teks }}</span>
+                                @endif
+
+                                @if($opsi->media_tipe === 'audio' && $opsi->media_path)
+                                    <div onclick="event.stopPropagation()">
+                                        <audio controls controlsList="nodownload" preload="none" style="height: 40px; max-width: 220px; outline:none;">
+                                            <source src="{{ asset('storage/' . $opsi->media_path) }}?v={{ $opsi->id }}" type="audio/mpeg">
+                                        </audio>
+                                    </div>
+                                @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
+                                    <div class="watermark-container">
+                                        <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 120px; border-radius: 6px; border: 1px solid #e5e7eb; padding: 2px; max-width: 100%; object-fit: contain;" oncontextmenu="return false;" draggable="false">
+                                        <div class="watermark-overlay small">Property of Urisowon</div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </label>
                     @endforeach
                 @elseif($currentSoal->tipe === 'essay')
                     <div style="padding: 35px; display: flex; flex-direction: column; height: 100%;">
                         <p style="font-size: 18px; margin-top: 0; color: #111;">Type Your Answer:</p>
-                        <textarea name="jawaban" form="answer-form" class="auto-save-trigger-typing" style="flex: 1; width: 100%; border: 1px solid #9ca3af; padding: 15px; font-size: 18px; resize: none;"></textarea>
+                        <textarea name="jawaban" form="answer-form" class="auto-save-trigger-typing" style="flex: 1; width: 100%; border: 1px solid #9ca3af; padding: 15px; font-size: 18px; resize: none; border-radius: 8px;">{{ $jawabanSaatIni?->jawaban_text ?? '' }}</textarea>
+                    </div>
+                @elseif($currentSoal->tipe === 'short_answer')
+                    <div style="padding: 35px; display: flex; flex-direction: column; height: 100%;">
+                        <p style="font-size: 16px; margin-top: 0; color: #374151; font-weight: 600;">✏️ Jawaban Singkat:</p>
+                        <p style="font-size: 13px; color: #6b7280; margin-top: 0; margin-bottom: 16px;">Tulis jawaban Anda di bawah ini. Sistem akan menilai otomatis.<br>Tidak perlu khawatir soal huruf besar/kecil atau typo kecil.</p>
+                        <input type="text" name="jawaban" form="answer-form"
+                            class="auto-save-trigger-typing"
+                            value="{{ $jawabanSaatIni?->jawaban_text ?? '' }}"
+                            autocomplete="off" autocorrect="off" spellcheck="false"
+                            placeholder="Ketik jawaban Anda di sini..."
+                            style="width: 100%; border: 2px solid #d1fae5; padding: 16px 18px; font-size: 18px; border-radius: 10px; outline: none; background: #f0fdf4; color: #065f46; font-weight: 500; transition: border-color 0.2s;"
+                            onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#d1fae5'">
                     </div>
                 @endif
             </div>
@@ -506,9 +601,9 @@
             @else
                 <div class="ftr-btn ftr-prev">&lt; Prev</div>
             @endif
-            
+
             <button id="btn-show-all" class="ftr-btn ftr-mid">QUESTIONS LIST</button>
-            
+
             @if($page < $totalSoal)
                 <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $page + 1]) }}" class="ftr-btn ftr-next">Next &gt;</a>
             @else
@@ -518,18 +613,18 @@
     </div>
 
     <!-- BOTTOM TEXT -->
-    <div class="bottom-text">EPS-TOPIK CBT Simulator Interface</div>
+    <div class="bottom-text">UBT Learning LPK URISOWON</div>
 
 
     <!-- MODAL SHOW ALL QUESTIONS -->
     <div id="modal-show-all" class="modal-overlay">
         <div class="modal-box">
-            
+
             <div class="modal-header">
                 <button id="btn-close-modal" style="background:none; border:none; color:#2563eb; cursor:pointer;">&lt; BACK</button>
                 <div style="display: flex; gap: 20px; font-size: 13px; color: #4b5563;">
                     <div style="display:flex; align-items:center;">
-                        <span style="display:inline-block; width:12px; height:12px; background:#3b82f6; border-radius:50%; margin-right:6px;"></span>
+                        <span style="display:inline-block; width:12px; height:12px; background:rgba(59, 130, 246, 0.2); border:1px solid #93c5fd; border-radius:50%; margin-right:6px;"></span>
                         Answered ({{ count($answeredSoalIds) }})
                     </div>
                     <div style="display:flex; align-items:center;">
@@ -541,42 +636,54 @@
 
             <div class="modal-body">
                 @php
-                    $halfPoint = floor($totalSoal / 2);
-                    if($halfPoint == 0) $halfPoint = $totalSoal;
+                    $readingSoals = [];
+                    $listeningSoals = [];
+                    foreach($soals as $index => $s) {
+                        $num = $index + 1;
+                        if (in_array($s->tipe, ['audio', 'pilihan_ganda_audio'])) {
+                            $listeningSoals[$num] = $s;
+                        } else {
+                            $readingSoals[$num] = $s;
+                        }
+                    }
                 @endphp
 
-                <!-- Sesi 1 -->
+                <!-- Sesi Reading / General -->
+                @if(count($readingSoals) > 0)
                 <div class="modal-section">
-                    <div style="font-size: 18px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">Session 1: Reading</div>
+                    <div style="font-size: 18px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
+                        {{ count($listeningSoals) > 0 ? 'Session 1: Reading' : 'Questions List' }}
+                    </div>
                     <div class="grid-nums">
-                        @for ($i = 1; $i <= $halfPoint; $i++)
+                        @foreach ($readingSoals as $num => $s)
                             @php
-                                $isAnsw = in_array($soals[$i-1]->id, $answeredSoalIds);
-                                $isCurr = $i == $page;
+                                $isAnsw = in_array($s->id, $answeredSoalIds);
+                                $isCurr = $num == $page;
                                 $cls = "grid-btn " . ($isAnsw ? 'answered ' : '') . ($isCurr ? 'current ' : '');
                             @endphp
-                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $i]) }}" class="{{ $cls }}">
-                                {{ $i }}
+                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $num]) }}" class="{{ $cls }}">
+                                {{ $num }}
                             </a>
-                        @endfor
+                        @endforeach
                     </div>
                 </div>
+                @endif
 
-                <!-- Sesi 2 -->
-                @if($totalSoal > $halfPoint)
+                <!-- Sesi Listening -->
+                @if(count($listeningSoals) > 0)
                 <div class="modal-section">
                     <div style="font-size: 18px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">Session 2: Listening</div>
                     <div class="grid-nums">
-                        @for ($i = $halfPoint + 1; $i <= $totalSoal; $i++)
+                        @foreach ($listeningSoals as $num => $s)
                             @php
-                                $isAnsw = in_array($soals[$i-1]->id, $answeredSoalIds);
-                                $isCurr = $i == $page;
+                                $isAnsw = in_array($s->id, $answeredSoalIds);
+                                $isCurr = $num == $page;
                                 $cls = "grid-btn " . ($isAnsw ? 'answered ' : '') . ($isCurr ? 'current ' : '');
                             @endphp
-                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $i]) }}" class="{{ $cls }}">
-                                {{ $i }}
+                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $num]) }}" class="{{ $cls }}">
+                                {{ $num }}
                             </a>
-                        @endfor
+                        @endforeach
                     </div>
                 </div>
                 @endif
@@ -594,7 +701,35 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        
+
+        // ANTI SCREENSHOT & RIGHT CLICK
+        document.addEventListener('contextmenu', event => event.preventDefault()); // Prevent right-click
+
+        document.addEventListener('keydown', (e) => {
+            // Prevent PrintScreen, F12, Ctrl+S, Ctrl+P, Ctrl+U, Ctrl+Shift+I, Win+Shift+S (Meta+Shift+S)
+            if (
+                e.key === 'PrintScreen' ||
+                e.key === 'F12' ||
+                (e.ctrlKey && ['s', 'p', 'u', 'S', 'P', 'U'].includes(e.key)) ||
+                (e.ctrlKey && e.shiftKey && ['i', 'I', 's', 'S', 'c', 'C'].includes(e.key)) ||
+                (e.metaKey && e.shiftKey && ['s', 'S'].includes(e.key))
+            ) {
+                e.preventDefault();
+                try {
+                    navigator.clipboard.writeText("Tindakan ini dilarang selama ujian berlangsung.");
+                } catch(err) {}
+                alert("Perhatian: Tindakan mengambil gambar, menyimpan, atau membuka panel pengembang sangat dilarang!");
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'PrintScreen') {
+                try {
+                    navigator.clipboard.writeText("Tindakan ini dilarang selama ujian berlangsung.");
+                } catch(err) {}
+            }
+        });
+
         // MODAL
         const modal = document.getElementById('modal-show-all');
         document.getElementById('btn-show-all').addEventListener('click', () => modal.style.display = 'flex');
@@ -604,42 +739,44 @@
         // TIMER
         let timeRemaining = window.TIMER_SECONDS;
         const timerDisplay = document.getElementById('countdown_timer');
-        
+
         function updateTimer() {
             if (timeRemaining <= 0) {
                 timerDisplay.innerText = "00:00";
                 document.getElementById('finish-form').submit();
                 return;
             }
-            
+
             // Format 59:58 (MM:SS)
             const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
             const s = Math.floor(timeRemaining % 60).toString().padStart(2, '0');
-            
+
             timerDisplay.innerText = `${m}:${s}`;
             timeRemaining--;
         }
-        
+
         updateTimer();
         setInterval(updateTimer, 1000);
-        
+
         // ANTI CHEAT & TAB DETECTION
         let isNavigating = false;
-        
+
         // Hanya elemen yang memindahkan halaman yang mematikan cheat detector
         document.querySelectorAll('a[href], button[onclick*="submit"]').forEach(el => {
             el.addEventListener('click', () => { isNavigating = true; });
         });
         document.getElementById('finish-form').addEventListener('submit', () => { isNavigating = true; });
 
-        document.addEventListener("visibilitychange", function() {
-            if (document.hidden && !isNavigating) triggerAntiCheatLog();
-        });
-        window.addEventListener('blur', function() {
-            // Abaikan blur jika user sedang klik dalam window/iframe
-            if (document.activeElement !== document.body && document.activeElement.tagName === 'IFRAME') return;
-            if (!isNavigating) triggerAntiCheatLog();
-        });
+        if (!window.IS_TRYOUT) {
+            document.addEventListener("visibilitychange", function() {
+                if (document.hidden && !isNavigating) triggerAntiCheatLog();
+            });
+            window.addEventListener('blur', function() {
+                // Abaikan blur jika user sedang klik dalam window/iframe
+                if (document.activeElement !== document.body && document.activeElement.tagName === 'IFRAME') return;
+                if (!isNavigating) triggerAntiCheatLog();
+            });
+        }
 
         let cheatReported = false;
         function triggerAntiCheatLog() {
@@ -676,9 +813,9 @@
                 }
                 return data;
             })
-            .then(data => { 
+            .then(data => {
                 if(data.redirect) {
-                    window.location.replace(data.redirect); 
+                    window.location.replace(data.redirect);
                 } else {
                     alert("Akses diblokir (Response tidak lengkap).");
                 }
@@ -690,7 +827,7 @@
             });
         }
 
-        // AUTO SAVE 
+        // AUTO SAVE
         let saveTimeout = null;
         function submitAnswer(dataObj) {
             fetch(window.AUTO_SAVE_URL, {

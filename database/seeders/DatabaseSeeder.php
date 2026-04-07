@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         // Buat satu kelas dummy
         $kelas = Kelas::create([
-            'nama' => 'Bahasa Jepang N4 - Reguler'
+            'nama' => 'Bahasa Korea EPS TOPIK'
         ]);
 
         // Akun Admin

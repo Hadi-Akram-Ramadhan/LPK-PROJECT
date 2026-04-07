@@ -27,9 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Admin Routes
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
         Route::get('/import-users', [\App\Http\Controllers\Admin\UserController::class, 'import'])->name('users.import');
@@ -63,14 +61,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Audio Explorer
         Route::get('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'index'])->name('audio.index');
         Route::post('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'store'])->name('audio.store');
+        Route::post('/audio/rename', [\App\Http\Controllers\Admin\AudioController::class, 'rename'])->name('audio.rename');
         Route::delete('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'destroy'])->name('audio.destroy');
+
+        // Image Explorer
+        Route::get('/image', [\App\Http\Controllers\Admin\ImageController::class, 'index'])->name('image.index');
+        Route::post('/image', [\App\Http\Controllers\Admin\ImageController::class, 'store'])->name('image.store');
+        Route::post('/image/rename', [\App\Http\Controllers\Admin\ImageController::class, 'rename'])->name('image.rename');
+        Route::delete('/image', [\App\Http\Controllers\Admin\ImageController::class, 'destroy'])->name('image.destroy');
     });
 
     // Guru Routes
     Route::middleware('role:guru')->prefix('guru')->name('guru.')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('guru.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', \App\Http\Controllers\Guru\DashboardController::class)->name('dashboard');
         
         // Paket Soal (Bank Soal terkelompok)
         Route::resource('paket-soal', \App\Http\Controllers\Guru\PaketSoalController::class);
@@ -98,11 +101,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Audio Explorer (Guru)
         Route::get('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'index'])->name('audio.index');
         Route::post('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'store'])->name('audio.store');
+        Route::post('/audio/rename', [\App\Http\Controllers\Guru\AudioController::class, 'rename'])->name('audio.rename');
         Route::delete('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'destroy'])->name('audio.destroy');
+
+        // Image Explorer (Guru)
+        Route::get('/image', [\App\Http\Controllers\Guru\ImageController::class, 'index'])->name('image.index');
+        Route::post('/image', [\App\Http\Controllers\Guru\ImageController::class, 'store'])->name('image.store');
+        Route::post('/image/rename', [\App\Http\Controllers\Guru\ImageController::class, 'rename'])->name('image.rename');
+        Route::delete('/image', [\App\Http\Controllers\Guru\ImageController::class, 'destroy'])->name('image.destroy');
 
         // Cheat Logs (Guru — hanya ujian milik guru ini)
         Route::get('/cheat-logs', [\App\Http\Controllers\Guru\CheatLogController::class, 'index'])->name('cheat-logs.index');
         Route::post('/cheat-logs/{cheatLog}/approve', [\App\Http\Controllers\Guru\CheatLogController::class, 'approve'])->name('cheat-logs.approve');
+
+        // Daftar Kelas & Murid
+        Route::get('/kelas', [\App\Http\Controllers\Guru\KelasController::class, 'index'])->name('kelas.index');
+        Route::get('/kelas/{kelas}', [\App\Http\Controllers\Guru\KelasController::class, 'show'])->name('kelas.show');
     });
 
     // Profile Routes (All Authenticated Users)

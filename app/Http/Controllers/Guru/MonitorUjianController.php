@@ -13,7 +13,7 @@ class MonitorUjianController extends Controller
 {
     public function index()
     {
-        $ujians = Ujian::where('guru_id', auth()->id())
+        $ujians = Ujian::with(['guru'])
             ->withCount('pesertas')
             ->latest()
             ->paginate(10);
@@ -23,9 +23,6 @@ class MonitorUjianController extends Controller
 
     public function show(Ujian $ujian)
     {
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(403);
-        }
 
         $pesertas = UjianPeserta::with(['user', 'cheatLogs'])
             ->where('ujian_id', $ujian->id)
@@ -41,9 +38,6 @@ class MonitorUjianController extends Controller
     public function grade(UjianPeserta $ujian_peserta)
     {
         $ujian = $ujian_peserta->ujian;
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(403);
-        }
 
         // Ambil soal essay saja
         $soalEssays = $ujian->soals()->where('tipe', 'essay')->get();
@@ -64,9 +58,6 @@ class MonitorUjianController extends Controller
     public function storeGrade(Request $request, UjianPeserta $ujian_peserta)
     {
         $ujian = $ujian_peserta->ujian;
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(403);
-        }
 
         $request->validate([
             'poin' => 'required|array',
@@ -102,12 +93,8 @@ class MonitorUjianController extends Controller
 
     public function export(Ujian $ujian)
     {
-        // Pastikan hanya guru pemilik ujian yang bisa export
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(403);
-        }
-
-        $pesertas = UjianPeserta::with('user.kelas')
+        // Eager load jawabanMurids.soal to calculate scores without N+1
+        $pesertas = UjianPeserta::with(['user.kelas', 'jawabanMurids.soal'])
             ->where('ujian_id', $ujian->id)
             ->get();
 
@@ -122,45 +109,69 @@ class MonitorUjianController extends Controller
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
         ];
 
-        // Headers
-        $headers = ['No', 'Nama Murid', 'Kelas', 'Waktu Mulai', 'Waktu Selesai', 'Status', 'Skor'];
+        // Headers (Added Listening & Reading)
+        $headers = ['No', 'Nama Murid', 'Kelas', 'Waktu Mulai', 'Waktu Selesai', 'Status', 'Listening', 'Reading', 'Total Skor'];
         $column = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($column . '1', $header);
             $sheet->getColumnDimension($column)->setAutoSize(true);
             $column++;
         }
-        $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
+        $sheet->getStyle('A1:I1')->applyFromArray($headerStyle);
 
         // Data
         $row = 2;
         foreach ($pesertas as $index => $p) {
+            // Hitung rincian nilai
+            $listening = $p->jawabanMurids->filter(function($j) {
+                return $j->soal && $j->soal->tipe === 'audio';
+            })->sum('poin_didapat');
+
+            $reading = $p->jawabanMurids->filter(function($j) {
+                return $j->soal && $j->soal->tipe !== 'audio';
+            })->sum('poin_didapat');
+
             $sheet->setCellValue('A' . $row, $index + 1);
             $sheet->setCellValue('B' . $row, $p->user->name);
             $sheet->setCellValue('C' . $row, $p->user->kelas->nama ?? '-');
             $sheet->setCellValue('D' . $row, $p->mulai_at);
             $sheet->setCellValue('E' . $row, $p->selesai_at);
             $sheet->setCellValue('F' . $row, strtoupper($p->status));
-            $sheet->setCellValue('G' . $row, $p->skor);
+            $sheet->setCellValue('G' . $row, $listening);
+            $sheet->setCellValue('H' . $row, $reading);
+            $sheet->setCellValue('I' . $row, $p->skor);
             
             // Alignments
             $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('F' . $row . ':G' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('F' . $row . ':I' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             
             $row++;
         }
 
         // Borders
-        $sheet->getStyle('A1:G' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+        $sheet->getStyle('A1:I' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
-        $filename = "Nilai_Ujian_" . str_replace(' ', '_', $ujian->judul) . "_" . date('Y-m-d') . ".xlsx";
-        
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
+        // Sanitize the filename for safe delivery
+        $sanitizedJudul = preg_replace('/[^A-Za-z0-9_\-]/', '_', $ujian->judul);
+        $filename = "Nilai_Ujian_" . $sanitizedJudul . "_" . date('Y-m-d') . ".xlsx";
+        $tempPath = storage_path('app/public/' . $filename);
+
+        // Aggressive buffer clearing
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
+        $writer->save($tempPath);
+
+        if (!file_exists($tempPath)) {
+             return "Gagal membuat file export.";
+        }
+
+        return response()->download($tempPath, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'X-Content-Type-Options' => 'nosniff',
+            'Content-Transfer-Encoding' => 'binary',
+        ])->deleteFileAfterSend(true);
     }
 }

@@ -15,7 +15,7 @@
         transition: border-color 0.15s; cursor: pointer; background: #f8fafc;
     }
     .file-input-wrapper:hover { border-color: #2563eb; background: #eff6ff; }
-    .file-input-wrapper svg { width: 48px; height: 48px; color: #94a3b8; margin-bottom: 12px; }
+    .file-input-wrapper svg { width: 48px; height: 48px; color: #94a3b8; margin-bottom: 12px; display: block; margin-left: auto; margin-right: auto; }
     .file-input-text { font-size: 14px; color: #64748b; margin-bottom: 4px; }
     .file-input-sub { font-size: 12px; color: #94a3b8; }
     .help-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 16px; margin-bottom: 24px; }
@@ -60,6 +60,24 @@
 
     <form action="{{ route('admin.soal.storeImport') }}" method="POST" enctype="multipart/form-data" id="importForm">
         @csrf
+
+        {{-- Paket Soal Selection --}}
+        <div class="form-group">
+            <label class="form-label" for="paket_soal_id">Pilih Paket Soal Tujuan</label>
+            <select name="paket_soal_id" id="paket_soal_id" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff; font-size: 14px; outline: none; transition: border-color 0.15s;" required onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
+                <option value="">-- Pilih Paket --</option>
+                @foreach($paketSoals as $paket)
+                    <option value="{{ $paket->id }}" {{ request('paket') == $paket->id ? 'selected' : '' }}>
+                        {{ $paket->nama }} ({{ $paket->soals->count() }} soal)
+                    </option>
+                @endforeach
+            </select>
+            <p style="font-size: 11px; color: #64748b; margin-top: 6px;">Soal yang diimport akan otomatis dimasukkan ke paket ini.</p>
+            @error('paket_soal_id')
+                <div style="color: #dc2626; font-size: 12px; margin-top: 4px;">{{ $message }}</div>
+            @enderror
+        </div>
+
         <div class="form-group">
             <label class="form-label" for="file_excel">Upload File Excel</label>
             <div class="file-input-wrapper" onclick="document.getElementById('file_excel').click()">
@@ -81,11 +99,53 @@
 </div>
 
 <script>
+    const wrapper = document.querySelector('.file-input-wrapper');
+    const inputElement = document.getElementById('file_excel');
+    
     function updateFileName(input) {
         const fileName = input.files[0] ? input.files[0].name : "Klik atau Drag file Excel ke sini";
-        document.getElementById('fileName').textContent = fileName;
-        document.querySelector('.file-input-wrapper').style.borderColor = "#2563eb";
-        document.querySelector('.file-input-wrapper').style.background = "#eff6ff";
+        document.getElementById('fileName').innerHTML = `<span style="color:#2563eb;font-weight:600;">File terpilih: ${fileName}</span>`;
+        wrapper.style.borderColor = "#2563eb";
+        wrapper.style.background = "#eff6ff";
+    }
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        wrapper.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        wrapper.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        wrapper.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        wrapper.style.borderColor = "#2563eb";
+        wrapper.style.background = "#eff6ff";
+    }
+
+    function unhighlight(e) {
+        wrapper.style.borderColor = "#e2e8f0";
+        wrapper.style.background = "#f8fafc";
+    }
+
+    wrapper.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        
+        if (files.length > 0) {
+            inputElement.files = files;
+            updateFileName(inputElement);
+        }
     }
 </script>
 

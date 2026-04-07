@@ -7,7 +7,7 @@
 <div class="flex-between mb-6">
     <div class="search-box" style="width: 300px;">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input type="text" placeholder="Cari nama ujian...">
+        <input type="text" id="searchInput" placeholder="Cari nama ujian...">
     </div>
     <a href="{{ route('admin.ujian.create') }}" class="btn btn-primary">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -26,6 +26,7 @@
         <thead>
             <tr>
                 <th>Judul Ujian</th>
+                <th>Jenis</th>
                 <th>Kelas</th>
                 <th>Durasi</th>
                 <th>Jumlah Soal</th>
@@ -39,6 +40,11 @@
                 <td>
                     <div style="font-weight: 600; color: #1e293b;">{{ $u->judul }}</div>
                     <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">{{ $u->kategori ?? 'Umum' }}</div>
+                </td>
+                <td>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase {{ $u->jenis_ujian === 'tryout' ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-purple-100 text-purple-800 border-purple-200' }}">
+                        {{ $u->jenis_ujian }}
+                    </span>
                 </td>
                 <td><span class="badge badge-blue">Semua Kelas</span></td>
                 <td><span class="badge badge-gray">{{ $u->durasi }} Menit</span></td>
@@ -72,4 +78,29 @@
         </tbody>
     </table>
 </div>
+@endsection
+
+@section('extra-js')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const term = this.value.toLowerCase().trim();
+                const rows = document.querySelectorAll('.tbl tbody tr');
+                rows.forEach(row => {
+                    // Skip empty state row
+                    if (row.querySelector('td[colspan]')) return;
+                    
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(term)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
 @endsection

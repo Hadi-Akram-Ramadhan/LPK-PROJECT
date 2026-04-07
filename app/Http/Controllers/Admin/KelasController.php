@@ -11,9 +11,15 @@ class KelasController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $kelas = Kelas::withCount('users')->latest()->paginate(15);
+        $query = Kelas::withCount('users');
+        
+        if ($request->filled('search')) {
+            $query->where('nama', 'like', '%' . $request->search . '%');
+        }
+
+        $kelas = $query->latest()->paginate(15);
         return view('admin.kelas.index', compact('kelas'));
     }
 
@@ -39,6 +45,18 @@ class KelasController extends Controller
         ]);
 
         return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Kelas $kela)
+    {
+        $kela->load(['users' => function($q) {
+            $q->where('role', 'murid')->latest();
+        }]);
+        
+        return view('admin.kelas.show', ['kelas' => $kela, 'students' => $kela->users]);
     }
 
     /**

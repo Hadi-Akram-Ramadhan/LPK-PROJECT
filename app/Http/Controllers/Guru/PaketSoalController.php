@@ -9,13 +9,15 @@ use Illuminate\Http\Request;
 
 class PaketSoalController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pakets = PaketSoal::where('guru_id', auth()->id())
-            ->withCount('soals')
-            ->latest()
-            ->get();
+        $query = PaketSoal::withCount('soals')->with('guru');
+        
+        if ($request->filled('search')) {
+            $query->where('nama', 'like', '%' . $request->search . '%');
+        }
 
+        $pakets = $query->latest()->paginate(15);
         return view('guru.paket_soal.index', compact('pakets'));
     }
 
@@ -41,25 +43,25 @@ class PaketSoalController extends Controller
             ->with('success', "Paket Soal \"{$request->nama}\" berhasil dibuat.");
     }
 
-    public function show(PaketSoal $paketSoal)
+    public function show(Request $request, PaketSoal $paketSoal)
     {
-        // Pastikan guru hanya bisa lihat paket miliknya
-        if ($paketSoal->guru_id !== auth()->id()) {
-            abort(403);
+        $query = $paketSoal->soals()->with('pilihanJawabans');
+        
+        if ($request->filled('search')) {
+            $query->where('pertanyaan', 'like', '%' . $request->search . '%');
         }
-        $soals = $paketSoal->soals()->with('pilihanJawabans')->latest()->get();
+
+        $soals = $query->latest()->paginate(20);
         return view('guru.paket_soal.show', compact('paketSoal', 'soals'));
     }
 
     public function edit(PaketSoal $paketSoal)
     {
-        if ($paketSoal->guru_id !== auth()->id()) abort(403);
         return view('guru.paket_soal.edit', compact('paketSoal'));
     }
 
     public function update(Request $request, PaketSoal $paketSoal)
     {
-        if ($paketSoal->guru_id !== auth()->id()) abort(403);
         $request->validate([
             'nama'      => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
@@ -71,7 +73,6 @@ class PaketSoalController extends Controller
 
     public function destroy(PaketSoal $paketSoal)
     {
-        if ($paketSoal->guru_id !== auth()->id()) abort(403);
         foreach ($paketSoal->soals as $soal) {
             $soal->pilihanJawabans()->delete();
             $soal->delete();

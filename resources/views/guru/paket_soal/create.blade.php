@@ -1,4 +1,4 @@
-﻿@extends('layouts.guru')
+@extends('layouts.guru')
 
 @section('header')
 <div style="display:flex;align-items:center;gap:12px;">
@@ -8,7 +8,7 @@
     <span>Buat Paket Soal Baru</span>
 </div>
 @endsection
-@section('header-sub', 'Admin / Bank Soal / Buat Paket')
+@section('header-sub', 'Guru / Bank Soal / Buat Paket')
 
 @section('content')
 <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:32px;">
@@ -38,4 +38,3 @@
     </form>
 </div>
 @endsection
-

@@ -70,6 +70,22 @@
         <div class="p-6">
             <form action="{{ route('guru.import.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                
+                {{-- Target Package Selection --}}
+                <div class="mb-6">
+                    <label for="paket_soal_id" class="block text-sm font-bold text-slate-700 mb-2">Pilih Paket Soal Tujuan</label>
+                    <select name="paket_soal_id" id="paket_soal_id" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-accent-500 focus:ring-accent-500 sm:text-sm" required>
+                        <option value="">-- Pilih Paket --</option>
+                        @foreach($paketSoals as $paket)
+                            <option value="{{ $paket->id }}" {{ request('paket') == $paket->id ? 'selected' : '' }}>
+                                {{ $paket->nama }} ({{ $paket->soals_count ?? $paket->soals->count() }} soal)
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="mt-2 text-xs text-slate-500">Semua soal dalam file Excel akan dimasukkan ke dalam paket ini.</p>
+                    @error('paket_soal_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+
                 <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-md bg-slate-50 hover:bg-slate-100 transition-colors">
                     <div class="space-y-1 text-center">
                         <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
@@ -98,4 +114,48 @@
     </div>
 
 </div>
+
+<script>
+    const wrapper = document.querySelector('.border-dashed');
+    const inputElement = document.getElementById('file_excel');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        wrapper.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        wrapper.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        wrapper.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        wrapper.classList.add('border-accent-500', 'bg-accent-100');
+        wrapper.classList.remove('border-slate-300', 'bg-slate-50');
+    }
+
+    function unhighlight(e) {
+        wrapper.classList.remove('border-accent-500', 'bg-accent-100');
+        wrapper.classList.add('border-slate-300', 'bg-slate-50');
+    }
+
+    wrapper.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        
+        if (files.length > 0) {
+            inputElement.files = files;
+            document.getElementById('file-name').innerHTML = `File terpilih: <span class="font-bold">${files[0].name}</span>`;
+        }
+    }
+</script>
 @endsection

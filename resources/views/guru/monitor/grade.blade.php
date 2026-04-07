@@ -40,7 +40,7 @@
         @forelse($soalEssays as $index => $soal)
             @php
                 $jawaban = $jawabans->get($soal->id);
-                $jawabanTeks = $jawaban ? $jawaban->jawaban_text : '<span class="italic text-slate-400">Tidak ada jawaban.</span>';
+                $jawabanTeks = $jawaban ? e($jawaban->jawaban_text) : '<span class="italic text-slate-400">Tidak ada jawaban.</span>';
                 $poinDidapat = $jawaban ? $jawaban->poin_didapat : 0;
             @endphp
             
@@ -51,7 +51,7 @@
                             {{ $index + 1 }}
                         </span>
                         <div class="text-sm font-medium text-slate-800 pt-1">
-                            {!! nl2br(strip_tags($soal->pertanyaan, '<br><b><i>')) !!}
+                            {!! nl2br(\App\Helpers\HtmlSanitizer::clean($soal->pertanyaan)) !!}
                         </div>
                     </div>
                     <div class="ml-4 flex-shrink-0 text-sm font-bold text-slate-500 bg-white px-3 py-1 rounded border border-slate-200 shadow-sm">

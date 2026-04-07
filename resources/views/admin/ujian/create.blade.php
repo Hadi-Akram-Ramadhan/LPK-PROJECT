@@ -7,9 +7,18 @@
 <div class="card p-8" style="max-width: 800px; margin: 0 auto;">
     <form action="{{ route('admin.ujian.store') }}" method="POST">
         @csrf
-        <div class="mb-6">
-            <label class="block text-sm font-bold mb-2 text-slate-700">Judul Ujian</label>
-            <input type="text" name="judul" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" placeholder="Contoh: UTS Bahasa Korea Dasar" required>
+        <div class="grid-2 mb-6">
+            <div>
+                <label class="block text-sm font-bold mb-2 text-slate-700">Judul Ujian</label>
+                <input type="text" name="judul" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" placeholder="Contoh: UTS Bahasa Korea Dasar" required>
+            </div>
+            <div>
+                <label class="block text-sm font-bold mb-2 text-slate-700">Jenis Ujian</label>
+                <select name="jenis_ujian" id="jenis_ujian_selector" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" required>
+                    <option value="reguler">Ujian Reguler</option>
+                    <option value="tryout">Try-Out (Akses Bebas)</option>
+                </select>
+            </div>
         </div>
 
         <div class="mb-6">
@@ -23,17 +32,21 @@
                 <input type="number" name="durasi" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" value="60" required>
             </div>
             <div>
-                <label class="block text-sm font-bold mb-2 text-slate-700">Target Kelas</label>
-                <select name="kelas_id" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" required>
-                    <option value="" disabled selected>Pilih Kelas...</option>
-                    @foreach($kelases as $k)
-                        <option value="{{ $k->id }}">{{ $k->nama }}</option>
-                    @endforeach
-                </select>
+                <label class="block text-sm font-bold mb-2 text-slate-700">Target Kelas (Bisa pilih multi)</label>
+                <div style="max-height: 120px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; background: #fff;">
+                    @forelse($kelases as $kls)
+                        <label style="display: flex; align-items: center; font-size: 13px; margin-bottom: 8px; cursor: pointer; color: #334155;">
+                            <input name="kelas_id[]" value="{{ $kls->id }}" type="checkbox" style="width: 16px; height: 16px; margin-right: 8px;" {{ (is_array(old('kelas_id')) && in_array($kls->id, old('kelas_id'))) ? 'checked' : '' }}>
+                            {{ $kls->nama }}
+                        </label>
+                    @empty
+                        <div class="text-sm text-red-500">Belum ada data kelas dari Admin.</div>
+                    @endforelse
+                </div>
             </div>
         </div>
 
-        <div class="grid-2 mb-8">
+        <div class="grid-2 mb-8" id="time_restricted_section">
             <div>
                 <label class="block text-sm font-bold mb-2 text-slate-700">Waktu Mulai</label>
                 <input type="datetime-local" name="mulai" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500">
@@ -198,6 +211,21 @@
                     }
                 });
             });
+
+            // Logic to hide time for Tryout
+            const typeSelector = document.getElementById('jenis_ujian_selector');
+            const timeSection = document.getElementById('time_restricted_section');
+            
+            function toggleTimeSection() {
+                if (typeSelector.value === 'tryout') {
+                    timeSection.style.display = 'none';
+                } else {
+                    timeSection.style.display = 'grid';
+                }
+            }
+
+            typeSelector.addEventListener('change', toggleTimeSection);
+            toggleTimeSection(); // Initial call
         });
         </script>
 

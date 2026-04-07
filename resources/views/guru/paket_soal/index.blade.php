@@ -1,7 +1,7 @@
-﻿@extends('layouts.guru')
+@extends('layouts.guru')
 
 @section('header', 'Bank Soal')
-@section('header-sub', 'Admin / Bank Soal')
+@section('header-sub', 'Guru / Bank Soal')
 
 @section('content')
 
@@ -13,12 +13,18 @@
 @endif
 
 {{-- Header action --}}
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-    <div>
-        <h2 style="font-size:16px;font-weight:700;color:#1e293b;margin:0;">Daftar Paket Soal</h2>
-        <p style="font-size:13px;color:#94a3b8;margin:4px 0 0;">{{ $pakets->count() }} paket tersedia</p>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:16px;">
+    <div style="display:flex;align-items:center;gap:16px;">
+        <div>
+            <h2 style="font-size:16px;font-weight:700;color:#1e293b;margin:0;">Daftar Paket Soal</h2>
+            <p style="font-size:13px;color:#94a3b8;margin:4px 0 0;">{{ $pakets->total() }} paket tersedia</p>
+        </div>
+        <form action="{{ route('guru.paket-soal.index') }}" method="GET" style="position:relative;">
+            <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama paket..." style="padding:10px 14px 10px 38px;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;width:240px;background:#fff;font-family:'Inter',sans-serif;">
+        </form>
     </div>
-    <a href="{{ route('guru.paket-soal.create') }}" style="display:inline-flex;align-items:center;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#2563eb;color:#fff;gap:8px;">
+    <a href="{{ route('guru.paket-soal.create') }}" style="display:inline-flex;align-items:center;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#2563eb;color:#fff;gap:8px;flex-shrink:0;">
         <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
         Buat Paket Baru
     </a>
@@ -37,6 +43,7 @@
         {{-- Jumlah soal badge --}}
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
             <span style="background:#dbeafe;color:#2563eb;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;">{{ $paket->soals_count }} Soal</span>
+            @if($paket->guru_id === auth()->id())
             <div style="display:flex;gap:6px;">
                 <a href="{{ route('guru.paket-soal.edit', $paket) }}" style="padding:6px;border-radius:8px;border:1px solid #e2e8f0;color:#64748b;text-decoration:none;display:flex;align-items:center;" title="Edit Paket">
                     <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -48,6 +55,7 @@
                     </button>
                 </form>
             </div>
+            @endif
         </div>
 
         <a href="{{ route('guru.paket-soal.show', $paket) }}" style="text-decoration:none;">
@@ -69,6 +77,11 @@
     </div>
     @endforeach
 </div>
+@if($pakets->hasPages())
+<div style="margin-top:24px;background:#fff;padding:16px;border-radius:12px;border:1px solid #e2e8f0;">
+    {{ $pakets->appends(request()->query())->links() }}
+</div>
+@endif
 @endif
 
 @endsection

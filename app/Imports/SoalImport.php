@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Helpers\HtmlSanitizer;
 use App\Models\Soal;
 use App\Models\PilihanJawaban;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,12 @@ class SoalImport
 {
     private int $sukses = 0;
     private int $gagal  = 0;
+    private int $paketSoalId;
+
+    public function __construct(int $paketSoalId)
+    {
+        $this->paketSoalId = $paketSoalId;
+    }
 
     /**
      * Loop tiap baris dari file Excel yang diberikan (path sementara).
@@ -35,42 +42,78 @@ class SoalImport
 
             // Tentukan tipe enum
             $tipeEnum = 'pilihan_ganda';
-            if (Str::contains($tipeRaw, 'multiple'))                              $tipeEnum = 'multiple_choice';
-            elseif (Str::contains($tipeRaw, 'essay') || Str::contains($tipeRaw, 'esai')) $tipeEnum = 'essay';
-            elseif (Str::contains($tipeRaw, 'audio') || Str::contains($tipeRaw, 'choukai')) $tipeEnum = 'audio';
+            if (Str::contains($tipeRaw, 'ganda audio')) {
+                $tipeEnum = 'pilihan_ganda_audio';
+            } elseif (Str::contains($tipeRaw, 'ganda gambar')) {
+                $tipeEnum = 'pilihan_ganda_gambar';
+            } elseif (Str::contains($tipeRaw, 'multiple')) {
+                $tipeEnum = 'multiple_choice';
+            } elseif (Str::contains($tipeRaw, 'short') || Str::contains($tipeRaw, 'singkat')) {
+                $tipeEnum = 'short_answer';
+            } elseif (Str::contains($tipeRaw, 'essay') || Str::contains($tipeRaw, 'esai')) {
+                $tipeEnum = 'essay';
+            } elseif (Str::contains($tipeRaw, 'audio') || Str::contains($tipeRaw, 'choukai')) {
+                $tipeEnum = 'audio';
+            }
 
-            $poin      = max(1, (int) ($row[9] ?? 10));
-            $audioFile = trim($row[8] ?? '');
-            $audioPath = $audioFile !== '' ? 'audio/' . $audioFile : null;
+            // Kolom:
+            // 0=Tipe, 1=Pertanyaan, 2=Gambar Soal, 3=Audio Soal,
+            // 4=Opsi A, 5=Media A, 6=Opsi B, 7=Media B, 8=Opsi C, 9=Media C, 10=Opsi D, 11=Media D, 12=Opsi E, 13=Media E,
+            // 14=Jawaban Benar, 15=Poin
+            
+            $poin         = max(1, (int) ($row[15] ?? 10));
+            $gambarRaw    = trim($row[2] ?? '');
+            $audioRaw     = trim($row[3] ?? '');
+            $jawabanKunci = trim($row[14] ?? ''); // Column O: used as kunci for short_answer
+
+            $gambarPath = $gambarRaw !== '' ? 'gambar/' . $gambarRaw : null;
+            $audioPath  = $audioRaw !== '' ? 'audio/' . $audioRaw : null;
 
             DB::beginTransaction();
             try {
                 $soal = Soal::create([
-                    'guru_id'    => auth()->id(),
-                    'tipe'       => $tipeEnum,
-                    'pertanyaan' => $pertanyaan,
-                    'poin'       => $poin,
-                    'audio_path' => $audioPath,
+                    'guru_id'       => auth()->id(),
+                    'paket_soal_id' => $this->paketSoalId,
+                    'tipe'          => $tipeEnum,
+                    'pertanyaan'    => HtmlSanitizer::clean($pertanyaan),
+                    'poin'          => $poin,
+                    'audio_path'    => $audioPath,
+                    'gambar_path'   => $gambarPath,
+                    'jawaban_kunci' => $tipeEnum === 'short_answer' ? $jawabanKunci : null,
                 ]);
 
-                if ($tipeEnum !== 'essay') {
+                // Only create PilihanJawaban for types that use them (not essay or short_answer)
+                if (!in_array($tipeEnum, ['essay', 'short_answer'])) {
                     $opsi = [
-                        'A' => trim($row[2] ?? ''),
-                        'B' => trim($row[3] ?? ''),
-                        'C' => trim($row[4] ?? ''),
-                        'D' => trim($row[5] ?? ''),
-                        'E' => trim($row[6] ?? ''),
+                        'A' => ['teks' => trim($row[4] ?? ''),  'media' => trim($row[5] ?? '')],
+                        'B' => ['teks' => trim($row[6] ?? ''),  'media' => trim($row[7] ?? '')],
+                        'C' => ['teks' => trim($row[8] ?? ''),  'media' => trim($row[9] ?? '')],
+                        'D' => ['teks' => trim($row[10] ?? ''), 'media' => trim($row[11] ?? '')],
+                        'E' => ['teks' => trim($row[12] ?? ''), 'media' => trim($row[13] ?? '')],
                     ];
 
-                    $jawabanBenarRaw   = Str::upper(trim($row[7] ?? ''));
+                    $jawabanBenarRaw   = Str::upper(trim($row[14] ?? ''));
                     $jawabanBenarArray = array_map('trim', explode(',', $jawabanBenarRaw));
 
-                    foreach ($opsi as $huruf => $teksOpsi) {
-                        if ($teksOpsi !== '') {
+                    foreach ($opsi as $huruf => $dataOpsi) {
+                        $teksOpsi = $dataOpsi['teks'];
+                        $mediaRaw = $dataOpsi['media'];
+                        
+                        if ($teksOpsi !== '' || $mediaRaw !== '') {
+                            $mediaTipe = null;
+                            $mediaPath = null;
+                            
+                            if ($mediaRaw !== '') {
+                                $mediaTipe = ($tipeEnum === 'pilihan_ganda_audio') ? 'audio' : 'gambar';
+                                $mediaPath = $mediaTipe . '/' . $mediaRaw;
+                            }
+                            
                             PilihanJawaban::create([
-                                'soal_id'  => $soal->id,
-                                'teks'     => $teksOpsi,
-                                'is_benar' => in_array($huruf, $jawabanBenarArray),
+                                'soal_id'    => $soal->id,
+                                'teks'       => $teksOpsi,
+                                'media_path' => $mediaPath,
+                                'media_tipe' => $mediaTipe,
+                                'is_benar'   => in_array($huruf, $jawabanBenarArray),
                             ]);
                         }
                     }
