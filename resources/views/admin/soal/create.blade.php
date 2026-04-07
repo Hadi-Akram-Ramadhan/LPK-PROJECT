@@ -156,14 +156,9 @@
                style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.05);padding:8px 16px;display:inline-flex;justify-content:center;font-size:14px;font-weight:500;color:#334155;text-decoration:none;">
                 Batal
             </a>
-<<<<<<< HEAD
             <button type="submit"
                 style="margin-left:4px;display:inline-flex;justify-content:center;padding:8px 24px;border:none;box-shadow:0 1px 2px rgba(0,0,0,.1);font-size:14px;font-weight:600;border-radius:8px;color:#fff;background:#4f46e5;cursor:pointer;">
-                Simpan Soal
-=======
-            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Perbarui Soal
->>>>>>> a3c8546a0dd752ec6dc30e0296fbe3914996d3d8
+                Simpan Perubahan
             </button>
         </div>
     </form>
