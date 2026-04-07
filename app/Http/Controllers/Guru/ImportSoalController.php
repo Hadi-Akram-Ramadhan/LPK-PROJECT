@@ -105,19 +105,26 @@ class ImportSoalController extends Controller
             'A', '10',
         ], null, 'A6');
 
-        // Contoh baris 7 — Short Answer (NEW)
+        // Contoh baris 7 - Pilihan Ganda Audio (NEW)
+        $sheet->fromArray([
+            'Pilihan Ganda Audio', 'Dengarkan suara dan pilih benda yang dimaksud!', '', 'soal-instruksi.mp3',
+            '', 'suara-a.mp3', '', 'suara-b.mp3', '', 'suara-c.mp3', '', 'suara-d.mp3', '', '',
+            'B', '15',
+        ], null, 'A7');
+
+        // Contoh baris 8 — Short Answer (NEW)
         $sheet->fromArray([
             'Short Answer', 'Apa nama ibukota Korea Selatan?', '', '',
             '', '', '', '', '', '', '', '', '', '',
             'Seoul|Seol|서울', '15',
-        ], null, 'A7');
+        ], null, 'A8');
 
         // Zebra row styling for example rows
-        $sheet->getStyle('A2:P7')->applyFromArray([
+        $sheet->getStyle('A2:P8')->applyFromArray([
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F1F5F9']],
         ]);
         // Highlight short_answer row
-        $sheet->getStyle('A7:P7')->applyFromArray([
+        $sheet->getStyle('A8:P8')->applyFromArray([
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'EFF6FF']],
             'font' => ['color' => ['rgb' => '1D4ED8']],
         ]);
@@ -145,6 +152,7 @@ class ImportSoalController extends Controller
             ['→ Ketik "Short Answer" jika isian singkat yang dinilai sistem otomatis. Kunci Jawaban: lihat bantuan di bawah.'],
             ['→ Ketik "Audio" jika ini soal Listening. Kolom D wajib diisi nama file mp3. Kunci Jawaban: A, B, C, D, atau E.'],
             ['→ Ketik "Pilihan Ganda Gambar" jika opsi A/B/C/D isinya gambar semua. Kunci Jawaban: A, B, C, D, atau E.'],
+            ['→ Ketik "Pilihan Ganda Audio" jika opsi A/B/C/D isinya suara semua. Kunci Jawaban: A, B, C, D, atau E.'],
             [''],
             ['--- BANTUAN UNTUK SOAL ISIAN SINGKAT (Short Answer) ---'],
             ['Terkadang anak bisa typo/salah ketik! Oleh karena itu di Isian Singkat: '],
