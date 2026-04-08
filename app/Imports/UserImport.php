@@ -32,7 +32,12 @@ class UserImport
             $password = trim($row[2] ?? '');
             $kelasId  = $row[3] ?? null;
 
-            // Skip baris kosong
+            // Skip baris yang benar-benar kosong (biasanya baris sisa di Excel)
+            if (empty($name) && empty($email) && empty($password)) {
+                continue;
+            }
+
+            // Jika ada yang kosong tapi tidak semua (data tidak lengkap), baru hitung Gagal
             if (empty($name) || empty($email) || empty($password)) {
                 $this->gagal++;
                 continue;
