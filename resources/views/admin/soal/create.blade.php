@@ -57,7 +57,7 @@
             <div>
                 <label for="pertanyaan" class="block text-sm font-medium text-slate-700 mb-2">Teks Pertanyaan</label>
                 <p class="text-xs text-slate-500 mb-2">Anda dapat menggunakan HTML dasar (seperti &lt;br&gt; untuk garis baru, atau &lt;b&gt; untuk teks tebal).</p>
-                <textarea id="pertanyaan" name="pertanyaan" rows="4" required class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">{{ old('pertanyaan') }}</textarea>
+                <textarea id="pertanyaan" name="pertanyaan" rows="4" required maxlength="10000" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">{{ old('pertanyaan') }}</textarea>
                 @error('pertanyaan') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
 
@@ -135,7 +135,7 @@
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <span class="text-slate-500 sm:text-sm font-bold">{{ chr(65 + $i) }}.</span>
                                     </div>
-                                    <input type="text" name="pilihan[{{$i}}]" class="focus:ring-accent-500 focus:border-accent-500 block w-full pl-8 sm:text-sm border-slate-300 rounded-md py-2" placeholder="Opsi jawaban teks (jika perlu)..." value="{{ old('pilihan.'.$i) }}">
+                                    <input type="text" name="pilihan[{{$i}}]" maxlength="1000" class="focus:ring-accent-500 focus:border-accent-500 block w-full pl-8 sm:text-sm border-slate-300 rounded-md py-2" placeholder="Opsi jawaban teks (jika perlu)..." value="{{ old('pilihan.'.$i) }}">
                                 </div>
                                 <div class="media-input-wrapper flex gap-2 w-full" style="display:none;">
                                     <select name="pilihan_media[{{$i}}]" class="audio-select bg-blue-50 border-blue-200 focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm rounded-md py-2" style="display:none;" disabled>

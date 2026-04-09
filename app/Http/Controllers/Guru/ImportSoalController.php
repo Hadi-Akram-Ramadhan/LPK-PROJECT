@@ -234,7 +234,7 @@ class ImportSoalController extends Controller
             return back()->with('error', 'Tidak ada soal yang berhasil diimport. Periksa format file Anda.');
 
         } catch (\Throwable $e) {
-            return back()->with('error', 'Terjadi kesalahan saat membaca file: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat mengimport soal. Pastikan format file benar.');
         }
     }
 }

@@ -111,6 +111,9 @@
         }
         .question-text {
             flex: 1;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
         }
 
         /* Audio Player Styling */
@@ -169,6 +172,9 @@
         .opt-text {
             font-size: 20px;
             color: #1f2937;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
         }
 
         /* CORRECT ANSWER HIGHLIGHTING (PREVIEW SPECIAL) */

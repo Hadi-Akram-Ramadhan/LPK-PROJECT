@@ -49,10 +49,10 @@ class SoalController extends Controller
         $request->validate([
             'paket_soal_id' => 'required|exists:paket_soals,id',
             'tipe'          => 'required|in:pilihan_ganda,multiple_choice,essay,audio,pilihan_ganda_audio,pilihan_ganda_gambar,short_answer',
-            'pertanyaan'    => 'required|string',
-            'poin'          => 'required|integer|min:1',
-            'audio_path'    => 'nullable|string',
-            'gambar_path'   => 'nullable|string',
+            'pertanyaan'    => 'required|string|max:10000',
+            'poin'          => 'required|integer|min:1|max:1000',
+            'audio_path'    => 'nullable|string|max:255',
+            'gambar_path'   => 'nullable|string|max:255',
         ]);
 
         // Security check: Verify paket soal exists and belongs to the guru
@@ -109,7 +109,7 @@ class SoalController extends Controller
                 ->with('success', 'Soal berhasil disimpan ke paket.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat menyimpan soal: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan soal. Pastikan format input benar.')->withInput();
         }
     }
 
@@ -143,10 +143,10 @@ class SoalController extends Controller
         }
 
         $request->validate([
-            'pertanyaan' => 'required|string',
-            'poin' => 'required|integer|min:1',
-            'audio_path' => 'nullable|string',
-            'gambar_path' => 'nullable|string',
+            'pertanyaan' => 'required|string|max:10000',
+            'poin' => 'required|integer|min:1|max:1000',
+            'audio_path' => 'nullable|string|max:255',
+            'gambar_path' => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
@@ -214,7 +214,7 @@ class SoalController extends Controller
                 ->with('success', 'Soal berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat mengupdate soal: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui soal.')->withInput();
         }
     }
 
