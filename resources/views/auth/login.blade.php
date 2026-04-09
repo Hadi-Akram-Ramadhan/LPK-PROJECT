@@ -410,7 +410,7 @@
                 </div>
 
                 <h1 class="form-title">Selamat Datang</h1>
-                <p class="form-subtitle">Silakan masuk ke akun <span class="accent">admin</span> Anda.</p>
+                <p class="form-subtitle">Silakan masuk ke <span class="accent">akun</span> Anda.</p>
 
                 @if(session('status'))
                     <div class="status-alert">{{ session('status') }}</div>
@@ -438,9 +438,7 @@
                     <!-- Password -->
                     <div class="label-row">
                         <label class="form-label" for="password">Password</label>
-                        @if(Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" class="forgot-link">Lupa Password?</a>
-                        @endif
+
                     </div>
                     <div class="input-group">
                         <svg class="i-left" fill="none" viewBox="0 0 24 24" stroke="currentColor">
