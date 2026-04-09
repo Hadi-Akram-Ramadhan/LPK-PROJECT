@@ -168,13 +168,8 @@
                 Batal
             </a>
             <button type="submit"
-<<<<<<< HEAD
-                style="margin-left:4px;display:inline-flex;justify-content:center;padding:8px 24px;border:none;box-shadow:0 1px 2px rgba(0,0,0,.1);font-size:14px;font-weight:600;border-radius:8px;color:#fff;background:#4f46e5;cursor:pointer;">
-                Simpan Perubahan
-=======
                 style="display:inline-flex;justify-content:center;padding:8px 24px;border:none;box-shadow:0 1px 2px rgba(0,0,0,.1);font-size:14px;font-weight:600;border-radius:8px;color:#fff;background:#4f46e5;cursor:pointer;">
                 Simpan Soal
->>>>>>> 00b61a58f2126803ab00ab80907d0636f1e84ce8
             </button>
         </div>
     </form>
