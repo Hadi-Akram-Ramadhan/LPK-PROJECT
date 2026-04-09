@@ -28,9 +28,10 @@ class UjianController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'judul' => 'required',
+            'judul' => 'required|string|max:255',
             'jenis_ujian' => 'nullable|in:reguler,tryout',
-            'durasi' => 'required|numeric',
+            'deskripsi' => 'nullable|string|max:1000',
+            'durasi' => 'required|numeric|min:1',
             'kelas_id' => 'required|array',
         ]);
 
@@ -81,9 +82,10 @@ class UjianController extends Controller
     public function update(Request $request, Ujian $ujian)
     {
         $request->validate([
-            'judul' => 'required',
+            'judul' => 'required|string|max:255',
             'jenis_ujian' => 'nullable|in:reguler,tryout',
-            'durasi' => 'required|numeric',
+            'deskripsi' => 'nullable|string|max:1000',
+            'durasi' => 'required|numeric|min:1',
         ]);
 
         $ujian->update([

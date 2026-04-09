@@ -50,7 +50,7 @@ class UjianController extends Controller
     {
         $request->validate([
             'judul' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'deskripsi' => 'nullable|string|max:1000',
             'durasi' => 'required|integer|min:1',
             'mulai' => 'nullable|date',
             'selesai' => 'nullable|date|after_or_equal:mulai',
@@ -145,7 +145,7 @@ class UjianController extends Controller
 
         $request->validate([
             'judul' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'deskripsi' => 'nullable|string|max:1000',
             'durasi' => 'required|integer|min:1',
             'mulai' => 'nullable|date',
             'selesai' => 'nullable|date|after_or_equal:mulai',

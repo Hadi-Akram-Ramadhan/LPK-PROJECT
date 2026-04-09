@@ -39,8 +39,8 @@
     .tag-blocked { background: #fef2f2; color: #ef4444; }
     .tag-time { background: #f1f5f9; color: #475569; }
 
-    .exam-title { font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 16px; line-height: 1.2; }
-    .exam-desc { font-size: 16px; color: #64748b; line-height: 1.6; margin-bottom: 30px; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .exam-title { font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 16px; line-height: 1.2; overflow-wrap: break-word; word-break: break-word; }
+    .exam-desc { font-size: 16px; color: #64748b; line-height: 1.6; margin-bottom: 30px; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: break-word; word-break: break-word; }
 
     .exam-meta { background: #f8fafc; border-radius: 14px; padding: 18px 22px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-bottom: 30px; border: 1px solid #f1f5f9; }
     .meta-item { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #475569; }

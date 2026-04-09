@@ -16,7 +16,7 @@
         <div class="grid-2 mb-6" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             <div>
                 <label class="block text-sm font-bold mb-2 text-slate-700">Judul Ujian</label>
-                <input type="text" name="judul" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" placeholder="Contoh: UTS Bahasa Korea Dasar" required>
+                <input type="text" name="judul" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" placeholder="Contoh: UTS Bahasa Korea Dasar" value="{{ old('judul') }}" maxlength="255" required>
             </div>
             <div>
                 <label class="block text-sm font-bold mb-2 text-slate-700">Jenis Ujian</label>
@@ -29,7 +29,7 @@
 
         <div class="mb-6">
             <label class="block text-sm font-bold mb-2 text-slate-700">Deskripsi Singkat</label>
-            <textarea name="deskripsi" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" placeholder="Tuliskan keterangan singkat mengenai ujian ini..." rows="3"></textarea>
+            <textarea name="deskripsi" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-blue-500" placeholder="Tuliskan keterangan singkat mengenai ujian ini..." rows="3" maxlength="1000">{{ old('deskripsi') }}</textarea>
         </div>
 
         <div class="grid-2 mb-6" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
