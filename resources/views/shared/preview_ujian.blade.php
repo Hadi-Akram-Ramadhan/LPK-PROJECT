@@ -332,8 +332,12 @@
 
     <div class="preview-banner">
         <div>MODE PREVIEW UJIAN (GURU/ADMIN)</div>
-        <a href="javascript:void(0);" onclick="if(window.history.length > 1) { window.history.back(); } else { window.close(); }" style="color:white; text-decoration:none; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:4px; font-size:11px;">KEMBALI KE PANEL</a>
+        @php
+            $back_url = request()->routeIs('admin.*') ? route('admin.ujian.index') : route('guru.ujian.index');
+        @endphp
+        <a href="{{ $back_url }}" style="color:white; text-decoration:none; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:4px; font-size:11px;">KEMBALI KE PANEL</a>
     </div>
+
 
     <div class="cbt-container">
         <!-- HEADER -->
