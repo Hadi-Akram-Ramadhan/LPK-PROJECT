@@ -119,7 +119,7 @@ class SoalController extends Controller
     public function edit(Soal $soal)
     {
         if ($soal->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action. Anda hanya dapat mengubah soal milik Anda sendiri.');
+            abort(404);
         }
 
         $soal->load('pilihanJawabans');
@@ -139,7 +139,7 @@ class SoalController extends Controller
     public function update(Request $request, Soal $soal)
     {
         if ($soal->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action. Anda hanya dapat mengubah soal milik Anda sendiri.');
+            abort(404);
         }
 
         $request->validate([
@@ -224,7 +224,7 @@ class SoalController extends Controller
     public function destroy(Soal $soal)
     {
         if ($soal->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action. Anda hanya dapat menghapus soal milik Anda sendiri.');
+            abort(404);
         }
 
         $paketId = $soal->paket_soal_id;

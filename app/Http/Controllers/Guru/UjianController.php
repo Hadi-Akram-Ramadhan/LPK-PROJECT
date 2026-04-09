@@ -16,7 +16,8 @@ class UjianController extends Controller
      */
     public function index()
     {
-        $ujians = Ujian::with(['guru'])
+        $ujians = Ujian::where('guru_id', auth()->id())
+            ->with(['guru'])
             ->withCount('soals')
             ->latest()
             ->paginate(10);
@@ -29,8 +30,9 @@ class UjianController extends Controller
      */
     public function create()
     {
-        // Ambil Semua Paket Soal (termasuk milik admin dan guru lain yang tampil di sistem)
-        $paketSoals = \App\Models\PaketSoal::with(['soals' => function($q) {
+        // Ambil Paket Soal Milik Sendiri
+        $paketSoals = \App\Models\PaketSoal::where('guru_id', auth()->id())
+            ->with(['soals' => function($q) {
                 $q->orderBy('id', 'asc');
             }])
             ->get();
@@ -117,13 +119,14 @@ class UjianController extends Controller
     public function edit(Ujian $ujian)
     {
         if ($ujian->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action. Anda hanya dapat mengubah jadwal ujian milik Anda sendiri.');
+            abort(404);
         }
 
         $ujian->load('soals');
         $selectedSoal = $ujian->soals->pluck('id')->toArray();
         
-        $paketSoals = \App\Models\PaketSoal::with(['soals' => function($q) {
+        $paketSoals = \App\Models\PaketSoal::where('guru_id', auth()->id())
+            ->with(['soals' => function($q) {
                 $q->orderBy('id', 'asc');
             }])
             ->get();
@@ -137,7 +140,7 @@ class UjianController extends Controller
     public function update(Request $request, Ujian $ujian)
     {
         if ($ujian->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action. Anda hanya dapat mengubah jadwal ujian milik Anda sendiri.');
+            abort(404);
         }
 
         $request->validate([
@@ -189,7 +192,7 @@ class UjianController extends Controller
     public function destroy(Ujian $ujian)
     {
         if ($ujian->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action. Anda hanya dapat menghapus jadwal ujian milik Anda sendiri.');
+            abort(404);
         }
 
         $ujian->delete();
@@ -198,9 +201,9 @@ class UjianController extends Controller
 
     public function preview(Request $request, Ujian $ujian)
     {
-        // Untuk guru, kita izinkan preview jika milik sendiri atau memang admin (di controller ini logic auth guru)
+        // Untuk guru, kita izinkan preview jika milik sendiri
         if ($ujian->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action. Preview hanya tersedia untuk pemilik ujian.');
+            abort(404);
         }
 
         $ujian->load(['soals.pilihanJawabans']);

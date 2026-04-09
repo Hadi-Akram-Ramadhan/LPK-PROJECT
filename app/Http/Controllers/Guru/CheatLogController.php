@@ -31,7 +31,7 @@ class CheatLogController extends Controller
     {
         // Security check: Guru can only approve if they own the exam
         if (!$cheatLog->ujianPeserta || $cheatLog->ujianPeserta->ujian->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
+            abort(404);
         }
         $request->validate([
             'status' => 'required|in:approved,rejected',

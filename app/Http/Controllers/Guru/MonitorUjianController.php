@@ -25,7 +25,7 @@ class MonitorUjianController extends Controller
     public function show(Ujian $ujian)
     {
         if ($ujian->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
+            abort(404);
         }
 
         $pesertas = UjianPeserta::with(['user', 'cheatLogs'])
@@ -44,7 +44,7 @@ class MonitorUjianController extends Controller
         $ujian = $ujian_peserta->ujian;
 
         if ($ujian->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
+            abort(404);
         }
 
         // Ambil soal essay saja
@@ -68,7 +68,7 @@ class MonitorUjianController extends Controller
         $ujian = $ujian_peserta->ujian;
 
         if ($ujian->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
+            abort(404);
         }
 
         $request->validate([
@@ -106,7 +106,7 @@ class MonitorUjianController extends Controller
     public function export(Ujian $ujian)
     {
         if ($ujian->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
+            abort(404);
         }
         // Eager load jawabanMurids.soal to calculate scores without N+1
         $pesertas = UjianPeserta::with(['user.kelas', 'jawabanMurids.soal'])

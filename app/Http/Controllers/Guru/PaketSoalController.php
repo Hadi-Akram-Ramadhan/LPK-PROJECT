@@ -11,7 +11,7 @@ class PaketSoalController extends Controller
 {
     public function index(Request $request)
     {
-        $query = PaketSoal::withCount('soals')->with('guru');
+        $query = PaketSoal::where('guru_id', auth()->id())->withCount('soals')->with('guru');
         
         if ($request->filled('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%');
@@ -45,6 +45,10 @@ class PaketSoalController extends Controller
 
     public function show(Request $request, PaketSoal $paketSoal)
     {
+        if ($paketSoal->guru_id !== auth()->id()) {
+            abort(404);
+        }
+
         $query = $paketSoal->soals()->with('pilihanJawabans');
         
         if ($request->filled('search')) {
@@ -58,7 +62,7 @@ class PaketSoalController extends Controller
     public function edit(PaketSoal $paketSoal)
     {
         if ($paketSoal->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action. Anda hanya dapat mengubah paket soal milik Anda sendiri.');
+            abort(404);
         }
 
         return view('guru.paket_soal.edit', compact('paketSoal'));
@@ -67,7 +71,7 @@ class PaketSoalController extends Controller
     public function update(Request $request, PaketSoal $paketSoal)
     {
         if ($paketSoal->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action. Anda hanya dapat mengubah paket soal milik Anda sendiri.');
+            abort(404);
         }
 
         $request->validate([
@@ -82,7 +86,7 @@ class PaketSoalController extends Controller
     public function destroy(PaketSoal $paketSoal)
     {
         if ($paketSoal->guru_id !== auth()->id()) {
-            abort(403, 'Unauthorized action. Anda hanya dapat menghapus paket soal milik Anda sendiri.');
+            abort(404);
         }
 
         foreach ($paketSoal->soals as $soal) {
