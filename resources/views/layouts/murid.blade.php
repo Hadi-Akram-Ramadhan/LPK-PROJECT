@@ -8,6 +8,20 @@
     <title>UBT Learning LPK URISOWON - Siswa</title>
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
 
+    <!-- Open Graph / Meta Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="LPK URISOWON - Pelatihan Bahasa Korea">
+    <meta property="og:description" content="Lembaga Pelatihan Kerja URISOWON Bangkalan. Pusat Pelatihan Bahasa Korea & Persiapan Ujian EPS-TOPIK Terpercaya di Madura.">
+    <meta property="og:image" content="{{ asset('og-banner.png') }}">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="LPK URISOWON - Pelatihan Bahasa Korea">
+    <meta property="twitter:description" content="LPK URISOWON Bangkalan. Pusat Pelatihan Bahasa Korea & Persiapan Ujian EPS-TOPIK Terpercaya.">
+    <meta property="twitter:image" content="{{ asset('og-banner.png') }}">
+
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
