@@ -50,7 +50,9 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex justify-end space-x-2">
+                            <a href="{{ route('admin.ujian.preview', $ujian) }}" target="_blank" class="text-emerald-600 hover:text-emerald-900 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-100 transition-colors">Preview</a>
                             <a href="{{ route('admin.monitor.show', $ujian) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md border border-indigo-100 transition-colors">Detail</a>
+
                             <a href="{{ route('admin.monitor.export', $ujian) }}" class="text-green-600 hover:text-green-900 bg-green-50 px-3 py-1 rounded-md border border-green-100 transition-colors">Export</a>
                         </div>
                     </td>

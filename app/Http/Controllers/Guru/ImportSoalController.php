@@ -205,11 +205,12 @@ class ImportSoalController extends Controller
     {
         $request->validate([
             'paket_soal_id' => 'required|exists:paket_soals,id',
-            'file_excel'    => 'required|mimes:xlsx,xls,csv|max:5120',
+            'file_excel'    => 'required|max:5120|mimes:xlsx,xls,csv,zip|mimetypes:application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain,application/csv,application/x-csv,application/zip,application/octet-stream',
         ], [
             'paket_soal_id.required' => 'Pilih paket soal tujuan.',
             'file_excel.required'    => 'File Excel wajib diunggah.',
-            'file_excel.mimes'       => 'Format harus xlsx, xls, atau csv.',
+            'file_excel.mimes'       => 'Format tidak valid. Pastikan file berakhiran .xlsx, .xls, atau .csv.',
+            'file_excel.mimetypes'   => 'Tipe berkas tidak didukung atau terdeteksi salah oleh sistem.',
             'file_excel.max'         => 'Ukuran file maksimal 5 MB.',
         ]);
 
@@ -233,7 +234,7 @@ class ImportSoalController extends Controller
             return back()->with('error', 'Tidak ada soal yang berhasil diimport. Periksa format file Anda.');
 
         } catch (\Throwable $e) {
-            return back()->with('error', 'Terjadi kesalahan saat membaca file: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat mengimport soal. Pastikan format file benar.');
         }
     }
 }

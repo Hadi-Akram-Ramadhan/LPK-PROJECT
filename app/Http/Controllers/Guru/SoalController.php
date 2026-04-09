@@ -49,14 +49,16 @@ class SoalController extends Controller
         $request->validate([
             'paket_soal_id' => 'required|exists:paket_soals,id',
             'tipe'          => 'required|in:pilihan_ganda,multiple_choice,essay,audio,pilihan_ganda_audio,pilihan_ganda_gambar,short_answer',
-            'pertanyaan'    => 'required|string',
-            'poin'          => 'required|integer|min:1',
-            'audio_path'    => 'nullable|string',
-            'gambar_path'   => 'nullable|string',
+            'pertanyaan'    => 'required|string|max:10000',
+            'poin'          => 'required|integer|min:1|max:1000',
+            'audio_path'    => 'nullable|string|max:255',
+            'gambar_path'   => 'nullable|string|max:255',
         ]);
 
-        // Security check: Verify paket soal exists
-        $paketSoal = PaketSoal::findOrFail($request->paket_soal_id);
+        // Security check: Verify paket soal exists and belongs to the guru
+        $paketSoal = PaketSoal::where('id', $request->paket_soal_id)
+            ->where('guru_id', auth()->id())
+            ->firstOrFail();
 
         DB::beginTransaction();
         try {
@@ -107,7 +109,7 @@ class SoalController extends Controller
                 ->with('success', 'Soal berhasil disimpan ke paket.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat menyimpan soal: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan soal. Pastikan format input benar.')->withInput();
         }
     }
 
@@ -116,6 +118,10 @@ class SoalController extends Controller
      */
     public function edit(Soal $soal)
     {
+        if ($soal->guru_id !== auth()->id()) {
+            abort(404);
+        }
+
         $soal->load('pilihanJawabans');
         $audioFiles = collect(Storage::disk('public')->files('audio'))->map(function($file) {
             return basename($file);
@@ -132,11 +138,15 @@ class SoalController extends Controller
      */
     public function update(Request $request, Soal $soal)
     {
+        if ($soal->guru_id !== auth()->id()) {
+            abort(404);
+        }
+
         $request->validate([
-            'pertanyaan' => 'required|string',
-            'poin' => 'required|integer|min:1',
-            'audio_path' => 'nullable|string',
-            'gambar_path' => 'nullable|string',
+            'pertanyaan' => 'required|string|max:10000',
+            'poin' => 'required|integer|min:1|max:1000',
+            'audio_path' => 'nullable|string|max:255',
+            'gambar_path' => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
@@ -204,7 +214,7 @@ class SoalController extends Controller
                 ->with('success', 'Soal berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat mengupdate soal: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui soal.')->withInput();
         }
     }
 
@@ -213,6 +223,10 @@ class SoalController extends Controller
      */
     public function destroy(Soal $soal)
     {
+        if ($soal->guru_id !== auth()->id()) {
+            abort(404);
+        }
+
         $paketId = $soal->paket_soal_id;
         $soal->pilihanJawabans()->delete();
         $soal->delete();

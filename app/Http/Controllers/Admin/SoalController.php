@@ -56,10 +56,10 @@ class SoalController extends Controller
         $request->validate([
             'paket_soal_id' => 'required|exists:paket_soals,id',
             'tipe'          => 'required|in:pilihan_ganda,multiple_choice,essay,audio,pilihan_ganda_audio,pilihan_ganda_gambar,short_answer',
-            'pertanyaan'    => 'required|string',
-            'poin'          => 'required|integer|min:1',
-            'audio_path'    => 'nullable|string',
-            'gambar_path'   => 'nullable|string',
+            'pertanyaan'    => 'required|string|max:10000',
+            'poin'          => 'required|integer|min:1|max:1000',
+            'audio_path'    => 'nullable|string|max:255',
+            'gambar_path'   => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
@@ -110,7 +110,7 @@ class SoalController extends Controller
                 ->with('success', 'Soal berhasil disimpan ke paket.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan soal.')->withInput();
         }
     }
 
@@ -129,10 +129,10 @@ class SoalController extends Controller
     public function update(Request $request, Soal $soal)
     {
         $request->validate([
-            'pertanyaan' => 'required|string',
-            'poin' => 'required|integer|min:1',
-            'audio_path' => 'nullable|string',
-            'gambar_path' => 'nullable|string',
+            'pertanyaan' => 'required|string|max:10000',
+            'poin' => 'required|integer|min:1|max:1000',
+            'audio_path' => 'nullable|string|max:255',
+            'gambar_path' => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
@@ -190,7 +190,7 @@ class SoalController extends Controller
                 ->with('success', 'Soal berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui soal.')->withInput();
         }
     }
 
@@ -214,7 +214,12 @@ class SoalController extends Controller
     {
         $request->validate([
             'paket_soal_id' => 'required|exists:paket_soals,id',
-            'file_excel'    => 'required|mimes:xlsx,xls,csv|max:5120',
+            'file_excel'    => 'required|max:5120|mimes:xlsx,xls,csv,zip|mimetypes:application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain,application/csv,application/x-csv,application/zip,application/octet-stream',
+        ], [
+            'file_excel.required' => 'File Excel wajib diunggah.',
+            'file_excel.mimes'    => 'Format tidak valid. Pastikan file berakhiran .xlsx, .xls, atau .csv.',
+            'file_excel.mimetypes' => 'Tipe berkas tidak didukung atau terdeteksi salah oleh sistem.',
+            'file_excel.max'      => 'Ukuran file maksimal 5 MB.',
         ]);
 
         try {
@@ -228,7 +233,7 @@ class SoalController extends Controller
             }
             return back()->with('error', 'Tidak ada soal yang berhasil diimport.');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat mengimport soal. Pastikan format file benar.');
         }
     }
 

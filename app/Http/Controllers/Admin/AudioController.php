@@ -136,7 +136,7 @@ class AudioController extends Controller
         ]);
 
         $oldName = $request->old_name;
-        $newName = \Illuminate\Support\Str::slug(pathinfo($request->new_name, PATHINFO_FILENAME)) . '.' . pathinfo($oldName, PATHINFO_EXTENSION);
+        $newName = Str::slug(pathinfo($request->new_name, PATHINFO_FILENAME)) . '.' . pathinfo($oldName, PATHINFO_EXTENSION);
 
         if ($oldName === $newName) {
             return back()->with('success', 'Nama file tidak berubah.');

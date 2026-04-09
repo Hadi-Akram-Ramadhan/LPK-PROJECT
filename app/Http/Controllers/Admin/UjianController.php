@@ -28,9 +28,10 @@ class UjianController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'judul' => 'required',
+            'judul' => 'required|string|max:255',
             'jenis_ujian' => 'nullable|in:reguler,tryout',
-            'durasi' => 'required|numeric',
+            'deskripsi' => 'nullable|string|max:1000',
+            'durasi' => 'required|numeric|min:1',
             'kelas_id' => 'required|array',
         ]);
 
@@ -81,9 +82,10 @@ class UjianController extends Controller
     public function update(Request $request, Ujian $ujian)
     {
         $request->validate([
-            'judul' => 'required',
+            'judul' => 'required|string|max:255',
             'jenis_ujian' => 'nullable|in:reguler,tryout',
-            'durasi' => 'required|numeric',
+            'deskripsi' => 'nullable|string|max:1000',
+            'durasi' => 'required|numeric|min:1',
         ]);
 
         $ujian->update([
@@ -135,4 +137,26 @@ class UjianController extends Controller
 
         return redirect()->route('admin.ujian.index')->with('success', 'Soal berhasil diperbarui untuk ujian ini.');
     }
+
+    public function preview(Request $request, Ujian $ujian)
+    {
+        $ujian->load(['soals.pilihanJawabans']);
+        
+        $totalSoal = $ujian->soals->count();
+        if ($totalSoal == 0) {
+            return back()->with('error', 'Ujian ini tidak memiliki soal untuk dipreview.');
+        }
+
+        $page = $request->query('page', 1);
+        $currentSoal = $ujian->soals()->skip($page - 1)->first();
+
+        if (!$currentSoal) {
+            return redirect()->route('admin.ujian.preview', ['ujian' => $ujian->id, 'page' => 1]);
+        }
+
+        $soals = $ujian->soals;
+
+        return view('shared.preview_ujian', compact('ujian', 'currentSoal', 'totalSoal', 'page', 'soals'));
+    }
 }
+

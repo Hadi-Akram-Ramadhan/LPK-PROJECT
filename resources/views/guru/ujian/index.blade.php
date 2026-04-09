@@ -58,7 +58,9 @@
                 </td>
                 <td>
                     <div style="display: flex; gap: 8px; justify-content: center;">
+                        <a href="{{ route('guru.ujian.preview', $u) }}" target="_blank" class="btn-primary" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; text-decoration: none; background: #059669;">Preview</a>
                         <a href="{{ route('guru.ujian.edit', $u) }}" class="btn-outline" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; text-decoration: none;">Edit</a>
+
                         <form action="{{ route('guru.ujian.destroy', $u) }}" method="POST" onsubmit="return confirm('Hapus jadwal ujian ini? Logika ujian peserta juga akan terhapus.')" style="margin:0;">
                             @csrf
                             @method('DELETE')

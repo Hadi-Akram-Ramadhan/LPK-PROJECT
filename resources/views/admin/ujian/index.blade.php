@@ -58,7 +58,9 @@
                 </td>
                 <td>
                     <div style="display: flex; gap: 8px; justify-content: center;">
+                        <a href="{{ route('admin.ujian.preview', $u) }}" target="_blank" class="btn-primary" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; text-decoration: none; background: #059669;">Preview</a>
                         <a href="{{ route('admin.ujian.edit', $u) }}" class="btn-outline" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; text-decoration: none;">Edit</a>
+
                         <a href="{{ route('admin.ujian.soal', $u) }}" class="btn-primary" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; text-decoration: none;">Soal</a>
                         <form action="{{ route('admin.ujian.destroy', $u) }}" method="POST" onsubmit="return confirm('Hapus ujian ini?')">
                             @csrf

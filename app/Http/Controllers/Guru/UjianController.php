@@ -16,7 +16,8 @@ class UjianController extends Controller
      */
     public function index()
     {
-        $ujians = Ujian::with(['guru'])
+        $ujians = Ujian::where('guru_id', auth()->id())
+            ->with(['guru'])
             ->withCount('soals')
             ->latest()
             ->paginate(10);
@@ -29,8 +30,9 @@ class UjianController extends Controller
      */
     public function create()
     {
-        // Ambil Semua Paket Soal (termasuk milik admin dan guru lain yang tampil di sistem)
-        $paketSoals = \App\Models\PaketSoal::with(['soals' => function($q) {
+        // Ambil Paket Soal Milik Sendiri
+        $paketSoals = \App\Models\PaketSoal::where('guru_id', auth()->id())
+            ->with(['soals' => function($q) {
                 $q->orderBy('id', 'asc');
             }])
             ->get();
@@ -48,7 +50,7 @@ class UjianController extends Controller
     {
         $request->validate([
             'judul' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'deskripsi' => 'nullable|string|max:1000',
             'durasi' => 'required|integer|min:1',
             'mulai' => 'nullable|date',
             'selesai' => 'nullable|date|after_or_equal:mulai',
@@ -116,11 +118,15 @@ class UjianController extends Controller
      */
     public function edit(Ujian $ujian)
     {
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(404);
+        }
 
         $ujian->load('soals');
         $selectedSoal = $ujian->soals->pluck('id')->toArray();
         
-        $paketSoals = \App\Models\PaketSoal::with(['soals' => function($q) {
+        $paketSoals = \App\Models\PaketSoal::where('guru_id', auth()->id())
+            ->with(['soals' => function($q) {
                 $q->orderBy('id', 'asc');
             }])
             ->get();
@@ -133,10 +139,13 @@ class UjianController extends Controller
      */
     public function update(Request $request, Ujian $ujian)
     {
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(404);
+        }
 
         $request->validate([
             'judul' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'deskripsi' => 'nullable|string|max:1000',
             'durasi' => 'required|integer|min:1',
             'mulai' => 'nullable|date',
             'selesai' => 'nullable|date|after_or_equal:mulai',
@@ -182,8 +191,38 @@ class UjianController extends Controller
      */
     public function destroy(Ujian $ujian)
     {
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(404);
+        }
 
         $ujian->delete();
         return redirect()->route('guru.ujian.index')->with('success', 'Ujian berhasil dihapus.');
     }
+
+    public function preview(Request $request, Ujian $ujian)
+    {
+        // Untuk guru, kita izinkan preview jika milik sendiri
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(404);
+        }
+
+        $ujian->load(['soals.pilihanJawabans']);
+        
+        $totalSoal = $ujian->soals->count();
+        if ($totalSoal == 0) {
+            return back()->with('error', 'Ujian ini tidak memiliki soal untuk dipreview.');
+        }
+
+        $page = $request->query('page', 1);
+        $currentSoal = $ujian->soals()->skip($page - 1)->first();
+
+        if (!$currentSoal) {
+            return redirect()->route('guru.ujian.preview', ['ujian' => $ujian->id, 'page' => 1]);
+        }
+
+        $soals = $ujian->soals;
+
+        return view('shared.preview_ujian', compact('ujian', 'currentSoal', 'totalSoal', 'page', 'soals'));
+    }
 }
+

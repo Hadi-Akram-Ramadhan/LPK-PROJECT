@@ -8,6 +8,20 @@
     <title>UBT Learning LPK URISOWON - Siswa</title>
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
 
+    <!-- Open Graph / Meta Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="LPK URISOWON - Pelatihan Bahasa Korea">
+    <meta property="og:description" content="Lembaga Pelatihan Kerja URISOWON Bangkalan. Pusat Pelatihan Bahasa Korea & Persiapan Ujian EPS-TOPIK Terpercaya di Madura.">
+    <meta property="og:image" content="{{ asset('og-banner.png') }}">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="LPK URISOWON - Pelatihan Bahasa Korea">
+    <meta property="twitter:description" content="LPK URISOWON Bangkalan. Pusat Pelatihan Bahasa Korea & Persiapan Ujian EPS-TOPIK Terpercaya.">
+    <meta property="twitter:image" content="{{ asset('og-banner.png') }}">
+
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,10 +76,12 @@
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     <span>{{ Auth::user()->name }}</span>
                 </div>
+                <a href="{{ route('murid.password') }}" class="logout-btn" style="color: #60a5fa; margin-right: -10px;">Ganti Password</a>
                 <form method="POST" action="{{ route('logout') }}">
-                    @csrf
+@csrf
                     <button type="submit" class="logout-btn">Logout</button>
                 </form>
+
             </div>
         </nav>
 

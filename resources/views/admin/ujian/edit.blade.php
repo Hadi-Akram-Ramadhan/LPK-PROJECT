@@ -39,12 +39,12 @@
                 
                 <div>
                     <label for="judul" class="block text-sm font-medium text-slate-700 mb-1">Judul Ujian <span class="text-red-500">*</span></label>
-                    <input type="text" name="judul" id="judul" value="{{ old('judul', $ujian->judul) }}" required class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md py-2 px-3">
+                    <input type="text" name="judul" id="judul" value="{{ old('judul', $ujian->judul) }}" required maxlength="255" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md py-2 px-3">
                 </div>
 
                 <div>
                     <label for="deskripsi" class="block text-sm font-medium text-slate-700 mb-1">Deksripsi (Opsional)</label>
-                    <textarea id="deskripsi" name="deskripsi" rows="3" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md py-2 px-3">{{ old('deskripsi', $ujian->deskripsi) }}</textarea>
+                    <textarea id="deskripsi" name="deskripsi" rows="3" maxlength="1000" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md py-2 px-3">{{ old('deskripsi', $ujian->deskripsi) }}</textarea>
                 </div>
 
                 <div>

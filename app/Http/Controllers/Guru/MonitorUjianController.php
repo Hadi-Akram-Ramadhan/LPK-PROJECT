@@ -13,7 +13,8 @@ class MonitorUjianController extends Controller
 {
     public function index()
     {
-        $ujians = Ujian::with(['guru'])
+        $ujians = Ujian::where('guru_id', auth()->id())
+            ->with(['guru'])
             ->withCount('pesertas')
             ->latest()
             ->paginate(10);
@@ -23,6 +24,9 @@ class MonitorUjianController extends Controller
 
     public function show(Ujian $ujian)
     {
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(404);
+        }
 
         $pesertas = UjianPeserta::with(['user', 'cheatLogs'])
             ->where('ujian_id', $ujian->id)
@@ -38,6 +42,10 @@ class MonitorUjianController extends Controller
     public function grade(UjianPeserta $ujian_peserta)
     {
         $ujian = $ujian_peserta->ujian;
+
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(404);
+        }
 
         // Ambil soal essay saja
         $soalEssays = $ujian->soals()->where('tipe', 'essay')->get();
@@ -58,6 +66,10 @@ class MonitorUjianController extends Controller
     public function storeGrade(Request $request, UjianPeserta $ujian_peserta)
     {
         $ujian = $ujian_peserta->ujian;
+
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(404);
+        }
 
         $request->validate([
             'poin' => 'required|array',
@@ -93,6 +105,9 @@ class MonitorUjianController extends Controller
 
     public function export(Ujian $ujian)
     {
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(404);
+        }
         // Eager load jawabanMurids.soal to calculate scores without N+1
         $pesertas = UjianPeserta::with(['user.kelas', 'jawabanMurids.soal'])
             ->where('ujian_id', $ujian->id)

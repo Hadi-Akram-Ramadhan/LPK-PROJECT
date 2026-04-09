@@ -168,10 +168,31 @@
                 <td style="padding:16px 20px;font-size:14px;font-weight:600;color:#334155;">{{ $soal->poin }}</td>
                 <td style="padding:16px 20px;">
                     <div style="display:flex;gap:6px;">
-                        <a href="{{ route('admin.soal.edit', $soal) }}" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid #e2e8f0;color:#2563eb;text-decoration:none;">Edit</a>
+                        <button type="button" 
+                            onclick="previewSoal({{ json_encode([
+                                'id' => $soal->id,
+                                'pertanyaan' => $soal->pertanyaan,
+                                'tipe' => $soal->tipe,
+                                'poin' => $soal->poin,
+                                'audio' => $soal->audio_path ? asset('storage/'.$soal->audio_path) : null,
+                                'gambar' => $soal->gambar_path ? asset('storage/'.$soal->gambar_path) : null,
+                                'pilihan' => $soal->pilihanJawabans->map(function($p) {
+                                    return [
+                                        'teks' => $p->teks,
+                                        'is_benar' => $p->is_benar,
+                                        'media' => $p->media_path ? asset('storage/'.$p->media_path) : null,
+                                        'media_tipe' => $p->media_tipe
+                                    ];
+                                }),
+                                'kunci' => $soal->jawaban_kunci
+                            ]) }})"
+                            style="padding:6px;border-radius:8px;border:1px solid #e2e8f0;color:#64748b;background:#fff;cursor:pointer;display:flex;align-items:center;" title="Preview Soal">
+                            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>
+                        <a href="{{ route('admin.soal.edit', $soal) }}" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid #e2e8f0;color:#2563eb;text-decoration:none;display:flex;align-items:center;">Edit</a>
                         <form action="{{ route('admin.soal.destroy', $soal) }}" method="POST" onsubmit="return confirm('Hapus soal ini?')">
                             @csrf @method('DELETE')
-                            <button type="submit" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;border:none;background:#fee2e2;color:#ef4444;cursor:pointer;">Hapus</button>
+                            <button type="submit" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;border:none;background:#fee2e2;color:#ef4444;cursor:pointer;height:100%;">Hapus</button>
                         </form>
                     </div>
                 </td>
@@ -190,4 +211,116 @@
 </div>
 @endif
 
+@endsection
+
+@section('extra-js')
+{{-- Modal Preview --}}
+<div id="previewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#fff;width:100%;max-width:800px;max-height:90vh;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
+        <div style="padding:20px 24px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span id="modalTipeBadge" style="background:#dbeafe;color:#2563eb;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;text-transform:uppercase;">Tipe</span>
+                <h3 style="font-size:16px;font-weight:700;color:#1e293b;margin:0;">Preview Soal</h3>
+            </div>
+            <button onclick="closePreview()" style="background:none;border:none;color:#94a3b8;cursor:pointer;padding:4px;">
+                <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="modalBody" style="padding:24px;overflow-y:auto;flex:1;background:#f8fafc;">
+            {{-- Content injected by JS --}}
+        </div>
+        <div style="padding:16px 24px;background:#fff;border-top:1px solid #f1f5f9;display:flex;justify-content:flex-end;">
+            <button onclick="closePreview()" style="padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;background:#f1f5f9;color:#64748b;border:none;cursor:pointer;">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewSoal(data) {
+    const modal = document.getElementById('previewModal');
+    const body = document.getElementById('modalBody');
+    const badge = document.getElementById('modalTipeBadge');
+    
+    badge.textContent = data.tipe.replace('_', ' ');
+    
+    let html = `
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+                <span style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;">Pertanyaan (ID: ${data.id})</span>
+                <span style="font-size:12px;font-weight:700;color:#059669;background:#ecfdf5;padding:2px 8px;border-radius:6px;">${data.poin} Poin</span>
+            </div>
+            
+            ${data.audio ? `
+                <div style="margin-bottom:16px;background:#eff6ff;padding:12px;border-radius:12px;border:1px solid #dbeafe;">
+                    <p style="font-size:11px;font-weight:700;color:#2563eb;margin:0 0 8px;text-transform:uppercase;">Audio Soal</p>
+                    <audio src="${data.audio}" controls style="width:100%;height:36px;"></audio>
+                </div>
+            ` : ''}
+            
+            ${data.gambar ? `
+                <div style="margin-bottom:16px;text-align:center;">
+                    <img src="${data.gambar}" style="max-width:100%;max-height:300px;border-radius:12px;border:1px solid #e2e8f0;">
+                </div>
+            ` : ''}
+            
+            <div style="font-size:16px;color:#1e293b;line-height:1.6;font-weight:500;">
+                ${data.pertanyaan}
+            </div>
+        </div>
+    `;
+
+    if (data.tipe === 'essay') {
+        html += `
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;">
+                <p style="font-size:13px;color:#64748b;margin:0;font-style:italic;">Ini adalah soal tipe Essay. Jawaban akan dinilai secara manual oleh Guru.</p>
+            </div>
+        `;
+    } else if (data.tipe === 'short_answer') {
+        html += `
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;">
+                <p style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin:0 0 10px;">Kunci Jawaban</p>
+                <div style="background:#f0fdf4;border:1.5px solid #bdf4c9;padding:12px 16px;border-radius:10px;color:#166534;font-weight:700;font-size:15px;display:inline-block;">
+                    ${data.kunci}
+                </div>
+            </div>
+        `;
+    } else {
+        html += `
+            <div style="display:grid;grid-template-columns:1fr;gap:12px;">
+                <p style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin:0 0 4px;">Pilihan Jawaban</p>
+                ${data.pilihan.map((p, idx) => {
+                    const letter = String.fromCharCode(65 + idx);
+                    const borderStyle = p.is_benar ? 'border:2px solid #10b981;background:#f0fdf4;' : 'border:1px solid #e2e8f0;background:#fff;';
+                    const badgeStyle = p.is_benar ? 'background:#10b981;color:#fff;' : 'background:#f1f5f9;color:#64748b;';
+                    
+                    return `
+                        <div style="${borderStyle}padding:14px 18px;border-radius:14px;display:flex;align-items:center;gap:14px;position:relative;">
+                            <span style="${badgeStyle}width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;">${letter}</span>
+                            <div style="flex:1;">
+                                ${p.teks ? `<div style="font-size:14px;color:#1e293b;font-weight:500;">${p.teks}</div>` : ''}
+                                
+                                ${p.media ? (p.media_tipe === 'audio' ? `
+                                    <div style="margin-top:8px;"><audio src="${p.media}" controls style="height:30px;width:100%;max-width:240px;"></audio></div>
+                                ` : `
+                                    <div style="margin-top:8px;"><img src="${p.media}" style="max-width:100%;max-height:150px;border-radius:8px;"></div>
+                                `) : ''}
+                            </div>
+                            ${p.is_benar ? `
+                                <div style="background:#10b981;color:#fff;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;position:absolute;right:16px;top:-10px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">Benar</div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    body.innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+function closePreview() {
+    document.getElementById('previewModal').style.display = 'none';
+}
+</script>
 @endsection
