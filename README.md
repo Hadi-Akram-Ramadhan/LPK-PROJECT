@@ -1,59 +1,93 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏆 Panduan Admin - UBT Learning LPK URISOWON
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Selamat datang di Sistem Ujian Berbasis Komputer (CBT) **LPK URISOWON**. Panduan ini akan membantu Anda mengelola seluruh ekosistem ujian, dari manajemen data siswa hingga pemantauan realtime ujian.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📊 1. Dashboard Utama
+Setelah login sebagai Admin, Anda akan disuguhkan statistik ringkas:
+- **Total Siswa & Staff**: Jumlah pengguna aktif dalam sistem.
+- **Ujian Aktif**: Informasi ujian yang sedang berlangsung.
+- **Nilai Terbaru**: Ringkasan hasil ujian siswa yang baru selesai.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 👥 2. Manajemen Pengguna (Siswa & Guru)
 
-## Learning Laravel
+### Menambah Siswa via Excel (Bulk Import)
+Untuk menghemat waktu, Anda dapat mengimpor data siswa dalam jumlah banyak sekaligus:
+1. Masuk ke menu **Manajemen User** > **Import Siswa**.
+2. Siapkan file Excel (.xlsx) dengan 4 kolom utama:
+   - **Kolom A**: Nama Lengkap
+   - **Kolom B**: Alamat Email
+   - **Kolom C**: Password (Min. 8 karakter)
+   - **Kolom D**: ID Kelas (Pastikan ID Kelas sudah benar dari menu Kelas)
+3. Upload file dan klik **Import**.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Menambah Staff/Guru
+1. Klik **User Baru** di dashboard manajemen user.
+2. Pilih Role (**Guru** atau **Admin**).
+3. Isi detail dan simpan.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🏫 3. Pengolahan Kelas & Jurusan
+Sebelum mengimpor siswa, pastikan kelas dan jurusan sudah terdaftar.
+- **ID Kelas**: Sangat penting untuk proses import siswa. ID ini bisa dilihat di tabel daftar kelas.
+- **Jurusan**: Mengelompokkan kelas berdasarkan bidang studi (misal: Bahasa Korea, Hospitality, dll).
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 📚 4. Bank Soal (Questions)
+Anda atau Guru dapat membuat bank soal yang akan digunakan dalam ujian.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Format Import Soal via Excel
+Jika soal sangat banyak, gunakan fitur import soal:
+- **Kolom A**: Pertanyaan (Mendukung teks dasar).
+- **Kolom B - F**: Opsi Jawaban (A sampai E).
+- **Kolom G**: Jawaban Benar (Gunakan huruf kapital 'A', 'B', 'C', 'D', atau 'E').
+- **Kolom H**: Poin Soal (Misal: 4).
 
-## Contributing
+> **💡 Tips**: Untuk soal dengan gambar atau audio, sebaiknya edit soal secara manual setelah diimport untuk menyisipkan media dari **Media Explorer**.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 📝 5. Pengaturan Ujian (Exam Management)
+Menu ini digunakan untuk merilis ujian kepada siswa.
+- **Judul & Token**: Buat judul ujian dan sistem akan menghasilkan token akses (Gunakan tombol "Refresh Token" jika diperlukan).
+- **Durasi**: Atur berapa menit siswa boleh mengerjakan.
+- **Waktu Mulai & Berakhir**: Ujian tidak akan bisa diakses jika belum waktunya atau sudah lewat batas.
+- **Acak Soal**: Centang fitur ini untuk mencegah kecurangan antar siswa.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 🛡️ 6. Keamanan & Log Kecurangan
+Sistem ini dilengkapi dengan **Anti-Cheat Engine**:
+- **Log Kecurangan**: Jika siswa mencoba membuka tab lain atau keluar dari halaman ujian, sistem akan mengirimkan peringatan dan mencatatnya.
+- **Otomatis Selesai**: Anda dapat mengatur agar ujian otomatis diselesaikan jika siswa melanggar lebih dari 3 kali.
+- Lihat rekaman pelanggaran di menu **Log Kecurangan**.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 📂 7. Media Explorer (Audio & Image)
+Gunakan menu ini untuk mengelola aset media yang digunakan dalam soal:
+- **Audio Explorer**: Upload file suara (.mp3, .wav) untuk soal Listening.
+- **Image Explorer**: Upload gambar (.jpg, .png) untuk visualisasi soal.
+- Masukkan URL file media tersebut ke dalam editor soal saat membuat pertanyaan.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## ✍️ 8. Monitoring & Penilaian (Monitoring)
+Melihat hasil dan memantau ujian secara realtime.
+- **Live Monitoring**: Lihat siapa saja siswa yang sedang mengerjakan, berapa soal yang sudah diisi, dan status koneksi mereka.
+- **Koreksi Manual (Essay)**: Jika terdapat soal essay, masuk ke menu **Nilai & Hasil** > **Koreksi** untuk memberikan nilai manual setelah ujian selesai.
+
+---
+
+## 🔒 Tips Keamanan Admin
+1. **Ganti Password**: Selalu ganti password Admin Anda secara berkala di menu Profil.
+2. **Backup**: Lakukan backup data nilai secara berkala (Download ke Excel).
+3. **Logout**: Selalu logout setelah selesai menggunakan dashboard untuk mencegah akses yang tidak sah.
+
+---
+*© 2026 Admin Panel - LPK URISOWON High Tech Learning*
