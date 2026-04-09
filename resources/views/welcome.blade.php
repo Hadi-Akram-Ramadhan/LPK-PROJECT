@@ -443,12 +443,7 @@
                     @enderror
 
                     <!-- Password -->
-                    <div class="label-row">
-                        <label class="form-label" for="password">Password</label>
-                        @if(Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" class="forgot-link">Lupa Password?</a>
-                        @endif
-                    </div>
+                    <label for="password" class="form-label">Password</label>
                     <div class="input-group">
                         <svg class="i-left" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

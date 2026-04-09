@@ -23,7 +23,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Anti-Cheat Endpoints
         Route::post('/exam/{ujian_peserta}/report-tab-switch', [\App\Http\Controllers\Murid\ExamController::class, 'reportCheat'])->name('murid.exam.reportCheat');
         Route::get('/exam/{ujian_peserta}/blocked', [\App\Http\Controllers\Murid\ExamController::class, 'blocked'])->name('murid.exam.blocked');
+
+        // Ganti Password
+        Route::get('/password', function() {
+            return view('murid.password');
+        })->name('murid.password');
     });
+
 
     // Admin Routes
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
