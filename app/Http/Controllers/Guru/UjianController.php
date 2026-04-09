@@ -195,4 +195,31 @@ class UjianController extends Controller
         $ujian->delete();
         return redirect()->route('guru.ujian.index')->with('success', 'Ujian berhasil dihapus.');
     }
+
+    public function preview(Request $request, Ujian $ujian)
+    {
+        // Untuk guru, kita izinkan preview jika milik sendiri atau memang admin (di controller ini logic auth guru)
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(403, 'Unauthorized action. Preview hanya tersedia untuk pemilik ujian.');
+        }
+
+        $ujian->load(['soals.pilihanJawabans']);
+        
+        $totalSoal = $ujian->soals->count();
+        if ($totalSoal == 0) {
+            return back()->with('error', 'Ujian ini tidak memiliki soal untuk dipreview.');
+        }
+
+        $page = $request->query('page', 1);
+        $currentSoal = $ujian->soals()->skip($page - 1)->first();
+
+        if (!$currentSoal) {
+            return redirect()->route('guru.ujian.preview', ['ujian' => $ujian->id, 'page' => 1]);
+        }
+
+        $soals = $ujian->soals;
+
+        return view('shared.preview_ujian', compact('ujian', 'currentSoal', 'totalSoal', 'page', 'soals'));
+    }
 }
+

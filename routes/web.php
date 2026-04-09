@@ -37,7 +37,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/staff', [\App\Http\Controllers\Admin\UserController::class, 'staff'])->name('staff.index');
         Route::resource('kelas', \App\Http\Controllers\Admin\KelasController::class);
         Route::resource('ujian', \App\Http\Controllers\Admin\UjianController::class);
+        Route::get('/ujian/{ujian}/preview', [\App\Http\Controllers\Admin\UjianController::class, 'preview'])->name('ujian.preview');
         Route::get('/ujian/{ujian}/soal', [\App\Http\Controllers\Admin\UjianController::class, 'manajemenSoal'])->name('ujian.soal');
+
         Route::post('/ujian/{ujian}/soal', [\App\Http\Controllers\Admin\UjianController::class, 'updateSoal'])->name('ujian.updateSoal');
         
         // Paket Soal (Bank Soal terkelompok)
@@ -83,6 +85,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // Manajemen Ujian
         Route::resource('ujian', \App\Http\Controllers\Guru\UjianController::class);
+        Route::get('/ujian/{ujian}/preview', [\App\Http\Controllers\Guru\UjianController::class, 'preview'])->name('ujian.preview');
+
         
         // Import Soal
         Route::get('/import-soal', [\App\Http\Controllers\Guru\ImportSoalController::class, 'index'])->name('import.index');

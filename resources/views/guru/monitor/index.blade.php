@@ -53,9 +53,13 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex space-x-2">
+                                <a href="{{ route('guru.ujian.preview', $ujian) }}" target="_blank" class="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-md hover:bg-emerald-200 transition-colors">
+                                    Preview
+                                </a>
                                 <a href="{{ route('guru.monitor.show', $ujian) }}" class="inline-flex items-center px-3 py-1 bg-accent-100 text-accent-700 text-xs font-semibold rounded-md hover:bg-accent-200 transition-colors">
                                     Monitor
                                 </a>
+
                                 <a href="{{ route('guru.monitor.export', $ujian) }}" class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-md hover:bg-green-200 transition-colors">
                                     Export
                                 </a>
