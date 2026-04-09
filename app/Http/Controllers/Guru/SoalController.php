@@ -55,8 +55,10 @@ class SoalController extends Controller
             'gambar_path'   => 'nullable|string',
         ]);
 
-        // Security check: Verify paket soal exists
-        $paketSoal = PaketSoal::findOrFail($request->paket_soal_id);
+        // Security check: Verify paket soal exists and belongs to the guru
+        $paketSoal = PaketSoal::where('id', $request->paket_soal_id)
+            ->where('guru_id', auth()->id())
+            ->firstOrFail();
 
         DB::beginTransaction();
         try {
@@ -116,6 +118,10 @@ class SoalController extends Controller
      */
     public function edit(Soal $soal)
     {
+        if ($soal->guru_id !== auth()->id()) {
+            abort(403, 'Unauthorized action. Anda hanya dapat mengubah soal milik Anda sendiri.');
+        }
+
         $soal->load('pilihanJawabans');
         $audioFiles = collect(Storage::disk('public')->files('audio'))->map(function($file) {
             return basename($file);
@@ -132,6 +138,10 @@ class SoalController extends Controller
      */
     public function update(Request $request, Soal $soal)
     {
+        if ($soal->guru_id !== auth()->id()) {
+            abort(403, 'Unauthorized action. Anda hanya dapat mengubah soal milik Anda sendiri.');
+        }
+
         $request->validate([
             'pertanyaan' => 'required|string',
             'poin' => 'required|integer|min:1',
@@ -213,6 +223,10 @@ class SoalController extends Controller
      */
     public function destroy(Soal $soal)
     {
+        if ($soal->guru_id !== auth()->id()) {
+            abort(403, 'Unauthorized action. Anda hanya dapat menghapus soal milik Anda sendiri.');
+        }
+
         $paketId = $soal->paket_soal_id;
         $soal->pilihanJawabans()->delete();
         $soal->delete();

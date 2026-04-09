@@ -116,6 +116,9 @@ class UjianController extends Controller
      */
     public function edit(Ujian $ujian)
     {
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(403, 'Unauthorized action. Anda hanya dapat mengubah jadwal ujian milik Anda sendiri.');
+        }
 
         $ujian->load('soals');
         $selectedSoal = $ujian->soals->pluck('id')->toArray();
@@ -133,6 +136,9 @@ class UjianController extends Controller
      */
     public function update(Request $request, Ujian $ujian)
     {
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(403, 'Unauthorized action. Anda hanya dapat mengubah jadwal ujian milik Anda sendiri.');
+        }
 
         $request->validate([
             'judul' => 'required|string|max:255',
@@ -182,6 +188,9 @@ class UjianController extends Controller
      */
     public function destroy(Ujian $ujian)
     {
+        if ($ujian->guru_id !== auth()->id()) {
+            abort(403, 'Unauthorized action. Anda hanya dapat menghapus jadwal ujian milik Anda sendiri.');
+        }
 
         $ujian->delete();
         return redirect()->route('guru.ujian.index')->with('success', 'Ujian berhasil dihapus.');

@@ -14,7 +14,10 @@ class CheatLogController extends Controller
      */
     public function index()
     {
-        $logs = CheatLog::with(['ujianPeserta.user', 'ujianPeserta.ujian', 'approvedBy'])
+        $logs = CheatLog::whereHas('ujianPeserta.ujian', function ($query) {
+                $query->where('guru_id', auth()->id());
+            })
+            ->with(['ujianPeserta.user', 'ujianPeserta.ujian', 'approvedBy'])
             ->latest()
             ->paginate(20);
 
@@ -26,6 +29,10 @@ class CheatLogController extends Controller
      */
     public function approve(Request $request, CheatLog $cheatLog)
     {
+        // Security check: Guru can only approve if they own the exam
+        if (!$cheatLog->ujianPeserta || $cheatLog->ujianPeserta->ujian->guru_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
         $request->validate([
             'status' => 'required|in:approved,rejected',
         ]);

@@ -57,11 +57,19 @@ class PaketSoalController extends Controller
 
     public function edit(PaketSoal $paketSoal)
     {
+        if ($paketSoal->guru_id !== auth()->id()) {
+            abort(403, 'Unauthorized action. Anda hanya dapat mengubah paket soal milik Anda sendiri.');
+        }
+
         return view('guru.paket_soal.edit', compact('paketSoal'));
     }
 
     public function update(Request $request, PaketSoal $paketSoal)
     {
+        if ($paketSoal->guru_id !== auth()->id()) {
+            abort(403, 'Unauthorized action. Anda hanya dapat mengubah paket soal milik Anda sendiri.');
+        }
+
         $request->validate([
             'nama'      => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
@@ -73,6 +81,10 @@ class PaketSoalController extends Controller
 
     public function destroy(PaketSoal $paketSoal)
     {
+        if ($paketSoal->guru_id !== auth()->id()) {
+            abort(403, 'Unauthorized action. Anda hanya dapat menghapus paket soal milik Anda sendiri.');
+        }
+
         foreach ($paketSoal->soals as $soal) {
             $soal->pilihanJawabans()->delete();
             $soal->delete();
