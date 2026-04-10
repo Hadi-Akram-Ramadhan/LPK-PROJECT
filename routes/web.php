@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // Paket Soal (Bank Soal terkelompok)
         Route::resource('paket-soal', \App\Http\Controllers\Admin\PaketSoalController::class);
+        Route::post('paket-soal/{paketSoal}/duplicate', [\App\Http\Controllers\Admin\PaketSoalController::class, 'duplicate'])->name('paket-soal.duplicate');
 
         // Individual Soal (dalam konteks paket)
         Route::resource('soal', \App\Http\Controllers\Admin\SoalController::class);
@@ -85,6 +86,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // Paket Soal (Bank Soal terkelompok)
         Route::resource('paket-soal', \App\Http\Controllers\Guru\PaketSoalController::class);
+        Route::post('paket-soal/{paketSoal}/duplicate', [\App\Http\Controllers\Guru\PaketSoalController::class, 'duplicate'])->name('paket-soal.duplicate');
 
         // Individual Soal Guru
         Route::resource('soal', \App\Http\Controllers\Guru\SoalController::class);

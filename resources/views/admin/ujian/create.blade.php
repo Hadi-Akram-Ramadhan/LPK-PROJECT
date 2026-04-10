@@ -57,6 +57,14 @@
             </div>
         </div>
 
+        <div class="mb-6" style="display:flex;align-items:center;gap:10px;padding:16px 20px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;">
+            <input id="acak_soal" name="acak_soal" type="checkbox" value="1" {{ old('acak_soal') ? 'checked' : '' }} style="width:18px;height:18px;cursor:pointer;">
+            <label for="acak_soal" style="font-size:14px;font-weight:600;color:#334155;cursor:pointer;">
+                Acak urutan soal untuk setiap peserta
+            </label>
+            <span style="font-size:11px;color:#94a3b8;margin-left:auto;">Setiap murid mendapat urutan soal berbeda</span>
+        </div>
+
         <div style="border-top: 2px solid #f1f5f9; padding-top: 32px; margin-top: 32px;">
             <div class="flex-between mb-4">
                 <h3 class="text-xl font-bold text-slate-800">Pilih Soal (Pilih minimal satu)</h3>

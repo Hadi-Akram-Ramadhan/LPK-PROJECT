@@ -43,6 +43,7 @@ class UjianController extends Controller
             'mulai' => $request->mulai,
             'selesai' => $request->selesai,
             'guru_id' => auth()->id(),
+            'acak_soal' => $request->has('acak_soal'),
         ]);
 
         // Otomatis daftarkan semua siswa di kelas ini ke ujian

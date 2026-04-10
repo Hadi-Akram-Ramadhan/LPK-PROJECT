@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PaketSoal;
 use App\Models\Soal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PaketSoalController extends Controller
 {
@@ -93,5 +94,43 @@ class PaketSoalController extends Controller
         $paketSoal->delete();
         return redirect()->route('guru.paket-soal.index')
             ->with('success', 'Paket Soal beserta semua soalnya berhasil dihapus.');
+    }
+
+    public function duplicate(PaketSoal $paketSoal)
+    {
+        DB::transaction(function () use ($paketSoal) {
+            // 1. Duplikasi paket soal
+            $newPaket = PaketSoal::create([
+                'guru_id'   => auth()->id(),
+                'nama'      => $paketSoal->nama . ' (Salinan)',
+                'deskripsi' => $paketSoal->deskripsi,
+            ]);
+
+            // 2. Duplikasi semua soal beserta pilihan jawabannya
+            foreach ($paketSoal->soals()->with('pilihanJawabans')->get() as $soal) {
+                $newSoal = $newPaket->soals()->create([
+                    'guru_id'       => auth()->id(),
+                    'tipe'          => $soal->tipe,
+                    'pertanyaan'    => $soal->pertanyaan,
+                    'poin'          => $soal->poin,
+                    'audio_path'    => $soal->audio_path,
+                    'gambar_path'   => $soal->gambar_path,
+                    'jawaban_kunci' => $soal->jawaban_kunci,
+                ]);
+
+                // 3. Duplikasi pilihan jawaban untuk setiap soal
+                foreach ($soal->pilihanJawabans as $pilihan) {
+                    $newSoal->pilihanJawabans()->create([
+                        'teks'       => $pilihan->teks,
+                        'is_benar'   => $pilihan->is_benar,
+                        'media_path' => $pilihan->media_path ?? null,
+                        'media_tipe' => $pilihan->media_tipe ?? null,
+                    ]);
+                }
+            }
+        });
+
+        return redirect()->route('guru.paket-soal.index')
+            ->with('success', "Paket Soal \"{$paketSoal->nama}\" berhasil diduplikasi.");
     }
 }
