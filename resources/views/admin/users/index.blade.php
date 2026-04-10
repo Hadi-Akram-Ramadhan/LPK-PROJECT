@@ -296,8 +296,8 @@
                 <span class="section-subtitle">Kelola akun pengajar dan admin sistem</span>
             </div>
         </div>
-        <div class="section-actions">
-            <form action="{{ route('admin.users.index') }}" method="GET" class="mini-search">
+        <div class="section-actions" style="flex-wrap: wrap; gap: 8px;">
+            <form action="{{ route('admin.users.index') }}" method="GET" class="mini-search" style="margin-bottom: 0;">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 <input type="text" name="search_guru" value="{{ request('search_guru') }}" placeholder="Cari guru/admin...">
             </form>
@@ -381,19 +381,21 @@
                 <span class="section-subtitle">Kelola semua akun peserta didik</span>
             </div>
         </div>
-        <div class="section-actions">
-            <form action="{{ route('admin.users.index') }}" method="GET" class="mini-search">
+        <div class="section-actions" style="flex-wrap: wrap; gap: 8px;">
+            <form action="{{ route('admin.users.index') }}" method="GET" class="mini-search" style="margin-bottom: 0;">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 <input type="text" name="search_siswa" value="{{ request('search_siswa') }}" placeholder="Cari nama siswa...">
             </form>
-            <a href="{{ route('admin.users.import') }}" class="btn-add" style="background: transparent; color: #10b981; border: 1.5px solid #10b981;">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                Import Excel
-            </a>
-            <a href="{{ route('admin.users.create') }}?role=murid" class="btn-add success">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-                Tambah Siswa
-            </a>
+            <div style="display: flex; gap: 8px; flex-wrap: nowrap;">
+              <a href="{{ route('admin.users.import') }}" class="btn-add" style="background: transparent; color: #10b981; border: 1.5px solid #10b981; white-space: nowrap;">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                  Import
+              </a>
+              <a href="{{ route('admin.users.create') }}?role=murid" class="btn-add success" style="white-space: nowrap;">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                  Tambah
+              </a>
+            </div>
         </div>
     </div>
     <table class="u-table" id="siswaTable">

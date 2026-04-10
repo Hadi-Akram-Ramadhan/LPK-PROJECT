@@ -5,9 +5,9 @@
 
 @section('extra-css')
 <style>
-    .page-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .toolbar-search { position: relative; }
-    .toolbar-search input { padding: 10px 14px 10px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px; outline: none; background: #fff; font-family: 'Inter', sans-serif; width: 280px; }
+    .page-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .toolbar-search { position: relative; flex: 1; min-width: 250px; }
+    .toolbar-search input { padding: 10px 14px 10px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px; outline: none; background: #fff; font-family: 'Inter', sans-serif; width: 100%; transition: border-color 0.2s; }
     .toolbar-search input:focus { border-color: #3b82f6; }
     .toolbar-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #94a3b8; }
     .tbtn { display: inline-flex; align-items: center; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; text-decoration: none; transition: 0.15s; font-family: 'Inter', sans-serif; }
@@ -34,9 +34,9 @@
 <div class="page-toolbar">
     <form action="{{ route('admin.kelas.index') }}" method="GET" class="toolbar-search">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kelas...">
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama kelas...">
     </form>
-    <a href="{{ route('admin.kelas.create') }}" class="tbtn tbtn-green">
+    <a href="{{ route('admin.kelas.create') }}" class="tbtn tbtn-green" style="white-space: nowrap;">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
         Tambah Kelas Baru
     </a>

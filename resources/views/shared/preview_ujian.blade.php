@@ -297,6 +297,37 @@
             background: #f8fafc;
         }
 
+        /* LANDSCAPE WARNING (COPY FROM MURID EXAM) */
+        #landscape-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: #111827;
+            z-index: 99999;
+            color: #fff;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+        @media screen and (max-width: 1024px) and (orientation: portrait) {
+            #landscape-overlay {
+                display: flex;
+            }
+        }
+        .rotate-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+            animation: rotate-anim 2s ease-in-out infinite;
+        }
+        @keyframes rotate-anim {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+            100% { transform: rotate(0deg); }
+        }
+
         /* WATERMARK */
         .watermark-container {
             position: relative;
@@ -325,16 +356,42 @@
 
         @media screen and (max-height: 500px) {
             .cbt-container {
-                height: 85vh !important;
+                height: 90vh !important;
+                width: 96vw !important;
+                max-width: none !important;
+                border: 1px solid #000 !important;
+                min-height: 0 !important;
                 margin-top: 35px;
             }
             .cbt-header, .cbt-footer { height: 45px !important; }
+            .hdr-col { border-right: 1px solid #000 !important; }
             .hdr-val { font-size: 14px !important; }
+            .hdr-label { display: inline-block !important; font-size: 10px !important; margin-right: 5px !important; }
             .opt-text, .question-flex { font-size: 16px !important; }
+            
+            .cbt-left { padding: 15px 25px !important; }
+            .opt-body { padding: 10px 25px !important; }
+            .opt-circle { width: 32px !important; height: 32px !important; margin-right: 15px !important; font-size: 14px !important; }
+            .question-flex { margin-bottom: 20px !important; }
+            .ftr-btn { font-size: 12px !important; }
+            
+            /* Modal Adjustments */
+            .modal-overlay { padding: 0 !important; }
+            .modal-box { height: 90vh !important; width: 96vw !important; max-width: none !important; border: 1px solid #000 !important; }
+            .grid-nums { gap: 8px !important; }
+            .grid-btn { width: 40px !important; height: 40px !important; font-size: 14px !important; margin: 0 auto !important; }
         }
     </style>
 </head>
 <body>
+
+    <div id="landscape-overlay">
+        <svg class="rotate-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+        </svg>
+        <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 15px; letter-spacing: -0.5px;">Gunakan Mode Landscape</h2>
+        <p style="font-size: 15px; color: #94a3b8; max-width: 300px; line-height: 1.6;">Halaman Preview tidak dapat dibuka dalam mode layar potrait. Mohon putar ponsel Anda ke posisi landscape untuk melihat preview ujian.</p>
+    </div>
 
     <div class="preview-banner">
         <div>MODE PREVIEW UJIAN (GURU/ADMIN)</div>

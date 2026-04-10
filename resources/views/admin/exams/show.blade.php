@@ -1,18 +1,18 @@
 @extends('layouts.admin')
 
 @section('header')
-<div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0">
+<div class="flex flex-wrap items-center justify-between gap-4 py-2">
     <div class="flex items-center">
-        <a href="{{ route('admin.monitor.index') }}" class="mr-4 text-slate-400 hover:text-slate-600 transition-colors">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <a href="{{ route('admin.monitor.index') }}" class="mr-3 text-slate-400 hover:text-slate-600 transition-colors">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </a>
         <div>
-            <h2 class="text-xl font-bold text-slate-800 leading-tight">Detail Hasil Ujian</h2>
-            <p class="text-sm text-slate-500">{{ $ujian->judul }}</p>
+            <h2 class="text-lg md:text-xl font-bold text-slate-800 leading-tight">Detail Hasil Ujian</h2>
+            <p class="text-xs md:text-sm text-slate-500">{{ $ujian->judul }}</p>
         </div>
     </div>
-    <div class="flex items-center space-x-3">
-        <a href="{{ route('admin.monitor.export', $ujian) }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+    <div class="flex items-center">
+        <a href="{{ route('admin.monitor.export', $ujian) }}" class="btn btn-green" style="padding: 8px 16px; font-size: 13px;">
             <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             Export CSV
         </a>

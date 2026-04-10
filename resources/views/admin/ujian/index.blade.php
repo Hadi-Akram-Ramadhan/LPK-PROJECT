@@ -4,12 +4,12 @@
 @section('header-sub', 'Kelola paket ujian dan jadwal pelaksanaan')
 
 @section('content')
-<div class="flex-between mb-6">
-    <div class="search-box" style="width: 300px;">
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <div class="search-box" style="flex: 1; min-width: 250px; max-width: 400px;">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         <input type="text" id="searchInput" placeholder="Cari nama ujian...">
     </div>
-    <a href="{{ route('admin.ujian.create') }}" class="btn btn-primary">
+    <a href="{{ route('admin.ujian.create') }}" class="btn btn-primary" style="white-space: nowrap;">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Tambah Ujian Baru
     </a>
@@ -57,15 +57,14 @@
                     @endif
                 </td>
                 <td>
-                    <div style="display: flex; gap: 8px; justify-content: center;">
-                        <a href="{{ route('admin.ujian.preview', $u) }}" target="_blank" class="btn-primary" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; text-decoration: none; background: #059669;">Preview</a>
-                        <a href="{{ route('admin.ujian.edit', $u) }}" class="btn-outline" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; text-decoration: none;">Edit</a>
-
-                        <a href="{{ route('admin.ujian.soal', $u) }}" class="btn-primary" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; text-decoration: none;">Soal</a>
+                    <div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
+                        <a href="{{ route('admin.ujian.preview', $u) }}" target="_blank" class="btn-primary" style="padding: 4px 8px; border-radius: 6px; font-size: 11px; text-decoration: none; background: #059669; white-space: nowrap;">Preview</a>
+                        <a href="{{ route('admin.ujian.edit', $u) }}" class="btn-outline" style="padding: 4px 8px; border-radius: 6px; font-size: 11px; text-decoration: none; white-space: nowrap;">Edit</a>
+                        <a href="{{ route('admin.ujian.soal', $u) }}" class="btn-primary" style="padding: 4px 8px; border-radius: 6px; font-size: 11px; text-decoration: none; white-space: nowrap;">Soal</a>
                         <form action="{{ route('admin.ujian.destroy', $u) }}" method="POST" onsubmit="return confirm('Hapus ujian ini?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn-danger" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; background: transparent;">Hapus</button>
+                            <button type="submit" class="btn-danger" style="padding: 4px 8px; border-radius: 6px; font-size: 11px; background: transparent; white-space: nowrap;">Hapus</button>
                         </form>
                     </div>
                 </td>

@@ -163,10 +163,15 @@
             margin-bottom: 0 !important;
             min-width: 600px; /* Force scroll on very small screens */
         }
+        .adm-header { 
+            height: 72px; background: #fff; border-bottom: 1px solid #e2e8f0; 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 32px; flex-shrink: 0; transition: all 0.3s;
+        }
 
         @media (max-width: 1024px) { 
             .grid-4 { grid-template-columns: repeat(2, 1fr); } 
-            .adm-header { height: 64px; padding: 0 20px; }
+            .adm-header { height: auto; min-height: 64px; padding: 12px 20px; flex-wrap: wrap; gap: 12px; }
             .adm-content { padding: 20px; }
         }
         @media (max-width: 768px) { 
@@ -174,7 +179,9 @@
             .stat-pill { padding: 16px; }
             .stat-pill-val { font-size: 22px; }
             .tbl th, .tbl td { padding: 12px 10px; font-size: 13px; }
-            .btn { padding: 8px 16px; font-size: 12px; }
+            .btn { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+            .btn svg { width: 14px; height: 14px; margin-right: 4px; }
+            .search-box { width: 100% !important; max-width: none !important; }
         }
     </style>
     @yield('extra-css')

@@ -164,17 +164,14 @@
             min-width: 600px; /* Force scroll on very small screens */
         }
 
-        @media (max-width: 1024px) { 
-            .grid-4 { grid-template-columns: repeat(2, 1fr); } 
-            .adm-header { height: 64px; padding: 0 20px; }
-            .adm-content { padding: 20px; }
-        }
         @media (max-width: 768px) { 
             .grid-4, .grid-2 { grid-template-columns: 1fr; } 
             .stat-pill { padding: 16px; }
             .stat-pill-val { font-size: 22px; }
             .tbl th, .tbl td { padding: 12px 10px; font-size: 13px; }
-            .btn { padding: 8px 16px; font-size: 12px; }
+            .btn { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+            .btn svg { width: 14px; height: 14px; margin-right: 4px; }
+            .search-box { width: 100% !important; max-width: none !important; }
         }
     </style>
     @yield('extra-css')
