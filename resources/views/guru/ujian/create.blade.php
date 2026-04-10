@@ -79,7 +79,7 @@
                         <option value="">-- Pilih Paket Soal --</option>
                         @foreach($paketSoals as $paket)
                             <option value="{{ $paket->id }}" data-soals="{{ $paket->soals->pluck('id')->join(',') }}">
-                                {{ $paket->nama }} ({{ $paket->soals->count() }} Soal)
+                                {{ $paket->nama }} ({{ $paket->soals->count() }} Soal) - Oleh: {{ $paket->guru->name ?? 'Admin' }}
                             </option>
                         @endforeach
                     </select>
@@ -98,7 +98,10 @@
             <div id="soalListContainer" style="max-height: 500px; overflow-y: auto; border: 1.5px solid #e2e8f0; border-radius: 12px;">
                 @forelse($paketSoals as $paket)
                     <div class="group-header" style="background: #f1f5f9; padding: 10px 15px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">{{ $paket->nama }}</span>
+                        <span style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">
+                            {{ $paket->nama }} 
+                            <span style="color: #6366f1; margin-left: 8px;">(Oleh: {{ $paket->guru->name ?? 'Admin' }})</span>
+                        </span>
                         <button type="button" class="btn-check-group" data-target=".paket-id-{{ $paket->id }}" style="background: none; border: none; color: #2563eb; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase;">Centang Grup</button>
                     </div>
                     <table class="w-full text-left" style="border-collapse: collapse; width: 100%;">

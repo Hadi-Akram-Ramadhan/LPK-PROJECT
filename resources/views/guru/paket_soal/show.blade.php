@@ -47,6 +47,7 @@
             <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:#94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pertanyaan..." style="padding:8px 12px 8px 32px;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;width:200px;background:#f8fafc;">
         </form>
+        @if($paketSoal->guru_id === auth()->id())
         <a href="{{ route('guru.soal.create', ['paket' => $paketSoal->id]) }}" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;background:#2563eb;color:#fff;">
             <svg style="width:15px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
             Tambah Soal
@@ -55,6 +56,9 @@
             <svg style="width:15px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19h6m-3-3v3"/></svg>
             Import
         </a>
+        @else
+        <span style="font-size: 11px; color: #94a3b8; font-style: italic; background: #f1f5f9; padding: 6px 12px; border-radius: 8px;">Mode Lihat Saja (Read Only)</span>
+        @endif
     </div>
 </div>
 
@@ -170,7 +174,7 @@
                     <div style="display:flex;gap:6px;">
                 <td style="padding:16px 20px;">
                     <div style="display:flex;gap:6px;">
-                        <button type="button" 
+                         <button type="button" 
                             onclick="previewSoal({{ json_encode([
                                 'id' => $soal->id,
                                 'pertanyaan' => $soal->pertanyaan,
@@ -191,11 +195,14 @@
                             style="padding:6px;border-radius:8px;border:1px solid #e2e8f0;color:#64748b;background:#fff;cursor:pointer;display:flex;align-items:center;" title="Preview Soal">
                             <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         </button>
+
+                        @if($paketSoal->guru_id === auth()->id())
                         <a href="{{ route('guru.soal.edit', $soal) }}" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid #e2e8f0;color:#2563eb;text-decoration:none;display:flex;align-items:center;">Edit</a>
                         <form action="{{ route('guru.soal.destroy', $soal) }}" method="POST" onsubmit="return confirm('Hapus soal ini?')">
                             @csrf @method('DELETE')
                             <button type="submit" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;border:none;background:#fee2e2;color:#ef4444;cursor:pointer;height:100%;">Hapus</button>
                         </form>
+                        @endif
                     </div>
                 </td>
                     </div>

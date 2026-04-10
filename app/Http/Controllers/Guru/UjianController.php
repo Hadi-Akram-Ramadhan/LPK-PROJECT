@@ -16,8 +16,7 @@ class UjianController extends Controller
      */
     public function index()
     {
-        $ujians = Ujian::where('guru_id', auth()->id())
-            ->with(['guru'])
+        $ujians = Ujian::with(['guru'])
             ->withCount('soals')
             ->latest()
             ->paginate(10);
@@ -30,9 +29,8 @@ class UjianController extends Controller
      */
     public function create()
     {
-        // Ambil Paket Soal Milik Sendiri
-        $paketSoals = \App\Models\PaketSoal::where('guru_id', auth()->id())
-            ->with(['soals' => function($q) {
+        // Ambil Semua Paket Soal (Termasuk Milik Orang Lain/Admin)
+        $paketSoals = \App\Models\PaketSoal::with(['guru', 'soals' => function($q) {
                 $q->orderBy('id', 'asc');
             }])
             ->get();
@@ -125,8 +123,7 @@ class UjianController extends Controller
         $ujian->load('soals');
         $selectedSoal = $ujian->soals->pluck('id')->toArray();
         
-        $paketSoals = \App\Models\PaketSoal::where('guru_id', auth()->id())
-            ->with(['soals' => function($q) {
+        $paketSoals = \App\Models\PaketSoal::with(['guru', 'soals' => function($q) {
                 $q->orderBy('id', 'asc');
             }])
             ->get();
@@ -201,11 +198,7 @@ class UjianController extends Controller
 
     public function preview(Request $request, Ujian $ujian)
     {
-        // Untuk guru, kita izinkan preview jika milik sendiri
-        if ($ujian->guru_id !== auth()->id()) {
-            abort(404);
-        }
-
+        // Untuk guru, kita izinkan preview semua ujian sebagai referensi
         $ujian->load(['soals.pilihanJawabans']);
         
         $totalSoal = $ujian->soals->count();

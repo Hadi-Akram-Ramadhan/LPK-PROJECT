@@ -67,9 +67,9 @@
             @endif
 
             <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f1f5f9;padding-top:14px;">
-                <span style="font-size:12px;color:#94a3b8;">Oleh: {{ $paket->guru->name ?? '-' }}</span>
+                <span style="font-size:12px;color:#94a3b8;">Oleh: <strong style="color:#6366f1;">{{ $paket->guru->name ?? '-' }}</strong></span>
                 <span style="font-size:12px;color:#2563eb;font-weight:600;display:flex;align-items:center;gap:4px;">
-                    Kelola Soal
+                    Lihat Soal
                     <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </span>
             </div>

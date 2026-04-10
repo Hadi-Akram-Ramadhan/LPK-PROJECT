@@ -107,7 +107,7 @@
                                 <option value="">-- Pilih Paket Soal --</option>
                                 @foreach($paketSoals as $paket)
                                     <option value="{{ $paket->id }}" data-soals="{{ $paket->soals->pluck('id')->join(',') }}">
-                                        {{ $paket->nama }} ({{ $paket->soals->count() }} Soal)
+                                        {{ $paket->nama }} ({{ $paket->soals->count() }} Soal) - Oleh: {{ $paket->guru->name ?? 'Admin' }}
                                     </option>
                                 @endforeach
                             </select>
@@ -133,7 +133,10 @@
                         <div class="max-h-[400px] overflow-y-auto custom-scrollbar" id="soalListContainer">
                             @forelse($paketSoals as $paket)
                                 <div class="bg-slate-50/30 px-4 py-2 border-b border-slate-100 flex justify-between items-center group-header">
-                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{{ $paket->nama }}</span>
+                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                                        {{ $paket->nama }}
+                                        <span class="text-indigo-500 ml-2">(Oleh: {{ $paket->guru->name ?? 'Admin' }})</span>
+                                    </span>
                                     <button type="button" class="btn-check-group text-[10px] font-bold text-accent-600 hover:text-accent-800 uppercase" data-target=".paket-id-{{ $paket->id }}">Centang Grup</button>
                                 </div>
                                 <table class="w-full text-left" style="border-collapse: collapse;">

@@ -39,7 +39,10 @@
             <tr>
                 <td>
                     <div style="font-weight: 600; color: #1e293b; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $u->judul }}">{{ $u->judul }}</div>
-                    <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">{{ $u->kategori ?? 'Umum' }}</div>
+                    <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">
+                        {{ $u->kategori ?? 'Umum' }} · 
+                        <span style="color: #6366f1; font-weight: 600;">Oleh: {{ $u->guru->name ?? 'Admin' }}</span>
+                    </div>
                 </td>
                 <td>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase {{ $u->jenis_ujian === 'tryout' ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-purple-100 text-purple-800 border-purple-200' }}">
@@ -57,15 +60,20 @@
                     @endif
                 </td>
                 <td>
-                    <div style="display: flex; gap: 8px; justify-content: center;">
+                    <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
                         <a href="{{ route('guru.ujian.preview', $u) }}" target="_blank" class="btn-primary" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; text-decoration: none; background: #059669;">Preview</a>
-                        <a href="{{ route('guru.ujian.edit', $u) }}" class="btn-outline" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; text-decoration: none;">Edit</a>
+                        
+                        @if($u->guru_id == auth()->id())
+                            <a href="{{ route('guru.ujian.edit', $u) }}" class="btn-outline" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; text-decoration: none;">Edit</a>
 
-                        <form action="{{ route('guru.ujian.destroy', $u) }}" method="POST" onsubmit="return confirm('Hapus jadwal ujian ini? Logika ujian peserta juga akan terhapus.')" style="margin:0;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-danger" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; background: transparent; cursor:pointer;">Hapus</button>
-                        </form>
+                            <form action="{{ route('guru.ujian.destroy', $u) }}" method="POST" onsubmit="return confirm('Hapus jadwal ujian ini? Logika ujian peserta juga akan terhapus.')" style="margin:0;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-danger" style="padding: 6px 10px; border-radius: 6px; font-size: 12px; background: transparent; cursor:pointer;">Hapus</button>
+                            </form>
+                        @else
+                            <span style="font-size: 11px; color: #94a3b8; font-style: italic; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">Read Only</span>
+                        @endif
                     </div>
                 </td>
             </tr>

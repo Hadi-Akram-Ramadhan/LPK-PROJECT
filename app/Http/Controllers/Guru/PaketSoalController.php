@@ -11,7 +11,7 @@ class PaketSoalController extends Controller
 {
     public function index(Request $request)
     {
-        $query = PaketSoal::where('guru_id', auth()->id())->withCount('soals')->with('guru');
+        $query = PaketSoal::query()->withCount('soals')->with('guru');
         
         if ($request->filled('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%');
@@ -45,10 +45,7 @@ class PaketSoalController extends Controller
 
     public function show(Request $request, PaketSoal $paketSoal)
     {
-        if ($paketSoal->guru_id !== auth()->id()) {
-            abort(404);
-        }
-
+        $paketSoal->load('guru');
         $query = $paketSoal->soals()->with('pilihanJawabans');
         
         if ($request->filled('search')) {
