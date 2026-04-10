@@ -61,6 +61,21 @@
 
         footer { background: #fff; border-top: 1px solid #e2e8f0; padding: 30px 40px; margin-top: auto; }
         .footer-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #64748b; }
+
+        /* REUSABLE RESPONSIVE TABLE UTILITY */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 1.5rem;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .table-responsive table {
+            margin-bottom: 0 !important;
+            min-width: 600px;
+        }
     </style>
 </head>
 <body>
@@ -142,6 +157,21 @@
                     confirmButtonText: 'Tutup'
                 });
             };
+
+            // 3. Auto-wrap tables for responsiveness
+            const tables = document.querySelectorAll('table');
+            tables.forEach(table => {
+                // Skip if already wrapped
+                if (table.parentElement.classList.contains('table-responsive') || 
+                    table.parentElement.classList.contains('overflow-x-auto')) {
+                    return;
+                }
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'table-responsive';
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            });
         });
     </script>
 </body>

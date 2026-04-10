@@ -151,8 +151,31 @@
         .icon-circle { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .icon-circle svg { width: 22px; height: 22px; }
 
-        @media (max-width: 1024px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { .grid-4, .grid-2 { grid-template-columns: 1fr; } }
+        /* REUSABLE RESPONSIVE TABLE UTILITY */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+        }
+        .table-responsive table {
+            margin-bottom: 0 !important;
+            min-width: 600px; /* Force scroll on very small screens */
+        }
+
+        @media (max-width: 1024px) { 
+            .grid-4 { grid-template-columns: repeat(2, 1fr); } 
+            .adm-header { height: 64px; padding: 0 20px; }
+            .adm-content { padding: 20px; }
+        }
+        @media (max-width: 768px) { 
+            .grid-4, .grid-2 { grid-template-columns: 1fr; } 
+            .stat-pill { padding: 16px; }
+            .stat-pill-val { font-size: 22px; }
+            .tbl th, .tbl td { padding: 12px 10px; font-size: 13px; }
+            .btn { padding: 8px 16px; font-size: 12px; }
+        }
     </style>
     @yield('extra-css')
 </head>
@@ -329,24 +352,42 @@
             });
         });
     </script>
-    </script>
     <script>
+        // Auto-wrap tables for responsiveness
         document.addEventListener('DOMContentLoaded', function() {
-            var menuBtn = document.getElementById('mobile-menu-btn');
-            var overlay = document.getElementById('sidebar-overlay');
-            var sidebar = document.querySelector('.adm-side');
-            
-            if(menuBtn && overlay && sidebar) {
-                menuBtn.addEventListener('click', function() {
-                    sidebar.classList.add('open');
-                    overlay.classList.add('open');
-                });
-                overlay.addEventListener('click', function() {
-                    sidebar.classList.remove('open');
-                    overlay.classList.remove('open');
-                });
-            }
+            const tables = document.querySelectorAll('table');
+            tables.forEach(table => {
+                // Skip if already wrapped in a responsive div
+                if (table.parentElement.classList.contains('table-responsive') || 
+                    table.parentElement.classList.contains('overflow-x-auto')) {
+                    return;
+                }
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'table-responsive';
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            });
         });
+
+        // Toggle Sidebar Mobile
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.querySelector('.adm-side');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('open');
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+            });
+        }
     </script>
     @yield('extra-js')
 </body>
