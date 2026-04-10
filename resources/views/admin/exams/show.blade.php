@@ -30,6 +30,7 @@
                     <th class="px-6 py-4 text-left">Peserta</th>
                     <th class="px-6 py-4 text-left">Kelas</th>
                     <th class="px-6 py-4 text-left">Status</th>
+                    <th class="px-6 py-4 text-center">Pelanggaran</th>
                     <th class="px-6 py-4 text-left">Waktu</th>
                     <th class="px-6 py-4 text-center">Skor</th>
                 </tr>
@@ -54,6 +55,16 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200 italic">BELUM MULAI</span>
                         @endif
                     </td>
+                    <td class="px-6 py-4 text-center">
+                        @php $cheatCount = $p->cheatLogs->count(); @endphp
+                        @if($cheatCount > 0)
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200">
+                                {{ $cheatCount }}x
+                            </span>
+                        @else
+                            <span class="text-slate-300 text-xs">—</span>
+                        @endif
+                    </td>
                     <td class="px-6 py-4 text-xs text-slate-500">
                         <div>Mulai: {{ $p->mulai_at ?? '-' }}</div>
                         <div>Selesai: {{ $p->selesai_at ?? '-' }}</div>
@@ -66,7 +77,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-12 text-center text-slate-400 italic">Belum ada peserta yang mengikuti ujian ini.</td>
+                    <td colspan="7" class="px-6 py-12 text-center text-slate-400 italic">Belum ada peserta yang mengikuti ujian ini.</td>
                 </tr>
                 @endforelse
             </tbody>

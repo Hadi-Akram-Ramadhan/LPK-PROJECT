@@ -20,7 +20,7 @@ class ExamMonitorController extends Controller
 
     public function show(Ujian $ujian)
     {
-        $pesertas = \App\Models\UjianPeserta::with('user.kelas')
+        $pesertas = \App\Models\UjianPeserta::with(['user.kelas', 'cheatLogs'])
             ->where('ujian_id', $ujian->id)
             ->latest()
             ->paginate(30);

@@ -63,6 +63,13 @@
             </div>
         </div>
 
+        <div class="mb-6 flex items-center">
+            <input id="acak_soal" name="acak_soal" type="checkbox" value="1" {{ old('acak_soal') ? 'checked' : '' }} style="width: 20px; height: 20px; color: #2563eb; border-radius: 4px; cursor: pointer;">
+            <label for="acak_soal" style="margin-left: 10px; font-size: 14px; font-weight: 700; color: #334155; cursor: pointer;">
+                Acak urutan soal untuk setiap peserta
+            </label>
+        </div>
+
         <div style="border-top: 2px solid #f1f5f9; padding-top: 32px; margin-top: 32px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <h3 class="text-xl font-bold text-slate-800">Pilih Soal (Pilih minimal satu)</h3>

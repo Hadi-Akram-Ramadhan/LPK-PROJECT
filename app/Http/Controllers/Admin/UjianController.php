@@ -33,6 +33,7 @@ class UjianController extends Controller
             'deskripsi' => 'nullable|string|max:1000',
             'durasi' => 'required|numeric|min:1',
             'kelas_id' => 'required|array',
+            'acak_soal' => 'nullable|boolean',
         ]);
 
         $ujian = Ujian::create([
@@ -42,6 +43,7 @@ class UjianController extends Controller
             'durasi' => $request->durasi,
             'mulai' => $request->mulai,
             'selesai' => $request->selesai,
+            'acak_soal' => $request->has('acak_soal'),
             'guru_id' => auth()->id(),
         ]);
 
