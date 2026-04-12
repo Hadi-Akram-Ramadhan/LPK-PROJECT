@@ -206,7 +206,7 @@ class UserController extends Controller
         $sheet->setTitle('Template Import');
 
         $headers = [
-            'A1' => 'Nama Murid (Maks 60 huruf)',
+            'A1' => 'Nama Murid (Maks 20 huruf)',
             'B1' => 'Alamat Email (Maks 100 huruf)',
             'C1' => 'Password (Min 8 huruf)',
             'D1' => 'ID Kelas (Angka)',

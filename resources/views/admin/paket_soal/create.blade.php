@@ -16,7 +16,7 @@
         @csrf
         <div style="margin-bottom:20px;">
             <label style="display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:8px;">Nama Paket Soal *</label>
-            <input type="text" name="nama" value="{{ old('nama') }}" required placeholder="Contoh: Bahasa Korea Level 1, JLPT N5 Listening..." maxlength="100"
+            <input type="text" name="nama" value="{{ old('nama') }}" required placeholder="Contoh: Bahasa Korea Level 1, JLPT N5 Listening..." maxlength="20"
                 style="width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;box-sizing:border-box;"
                 onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
             @error('nama') <p style="color:#ef4444;font-size:12px;margin:6px 0 0;">{{ $message }}</p> @enderror
@@ -24,7 +24,7 @@
 
         <div style="margin-bottom:28px;">
             <label style="display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:8px;">Deskripsi (Opsional)</label>
-            <textarea name="deskripsi" rows="4" placeholder="Deskripsi singkat tentang paket soal ini..." maxlength="300"
+            <textarea name="deskripsi" rows="4" placeholder="Deskripsi singkat tentang paket soal ini..." maxlength="50"
                 style="width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;resize:vertical;box-sizing:border-box;"
                 onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">{{ old('deskripsi') }}</textarea>
         </div>

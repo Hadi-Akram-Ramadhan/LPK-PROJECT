@@ -38,12 +38,12 @@
                 <h3 class="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2">Konfigurasi Ujian</h3>
                 
                 <div>
-                    <input type="text" name="judul" id="judul" value="{{ old('judul', $ujian->judul) }}" required maxlength="100" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">
+                    <input type="text" name="judul" id="judul" value="{{ old('judul', $ujian->judul) }}" required maxlength="20" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">
                 </div>
 
                 <div>
                     <label for="deskripsi" class="block text-sm font-medium text-slate-700 mb-1">Deksripsi (Opsional)</label>
-                    <textarea id="deskripsi" name="deskripsi" rows="3" maxlength="300" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">{{ old('deskripsi', $ujian->deskripsi) }}</textarea>
+                    <textarea id="deskripsi" name="deskripsi" rows="3" maxlength="50" class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">{{ old('deskripsi', $ujian->deskripsi) }}</textarea>
                 </div>
 
                 <div>

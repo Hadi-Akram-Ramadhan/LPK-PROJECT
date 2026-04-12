@@ -18,7 +18,7 @@
         <div class="space-y-6">
             <div>
                 <label for="nama" class="block text-sm font-medium text-slate-700 mb-1">Nama Kelas</label>
-                <input type="text" name="nama" id="nama" value="{{ old('nama', $kelas->nama) }}" required autofocus maxlength="50" class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-slate-300 rounded-md">
+                <input type="text" name="nama" id="nama" value="{{ old('nama', $kelas->nama) }}" required autofocus maxlength="20" class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-slate-300 rounded-md">
                 @error('nama') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
         </div>

@@ -31,8 +31,8 @@ class PaketSoalController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama'      => 'required|string|max:100',
-            'deskripsi' => 'nullable|string|max:300',
+            'nama'      => 'required|string|max:20',
+            'deskripsi' => 'nullable|string|max:50',
         ]);
 
         PaketSoal::create([
@@ -65,8 +65,8 @@ class PaketSoalController extends Controller
     public function update(Request $request, PaketSoal $paketSoal)
     {
         $request->validate([
-            'nama'      => 'required|string|max:100',
-            'deskripsi' => 'nullable|string|max:300',
+            'nama'      => 'required|string|max:20',
+            'deskripsi' => 'nullable|string|max:50',
         ]);
 
         $paketSoal->update([
