@@ -47,6 +47,12 @@
                 <a href="{{ route('admin.paket-soal.edit', $paket) }}" style="padding:6px;border-radius:8px;border:1px solid #e2e8f0;color:#64748b;text-decoration:none;display:flex;align-items:center;" title="Edit Paket">
                     <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 </a>
+                <form action="{{ route('admin.paket-soal.duplicate', $paket) }}" method="POST" onsubmit="return confirm('Duplikat paket soal ini beserta seluruh soalnya?')">
+                    @csrf
+                    <button type="submit" style="padding:6px;border-radius:8px;border:1px solid #e2e8f0;background:transparent;cursor:pointer;color:#2563eb;display:flex;align-items:center;" title="Duplikat Paket">
+                        <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                    </button>
+                </form>
                 <form action="{{ route('admin.paket-soal.destroy', $paket) }}" method="POST" onsubmit="return confirm('Hapus paket ini beserta SEMUA soalnya? Tindakan ini tidak dapat dibatalkan.')">
                     @csrf @method('DELETE')
                     <button type="submit" style="padding:6px;border-radius:8px;border:1px solid #e2e8f0;background:transparent;cursor:pointer;color:#ef4444;display:flex;align-items:center;" title="Hapus Paket">

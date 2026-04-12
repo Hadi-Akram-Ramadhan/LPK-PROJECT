@@ -43,8 +43,14 @@
         {{-- Jumlah soal badge --}}
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
             <span style="background:#dbeafe;color:#2563eb;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;">{{ $paket->soals_count }} Soal</span>
-            @if($paket->guru_id === auth()->id())
             <div style="display:flex;gap:6px;">
+                <form action="{{ route('guru.paket-soal.duplicate', $paket) }}" method="POST" onsubmit="return confirm('Duplikat paket soal ini beserta seluruh soalnya?')">
+                    @csrf
+                    <button type="submit" style="padding:6px;border-radius:8px;border:1px solid #e2e8f0;background:transparent;cursor:pointer;color:#2563eb;display:flex;align-items:center;" title="Duplikat Paket">
+                        <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                    </button>
+                </form>
+                @if($paket->guru_id === auth()->id())
                 <a href="{{ route('guru.paket-soal.edit', $paket) }}" style="padding:6px;border-radius:8px;border:1px solid #e2e8f0;color:#64748b;text-decoration:none;display:flex;align-items:center;" title="Edit Paket">
                     <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 </a>
@@ -54,8 +60,8 @@
                         <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
                 </form>
+                @endif
             </div>
-            @endif
         </div>
 
         <a href="{{ route('guru.paket-soal.show', $paket) }}" style="text-decoration:none;">

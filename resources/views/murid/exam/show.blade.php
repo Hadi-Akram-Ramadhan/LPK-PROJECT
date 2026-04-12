@@ -240,6 +240,69 @@
             color: #111;
         }
 
+        /* MATCHING UI */
+        .matching-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            padding: 30px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .matching-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 40%;
+            z-index: 2;
+        }
+        .match-item {
+            background: #fff;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            min-height: 80px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .match-item:hover { border-color: #9ca3af; }
+        .match-item.active { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 0 0 3px rgba(59,130,246,0.3); }
+        .match-item.connected { border-color: #10b981; background: #f0fdf4; }
+        
+        .match-dot {
+            width: 14px;
+            height: 14px;
+            background: #9ca3af;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: background 0.2s;
+        }
+        .match-item.active .match-dot { background: #3b82f6; }
+        .match-item.connected .match-dot { background: #10b981; }
+        .match-left .match-dot { right: -20px; }
+        .match-right .match-dot { left: -20px; }
+
+        #matching-svg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .match-line {
+            stroke: #10b981;
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
         /* BOTTOM TEXT */
         .bottom-text {
             margin-top: 12px;
@@ -503,10 +566,15 @@
                 </div>
 
                 @if($currentSoal->audio_path)
-                    <div class="audio-wrapper">
-                        <audio controls controlsList="nodownload" class="audio-player" preload="none">
+                    <div class="audio-wrapper flex-col items-center">
+                        <audio controls controlsList="nodownload" class="audio-player soal-audio" preload="none" data-id="soal_{{ $currentSoal->id }}" data-max="{{ $currentSoal->audio_max_play }}">
                             <source src="{{ asset('storage/' . $currentSoal->audio_path) }}?v={{ $currentSoal->id }}" type="audio/mpeg">
                         </audio>
+                        @if($currentSoal->audio_max_play)
+                            <div class="text-xs text-red-600 mt-2 font-bold audio-counter" id="counter_soal_{{ $currentSoal->id }}">Sisa putar: {{ $currentSoal->audio_max_play }} kali</div>
+                        @else
+                            <div class="text-xs text-slate-500 mt-2">Bebas putar</div>
+                        @endif
                     </div>
                 @endif
 
@@ -536,9 +604,12 @@
                                 @if($opsi->media_tipe === 'audio' && $opsi->media_path)
                                     <!-- Stop propagation on audio play so the radio button isn't toggled incorrectly on some devices -->
                                     <div onclick="event.stopPropagation()">
-                                        <audio controls controlsList="nodownload" preload="none" style="height: 40px; max-width: 220px; outline:none;">
+                                        <audio controls controlsList="nodownload" preload="none" class="opsi-audio" data-id="opt_{{ $opsi->id }}" data-max="{{ $opsi->audio_max_play }}" style="height: 40px; max-width: 220px; outline:none;">
                                             <source src="{{ asset('storage/' . $opsi->media_path) }}?v={{ $opsi->id }}" type="audio/mpeg">
                                         </audio>
+                                        @if($opsi->audio_max_play)
+                                            <div class="text-xs text-red-600 mt-1 audio-counter" id="counter_opt_{{ $opsi->id }}">Sisa: {{ $opsi->audio_max_play }}</div>
+                                        @endif
                                     </div>
                                 @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
                                     <div class="watermark-container">
@@ -579,6 +650,73 @@
                         </div>
                     </label>
                     @endforeach
+                @elseif($currentSoal->tipe === 'matching')
+                    @php
+                        $pairs = $currentSoal->pilihanJawabans;
+                        $leftItems = [];
+                        $rightItems = [];
+
+                        // Array of right indices to shuffle
+                        $shuffledIndices = [];
+                        for ($i = 0; $i < $pairs->count(); $i++) { $shuffledIndices[] = $i; }
+                        
+                        // Seed random so shuffle is consistent on reload for this user+exam+page mix
+                        mt_srand($ujian_peserta->id + $currentSoal->id);
+                        shuffle($shuffledIndices);
+                        mt_srand(); // reset seed
+
+                        // Generate Map: rightShuffledIndex -> originalPairIndex
+                        $shuffleMap = [];
+                        foreach ($shuffledIndices as $rightShuffledIndex => $originalPairIndex) {
+                            $shuffleMap[$rightShuffledIndex] = $originalPairIndex;
+                        }
+
+                        $existingJawaban = $jawabanSaatIni ? json_decode($jawabanSaatIni->jawaban_text, true) : [];
+
+                        foreach ($pairs as $idx => $pair) {
+                            $leftItems[] = ['id' => $idx, 'val' => $pair->teks, 'tipe' => in_array($pair->media_tipe, ['matching_gambar_kiri', 'matching_gambar_keduanya']) ? 'gambar' : 'teks'];
+                            $rightItems[] = [
+                                'id' => $idx, // Array display index
+                                'original' => $shuffledIndices[$idx], // the pair index it originally belongs to
+                                'val' => $pairs[$shuffledIndices[$idx]]->media_path,
+                                'tipe' => in_array($pairs[$shuffledIndices[$idx]]->media_tipe, ['matching_gambar_kanan', 'matching_gambar_keduanya']) ? 'gambar' : 'teks'
+                            ];
+                        }
+                    @endphp
+                    
+                    <input type="hidden" id="matching_shuffle_map" form="answer-form" name="shuffle_map" value="{{ json_encode($shuffleMap) }}">
+                    <input type="hidden" id="matching_answer" form="answer-form" name="jawaban" value="{{ json_encode($existingJawaban ?? new stdClass) }}">
+
+                    <div class="matching-wrapper" id="matching-wrapper">
+                        <svg id="matching-svg"></svg>
+                        
+                        <div class="matching-col left-col">
+                            @foreach($leftItems as $item)
+                                <div class="match-item match-left" data-side="left" data-id="{{ $item['id'] }}" id="left_{{ $item['id'] }}">
+                                    @if($item['tipe'] === 'gambar')
+                                        <img src="{{ asset('storage/' . $item['val']) }}" style="max-height:80px; object-fit:contain; border-radius:4px;" oncontextmenu="return false;" draggable="false">
+                                    @else
+                                        <span style="font-size: 16px; font-weight: 500;">{{ $item['val'] }}</span>
+                                    @endif
+                                    <div class="match-dot"></div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="matching-col right-col">
+                            @foreach($rightItems as $item)
+                                <div class="match-item match-right" data-side="right" data-id="{{ $item['id'] }}" id="right_{{ $item['id'] }}">
+                                    <div class="match-dot"></div>
+                                    @if($item['tipe'] === 'gambar')
+                                        <img src="{{ asset('storage/' . $item['val']) }}" style="max-height:80px; object-fit:contain; border-radius:4px;" oncontextmenu="return false;" draggable="false">
+                                    @else
+                                        <span style="font-size: 16px; font-weight: 500;">{{ $item['val'] }}</span>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
                 @elseif($currentSoal->tipe === 'essay')
                     <div style="padding: 35px; display: flex; flex-direction: column; height: 100%;">
                         <p style="font-size: 18px; margin-top: 0; color: #111;">Type Your Answer:</p>
@@ -870,6 +1008,177 @@
                 saveTimeout = setTimeout(() => submitAnswer({ soal_id: soalId, jawaban: this.value }), 1000);
             });
         });
+
+        // ── MATCHING LOGIC ──
+        const mWrap = document.getElementById('matching-wrapper');
+        if (mWrap) {
+            const svg = document.getElementById('matching-svg');
+            const ansInput = document.getElementById('matching_answer');
+            const shuffleMapInput = document.getElementById('matching_shuffle_map');
+            let connections = JSON.parse(ansInput.value || '{}');
+            let activeItem = null;
+
+            function updateSVG() {
+                svg.innerHTML = '';
+                const mWrapRect = mWrap.getBoundingClientRect();
+                
+                for (const leftId in connections) {
+                    const rightId = connections[leftId];
+                    const leftEl = document.getElementById('left_' + leftId);
+                    const rightEl = document.getElementById('right_' + rightId);
+                    
+                    if (leftEl && rightEl) {
+                        const lDot = leftEl.querySelector('.match-dot').getBoundingClientRect();
+                        const rDot = rightEl.querySelector('.match-dot').getBoundingClientRect();
+                        
+                        const x1 = lDot.left + lDot.width/2 - mWrapRect.left + mWrap.scrollLeft;
+                        const y1 = lDot.top + lDot.height/2 - mWrapRect.top + mWrap.scrollTop;
+                        const x2 = rDot.left + rDot.width/2 - mWrapRect.left + mWrap.scrollLeft;
+                        const y2 = rDot.top + rDot.height/2 - mWrapRect.top + mWrap.scrollTop;
+
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+                        line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+                        line.setAttribute('class', 'match-line');
+                        svg.appendChild(line);
+
+                        leftEl.classList.add('connected');
+                        rightEl.classList.add('connected');
+                    }
+                }
+            }
+
+            function handleItemClick(e) {
+                const item = e.currentTarget;
+                const side = item.dataset.side;
+                const id = item.dataset.id;
+
+                // Jika klik yg sudah connected, hapus connection-nya
+                if (item.classList.contains('connected')) {
+                    if (side === 'left') {
+                        const rightId = connections[id];
+                        delete connections[id];
+                        item.classList.remove('connected');
+                        if(rightId !== undefined) {
+                            const rel = document.getElementById('right_' + rightId);
+                            if(rel) rel.classList.remove('connected');
+                        }
+                    } else {
+                        for (const lId in connections) {
+                            if (connections[lId] == id) {
+                                delete connections[lId];
+                                document.getElementById('left_' + lId).classList.remove('connected');
+                                break;
+                            }
+                        }
+                        item.classList.remove('connected');
+                    }
+                    saveMatching();
+                    updateSVG();
+                    if(activeItem === item) {
+                        item.classList.remove('active');
+                        activeItem = null;
+                    }
+                    return;
+                }
+
+                // Normal selection flow
+                if (!activeItem) {
+                    activeItem = item;
+                    item.classList.add('active');
+                } else {
+                    if (activeItem.dataset.side === side) {
+                        activeItem.classList.remove('active');
+                        activeItem = item;
+                        item.classList.add('active');
+                    } else {
+                        // Match found
+                        const leftId = activeItem.dataset.side === 'left' ? activeItem.dataset.id : id;
+                        const rightId = activeItem.dataset.side === 'right' ? activeItem.dataset.id : id;
+                        
+                        // Hapus existing connection for this left item if any
+                        if (connections[leftId] !== undefined) {
+                            const oldR = document.getElementById('right_' + connections[leftId]);
+                            if(oldR) oldR.classList.remove('connected');
+                        }
+                        // Hapus existing connection for this right item if any
+                        for (const lId in connections) {
+                            if (connections[lId] == rightId) {
+                                delete connections[lId];
+                                document.getElementById('left_' + lId).classList.remove('connected');
+                            }
+                        }
+
+                        connections[leftId] = rightId;
+                        activeItem.classList.remove('active');
+                        activeItem = null;
+                        
+                        saveMatching();
+                        updateSVG();
+                    }
+                }
+            }
+
+            function saveMatching() {
+                ansInput.value = JSON.stringify(connections);
+                submitAnswer({ 
+                    soal_id: soalId, 
+                    jawaban: ansInput.value,
+                    shuffle_map: shuffleMapInput.value // Kirim map pengacakan ke server
+                });
+            }
+
+            document.querySelectorAll('.match-item').forEach(item => {
+                item.addEventListener('click', handleItemClick);
+            });
+
+            // Initial render
+            setTimeout(updateSVG, 100);
+            window.addEventListener('resize', updateSVG);
+        }
+
+        // ── AUDIO LIMIT COUNTER LOGIC ──
+        function setupAudioLimiter(audioSelector) {
+            document.querySelectorAll(audioSelector).forEach(audioEl => {
+                const maxPlay = parseInt(audioEl.getAttribute('data-max'));
+                if (isNaN(maxPlay) || maxPlay <= 0) return; // tidak ada limit
+                
+                const aid = audioEl.getAttribute('data-id');
+                const counterEl = document.getElementById('counter_' + aid);
+                const storageKey = 'exam_' + window.EXAM_ID + '_audio_' + aid;
+                
+                let playCount = parseInt(sessionStorage.getItem(storageKey) || '0');
+                
+                function updateInfo() {
+                    const sisa = maxPlay - playCount;
+                    if (counterEl) {
+                        counterEl.textContent = sisa > 0 ? \`Sisa putar: \${sisa} kali\` : 'Batas maksimal putar tercapai';
+                    }
+                    if (playCount >= maxPlay) {
+                        // Sembunyikan kontrol / blur / disable
+                        audioEl.controls = false;
+                        const parent = audioEl.parentElement;
+                        const lockMsg = document.createElement('div');
+                        lockMsg.className = "p-2 bg-slate-100 text-slate-500 rounded text-sm text-center border border-slate-200";
+                        lockMsg.textContent = "🎧 Audio telah diputar maksimal (" + maxPlay + "x)";
+                        parent.replaceChild(lockMsg, audioEl);
+                    }
+                }
+                
+                updateInfo();
+                
+                audioEl.addEventListener('play', () => {
+                    playCount++;
+                    sessionStorage.setItem(storageKey, playCount.toString());
+                    updateInfo();
+                }, { once: true }); 
+                // Note: {once: true} only counts the FIRST play on this element per load. 
+                // Full reload = able to play again until storage limits out.
+            });
+        }
+        
+        setupAudioLimiter('audio.soal-audio');
+        setupAudioLimiter('audio.opsi-audio');
 
     });
 </script>

@@ -52,19 +52,21 @@ class SoalImport
                 $tipeEnum = 'short_answer';
             } elseif (Str::contains($tipeRaw, 'essay') || Str::contains($tipeRaw, 'esai')) {
                 $tipeEnum = 'essay';
+            } elseif (Str::contains($tipeRaw, 'matching') || Str::contains($tipeRaw, 'pasang')) {
+                $tipeEnum = 'matching';
             } elseif (Str::contains($tipeRaw, 'audio') || Str::contains($tipeRaw, 'choukai')) {
                 $tipeEnum = 'audio';
             }
 
             // Kolom:
             // 0=Tipe, 1=Pertanyaan, 2=Gambar Soal, 3=Audio Soal,
-            // 4=Opsi A, 5=Media A, 6=Opsi B, 7=Media B, 8=Opsi C, 9=Media C, 10=Opsi D, 11=Media D, 12=Opsi E, 13=Media E,
+            // 4=Opsi A/Pasang Kiri 1, 5=Media A/Pasang Kanan 1, 6=Opsi B/Pasang Kiri 2, 7=Media B/Pasang Kanan 2, ...
             // 14=Jawaban Benar, 15=Poin
             
             $poin         = max(1, (int) ($row[15] ?? 10));
             $gambarRaw    = trim($row[2] ?? '');
             $audioRaw     = trim($row[3] ?? '');
-            $jawabanKunci = trim($row[14] ?? ''); // Column O: used as kunci for short_answer
+            $jawabanKunci = trim($row[14] ?? '');
 
             $gambarPath = $gambarRaw !== '' ? 'gambar/' . $gambarRaw : null;
             $audioPath  = $audioRaw !== '' ? 'audio/' . $audioRaw : null;
@@ -82,8 +84,45 @@ class SoalImport
                     'jawaban_kunci' => $tipeEnum === 'short_answer' ? $jawabanKunci : null,
                 ]);
 
-                // Only create PilihanJawaban for types that use them (not essay or short_answer)
-                if (!in_array($tipeEnum, ['essay', 'short_answer'])) {
+                if ($tipeEnum === 'matching') {
+                    // Kolom E/F = Pasang 1, G/H = Pasang 2, I/J = Pasang 3, K/L = Pasang 4, M/N = Pasang 5
+                    $pasangKoloms = [
+                        ['kiri' => trim($row[4] ?? ''),  'kanan' => trim($row[5] ?? '')],
+                        ['kiri' => trim($row[6] ?? ''),  'kanan' => trim($row[7] ?? '')],
+                        ['kiri' => trim($row[8] ?? ''),  'kanan' => trim($row[9] ?? '')],
+                        ['kiri' => trim($row[10] ?? ''), 'kanan' => trim($row[11] ?? '')],
+                        ['kiri' => trim($row[12] ?? ''), 'kanan' => trim($row[13] ?? '')],
+                    ];
+
+                    foreach ($pasangKoloms as $pasang) {
+                        if (empty($pasang['kiri']) && empty($pasang['kanan'])) continue;
+
+                        // Cek apakah kiri/kanan adalah file gambar
+                        $kiriIsGambar  = !empty($pasang['kiri']) && preg_match('/\.(jpg|jpeg|png|webp|gif)$/i', $pasang['kiri']);
+                        $kananIsGambar = !empty($pasang['kanan']) && preg_match('/\.(jpg|jpeg|png|webp|gif)$/i', $pasang['kanan']);
+
+                        $kiriVal  = $kiriIsGambar  ? 'gambar/' . $pasang['kiri']  : $pasang['kiri'];
+                        $kananVal = $kananIsGambar ? 'gambar/' . $pasang['kanan'] : $pasang['kanan'];
+
+                        if ($kiriIsGambar && $kananIsGambar) {
+                            $mediaTipe = 'matching_gambar_keduanya';
+                        } elseif ($kiriIsGambar) {
+                            $mediaTipe = 'matching_gambar_kiri';
+                        } elseif ($kananIsGambar) {
+                            $mediaTipe = 'matching_gambar_kanan';
+                        } else {
+                            $mediaTipe = 'matching_teks';
+                        }
+
+                        PilihanJawaban::create([
+                            'soal_id'    => $soal->id,
+                            'teks'       => $kiriVal,
+                            'media_path' => $kananVal,
+                            'media_tipe' => $mediaTipe,
+                            'is_benar'   => true,
+                        ]);
+                    }
+                } elseif (!in_array($tipeEnum, ['essay', 'short_answer'])) {
                     $opsi = [
                         'A' => ['teks' => trim($row[4] ?? ''),  'media' => trim($row[5] ?? '')],
                         'B' => ['teks' => trim($row[6] ?? ''),  'media' => trim($row[7] ?? '')],
@@ -127,6 +166,7 @@ class SoalImport
             }
         }
     }
+
 
     public function getSummary(): array
     {

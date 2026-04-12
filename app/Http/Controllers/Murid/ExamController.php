@@ -224,6 +224,33 @@ class ExamController extends Controller
                     break;
                 }
             }
+        } else if ($soal->tipe === 'matching') {
+            // Jawaban: JSON string {"0": 2, "1": 0, "2": 1} 
+            // key = index of left prompt, value = index of right option (setelah diacak di UI)
+            $dataUpdate['jawaban_text'] = $request->jawaban;
+            $jawabanArr = json_decode($request->jawaban, true) ?? [];
+
+            // Pairs disimpan berurutan — pair[i].kiri harus dipasangkan ke pair[i].kanan (index i di kanan yang diacak)
+            // UI menyimpan: mapping[promptIndex] = rightShuffledIndex
+            // shuffleMap dikirim juga dari JS: shuffleMap[rightShuffledIndex] = originalPairIndex
+            $shuffleMap = json_decode($request->shuffle_map ?? '[]', true) ?? [];
+
+            $pairs = $soal->pilihanJawabans()->get();
+            $totalPairs = $pairs->count();
+
+            if ($totalPairs > 0) {
+                $benar = 0;
+                foreach ($jawabanArr as $promptIdx => $rightShuffledIdx) {
+                    // Konversi rightShuffledIdx ke originalPairIndex
+                    $originalPairIdx = isset($shuffleMap[$rightShuffledIdx]) ? (int)$shuffleMap[$rightShuffledIdx] : (int)$rightShuffledIdx;
+                    // Pasangan benar: promptIdx harus sama dengan originalPairIdx
+                    if ((int)$promptIdx === $originalPairIdx) {
+                        $benar++;
+                    }
+                }
+                // Partial scoring: proporsional
+                $poinDidapat = (int) round($soal->poin * ($benar / $totalPairs));
+            }
         }
 
         $dataUpdate['poin_didapat'] = $poinDidapat;

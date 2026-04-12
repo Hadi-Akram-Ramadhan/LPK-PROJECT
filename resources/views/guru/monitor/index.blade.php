@@ -61,7 +61,7 @@
                                 </a>
 
                                 <a href="{{ route('guru.monitor.export', $ujian) }}" class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-md hover:bg-green-200 transition-colors">
-                                    Export
+                                    Export Excel
                                 </a>
                             </div>
                     </td>

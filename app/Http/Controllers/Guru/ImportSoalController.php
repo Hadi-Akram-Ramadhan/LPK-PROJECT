@@ -119,12 +119,19 @@ class ImportSoalController extends Controller
             'Seoul|Seol|서울', '15',
         ], null, 'A8');
 
+        // Contoh baris 9 — Matching (NEW)
+        $sheet->fromArray([
+            'Matching', 'Jodohkan bahasa Indonesia dengan Korea!', '', '',
+            'Pagi', 'Achim', 'Siang', 'Jeomsim', 'Malam', 'Jeonyeok', 'Besok', 'Naeil', 'Lusa', 'Morae',
+            '', '15',
+        ], null, 'A9');
+
         // Zebra row styling for example rows
-        $sheet->getStyle('A2:P8')->applyFromArray([
+        $sheet->getStyle('A2:P9')->applyFromArray([
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F1F5F9']],
         ]);
         // Highlight short_answer row
-        $sheet->getStyle('A8:P8')->applyFromArray([
+        $sheet->getStyle('A8:P9')->applyFromArray([
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'EFF6FF']],
             'font' => ['color' => ['rgb' => '1D4ED8']],
         ]);
@@ -140,8 +147,8 @@ class ImportSoalController extends Controller
             ['Kolom A (Tipe Soal)', 'WAJIB DIISI! Ketik sesuai tipe yang dimau (contoh: Pilihan Ganda, Essay, Audio, dll). Lihat daftar valid di bawah.'],
             ['Kolom B (Pertanyaan)', 'Ketik pertanyaan soal di sini. Boleh ditarik memanjang.'],
             ['Kolom C & D (Gambar / Audio)', 'OPSIONAL. Jika soal bergambar atau bersuara, ketik *Nama File*-nya secara persis. Contoh: "soal1.jpg" atau "suara2.mp3". Ingat! Anda HARUS sudah meng-upload file zip audionya ke sistem melalui dashboard.'],
-            ['Kolom E, G, I, K, M', 'Tuliskan teks jawaban A, B, C, D, E.'],
-            ['Kolom F, H, J, L, N', 'OPSIONAL. Isikan *Nama File* hanya jika opsi jawabannya berupa gambar/audio.'],
+            ['Kolom E, G, I, K, M', 'Tuliskan teks jawaban A, B, C, D, E. (Atau KIRI 1, KIRI 2, dst untuk tipe Matching)'],
+            ['Kolom F, H, J, L, N', 'OPSIONAL. Isikan *Nama File* hanya jika opsi jawabannya berupa gambar/audio. (Atau KANAN 1, KANAN 2, dst untuk tipe Matching)'],
             ['Kolom O (Kunci Jawaban)', 'Ketik HURUF dari jawaban yang benar (misal: A, B, atau C).'],
             ['Kolom P (Poin Nilai)', 'WAJIB DIISI! Ketik angka saja tanpa huruf (contoh: 10 atau 20).'],
             [''],
@@ -150,6 +157,7 @@ class ImportSoalController extends Controller
             ['→ Ketik "Multiple Choice" jika ada banyak jawaban yang diklik. Kunci Jawaban isi berjejer pisah koma: A,B,C'],
             ['→ Ketik "Essay" jika jawaban bebas dari murid dan dinilai guru manual. Kunci Jawaban: KOSONGKAN/HAPUS.'],
             ['→ Ketik "Short Answer" jika isian singkat yang dinilai sistem otomatis. Kunci Jawaban: lihat bantuan di bawah.'],
+            ['→ Ketik "Matching" jika soal menjodohkan. Kunci Jawaban: KOSONGKAN. Pasangan diisi berdampingan (Kolom E dg F, G dg H, I dg J).'],
             ['→ Ketik "Audio" jika ini soal Listening. Kolom D wajib diisi nama file mp3. Kunci Jawaban: A, B, C, D, atau E.'],
             ['→ Ketik "Pilihan Ganda Gambar" jika opsi A/B/C/D isinya gambar semua. Kunci Jawaban: A, B, C, D, atau E.'],
             ['→ Ketik "Pilihan Ganda Audio" jika opsi A/B/C/D isinya suara semua. Kunci Jawaban: A, B, C, D, atau E.'],
@@ -162,8 +170,8 @@ class ImportSoalController extends Controller
             ['   Contoh ketik di Kolom O Kunci Jawaban: Seoul|Seol|서울'],
             [''],
             ['--- CATATAN AKHIR ---'],
-            ['1. Jangan lupa hapus baris yang berwarna abu-abu (baris 2 sampai 7) sebelum ditaruh data soal asli.'],
-            ['2. Huruf besar-kecil pada penamaan file gambar/audio "SANGAT BERPENGARUH". "mobil.jpg" beda dengan "Mobil.jpg".'],
+            ['1. Jangan lupa hapus baris yang berwarna abu-abu (baris 2 sampai 9) sebelum ditaruh data soal asli.'],
+            ['2. Huruf besar-kecil pada penamaan file gambar/audio "SANGAT BERPENGARUH". "mobil.jpg" beda dengan "Mobil.jpg" atau "mobil.png". Pada Matching, jika isian berakhiran .jpg/.png otomatis diubah jadi gambar.'],
             ['3. SATU FILE EXCEL UNTUK SATU UJIAN. Jangan campur soal Ujian Seoul dan soal Ujian Busan dalam satu file Excel yang sama.'],
         ];
 

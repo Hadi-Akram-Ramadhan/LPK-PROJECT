@@ -50,17 +50,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // Paket Soal (Bank Soal terkelompok)
         Route::resource('paket-soal', \App\Http\Controllers\Admin\PaketSoalController::class);
+        Route::post('/paket-soal/{paket_soal}/duplicate', [\App\Http\Controllers\Admin\PaketSoalController::class, 'duplicate'])->name('paket-soal.duplicate');
 
         // Individual Soal (dalam konteks paket)
         Route::resource('soal', \App\Http\Controllers\Admin\SoalController::class);
         Route::get('/import-soal', [\App\Http\Controllers\Admin\SoalController::class, 'import'])->name('soal.import');
         Route::post('/import-soal', [\App\Http\Controllers\Admin\SoalController::class, 'storeImport'])->name('soal.storeImport');
         Route::get('/import-soal/template', [\App\Http\Controllers\Admin\SoalController::class, 'downloadTemplate'])->name('soal.template');
+        Route::post('/soal/upload-media', [\App\Http\Controllers\Admin\SoalController::class, 'uploadMedia'])->name('soal.uploadMedia');
         
         // Ujian Monitoring
         Route::get('/monitor', [\App\Http\Controllers\Admin\ExamMonitorController::class, 'index'])->name('monitor.index');
         Route::get('/monitor/{ujian}', [\App\Http\Controllers\Admin\ExamMonitorController::class, 'show'])->name('monitor.show');
         Route::get('/monitor/{ujian}/export', [\App\Http\Controllers\Admin\ExamMonitorController::class, 'export'])->name('monitor.export');
+        Route::get('/monitor/{ujian}/peserta/{ujian_peserta}', [\App\Http\Controllers\Admin\ExamMonitorController::class, 'pesertaDetail'])->name('monitor.pesertaDetail');
         
         // Cheat Logs Monitoring
         Route::get('/cheat-logs', [\App\Http\Controllers\Admin\CheatLogController::class, 'index'])->name('cheat-logs.index');
@@ -85,6 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // Paket Soal (Bank Soal terkelompok)
         Route::resource('paket-soal', \App\Http\Controllers\Guru\PaketSoalController::class);
+        Route::post('/paket-soal/{paket_soal}/duplicate', [\App\Http\Controllers\Guru\PaketSoalController::class, 'duplicate'])->name('paket-soal.duplicate');
 
         // Individual Soal Guru
         Route::resource('soal', \App\Http\Controllers\Guru\SoalController::class);
@@ -101,10 +105,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Endpoint download template
         Route::get('/import-soal/template', [\App\Http\Controllers\Guru\ImportSoalController::class, 'downloadTemplate'])->name('import.template');
 
+        // Upload Media Langsung dari form soal
+        Route::post('/soal/upload-media', [\App\Http\Controllers\Guru\SoalController::class, 'uploadMedia'])->name('soal.uploadMedia');
+
         // Monitor Ujian & Penilaian
         Route::get('/monitor', [\App\Http\Controllers\Guru\MonitorUjianController::class, 'index'])->name('monitor.index');
         Route::get('/monitor/{ujian}', [\App\Http\Controllers\Guru\MonitorUjianController::class, 'show'])->name('monitor.show');
         Route::get('/monitor/{ujian}/export', [\App\Http\Controllers\Guru\MonitorUjianController::class, 'export'])->name('monitor.export');
+        Route::get('/monitor/{ujian}/peserta/{ujian_peserta}', [\App\Http\Controllers\Guru\MonitorUjianController::class, 'pesertaDetail'])->name('monitor.pesertaDetail');
         Route::get('/monitor/grade/{ujian_peserta}', [\App\Http\Controllers\Guru\MonitorUjianController::class, 'grade'])->name('monitor.grade');
         Route::post('/monitor/grade/{ujian_peserta}', [\App\Http\Controllers\Guru\MonitorUjianController::class, 'storeGrade'])->name('monitor.storeGrade');
 

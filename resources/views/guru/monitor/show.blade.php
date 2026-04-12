@@ -112,17 +112,21 @@
                         {{ $peserta->selesai_at ? \Carbon\Carbon::parse($peserta->selesai_at)->format('d M Y, H:i') : '-' }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                        @if($peserta->status === 'selesai')
-                            @if($essayCount > 0)
-                            <a href="{{ route('guru.monitor.grade', $peserta->id) }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition-colors">
-                                <svg class="-ml-1 mr-1 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                Beri Nilai Essay
-                            </a>
-                            @else
-                            <span class="text-slate-400 text-xs italic">Tidak ada soal essay</span>
-                            @endif
+                        @if($peserta->status === 'selesai' || $peserta->status === 'diblokir')
+                            <div class="flex flex-col items-center gap-2">
+                                <a href="{{ route('guru.monitor.pesertaDetail', [$ujian->id, $peserta->id]) }}" class="inline-flex items-center px-3 py-1.5 border border-indigo-200 text-xs font-medium rounded shadow-sm text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors w-full justify-center">
+                                    <svg class="-ml-1 mr-1 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    Detail Jawaban
+                                </a>
+                                @if($essayCount > 0)
+                                <a href="{{ route('guru.monitor.grade', $peserta->id) }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-accent-600 hover:bg-accent-700 transition-colors w-full justify-center">
+                                    <svg class="-ml-1 mr-1 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    Beri Nilai Essay
+                                </a>
+                                @endif
+                            </div>
                         @else
-                            <span class="text-slate-400 text-xs italic">Ujian Belum Selesai</span>
+                            <span class="text-slate-400 text-xs italic">Belum Selesai</span>
                         @endif
                     </td>
                 </tr>

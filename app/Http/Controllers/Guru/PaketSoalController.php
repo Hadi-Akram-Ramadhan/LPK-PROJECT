@@ -94,4 +94,27 @@ class PaketSoalController extends Controller
         return redirect()->route('guru.paket-soal.index')
             ->with('success', 'Paket Soal beserta semua soalnya berhasil dihapus.');
     }
+
+    public function duplicate(PaketSoal $paketSoal)
+    {
+        // Teachers can duplicate any packet they can see
+        $newPaket = $paketSoal->replicate();
+        $newPaket->nama = $paketSoal->nama . ' (Copy)';
+        $newPaket->guru_id = auth()->id();
+        $newPaket->save();
+
+        foreach ($paketSoal->soals as $soal) {
+            $newSoal = $soal->replicate();
+            $newSoal->paket_soal_id = $newPaket->id;
+            $newSoal->save();
+
+            foreach ($soal->pilihanJawabans as $pilihan) {
+                $newPilihan = $pilihan->replicate();
+                $newPilihan->soal_id = $newSoal->id;
+                $newPilihan->save();
+            }
+        }
+
+        return redirect()->route('guru.paket-soal.index')->with('success', 'Paket Soal berhasil diduplikat.');
+    }
 }

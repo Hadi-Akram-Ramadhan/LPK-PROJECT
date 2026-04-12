@@ -14,7 +14,7 @@
     <div class="flex items-center">
         <a href="{{ route('admin.monitor.export', $ujian) }}" class="btn btn-green" style="padding: 8px 16px; font-size: 13px;">
             <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            Export CSV
+            Export Excel
         </a>
     </div>
 </div>
@@ -33,6 +33,7 @@
                     <th class="px-6 py-4 text-center">Pelanggaran</th>
                     <th class="px-6 py-4 text-left">Waktu</th>
                     <th class="px-6 py-4 text-center">Skor</th>
+                    <th class="px-6 py-4 text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-slate-200 text-sm">
@@ -73,6 +74,15 @@
                         <span class="inline-flex items-center px-3 py-1 bg-slate-100 rounded text-slate-900 font-bold border border-slate-200 shadow-sm">
                             {{ $p->skor }}
                         </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        @if(strtolower($p->status) === 'selesai' || strtolower($p->status) === 'diblokir')
+                        <a href="{{ route('admin.monitor.pesertaDetail', [$ujian->id, $p->id]) }}" class="inline-flex items-center px-3 py-1.5 border border-indigo-200 text-xs font-medium rounded shadow-sm text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors">
+                            Detail Jawaban
+                        </a>
+                        @else
+                        <span class="text-slate-400 text-xs italic">-</span>
+                        @endif
                     </td>
                 </tr>
                 @empty
