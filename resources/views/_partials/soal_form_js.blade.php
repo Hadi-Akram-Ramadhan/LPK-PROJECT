@@ -168,8 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 imgOptsKanan += `<option value="gambar/${f}">${f}</option>`;
             });
             container.insertAdjacentHTML('beforeend', `
-            <div class="matching-pair-row flex gap-0 group" data-idx="${idx}">
-                <div class="flex-1 p-3 border-r border-slate-200">
+            <div class="matching-pair-row grid grid-cols-2 gap-0 group" data-idx="${idx}">
+                <div class="min-w-0 p-3 border-r border-slate-200">
                     <div class="flex items-center gap-2 mb-2">
                         <span class="text-xs font-bold text-slate-600 bg-slate-200 rounded px-2 py-0.5">${idx + 1}</span>
                         <label class="flex items-center gap-1.5 cursor-pointer text-xs text-slate-500">
@@ -182,14 +182,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="kiri-gambar-field" style="display:none;">
                         <div class="flex gap-2 items-center">
-                            <select name="pasang_kiri_gambar[${idx}]" class="flex-1 sm:text-sm border-orange-300 bg-orange-50 rounded-md py-2 px-2" onchange="previewMatchImg(this,'kiri_prev_${idx}')">${imgOptsKiri}</select>
+                            <select name="pasang_kiri_gambar[${idx}]" class="flex-1 min-w-0 sm:text-sm border-orange-300 bg-orange-50 rounded-md py-2 px-2" onchange="previewMatchImg(this,'kiri_prev_${idx}')">${imgOptsKiri}</select>
                             <button type="button" class="flex-shrink-0 px-2 py-1.5 border border-orange-200 bg-white text-orange-600 text-xs rounded-md" onclick="triggerMatchUpload(${idx},'kiri')">⬆</button>
                         </div>
                         <input type="file" id="match_upload_kiri_${idx}" class="hidden" accept=".jpg,.jpeg,.png,.webp">
                         <img id="kiri_prev_${idx}" src="" class="mt-2 max-h-20 mx-auto rounded border border-orange-200 object-contain" style="display:none;">
                     </div>
                 </div>
-                <div class="flex-1 p-3 relative">
+                <div class="min-w-0 p-3 relative">
                     <div class="flex items-center justify-between gap-2 mb-2">
                         <label class="flex items-center gap-1.5 cursor-pointer text-xs text-slate-500">
                             <input type="checkbox" class="kanan-gambar-toggle rounded border-slate-300 text-indigo-600" onchange="toggleMatchingSide(this,'kanan',${idx})">
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="kanan-gambar-field" style="display:none;">
                         <div class="flex gap-2 items-center">
-                            <select name="pasang_kanan_gambar[${idx}]" class="flex-1 sm:text-sm border-orange-300 bg-orange-50 rounded-md py-2 px-2" onchange="previewMatchImg(this,'kanan_prev_${idx}')">${imgOptsKanan}</select>
+                            <select name="pasang_kanan_gambar[${idx}]" class="flex-1 min-w-0 sm:text-sm border-orange-300 bg-orange-50 rounded-md py-2 px-2" onchange="previewMatchImg(this,'kanan_prev_${idx}')">${imgOptsKanan}</select>
                             <button type="button" class="flex-shrink-0 px-2 py-1.5 border border-orange-200 bg-white text-orange-600 text-xs rounded-md" onclick="triggerMatchUpload(${idx},'kanan')">⬆</button>
                         </div>
                         <input type="file" id="match_upload_kanan_${idx}" class="hidden" accept=".jpg,.jpeg,.png,.webp">

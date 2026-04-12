@@ -1,8 +1,8 @@
 {{-- Matching pair row partial --}}
 @php $pair_upload_route = $uploadRoute ?? 'admin.soal.uploadMedia'; @endphp
-<div class="matching-pair-row flex gap-0 group" data-idx="{{ $i }}">
+<div class="matching-pair-row grid grid-cols-2 gap-0 group" data-idx="{{ $i }}">
     {{-- Sisi Kiri --}}
-    <div class="flex-1 p-3 border-r border-slate-200">
+    <div class="min-w-0 p-3 border-r border-slate-200">
         <div class="flex items-center gap-2 mb-2">
             <span class="text-xs font-bold text-slate-600 bg-slate-200 rounded px-2 py-0.5">{{ $i + 1 }}</span>
             <label class="flex items-center gap-1.5 cursor-pointer text-xs text-slate-500">
@@ -23,7 +23,7 @@
         <div class="kiri-gambar-field" style="{{ isset($kiriIsGambar) && $kiriIsGambar ? '' : 'display:none;' }}">
             <div class="flex gap-2 items-center">
                 <select name="pasang_kiri_gambar[{{ $i }}]"
-                    class="flex-1 sm:text-sm border-orange-300 bg-orange-50 rounded-md py-2 px-2 focus:ring-orange-500 focus:border-orange-500"
+                    class="flex-1 min-w-0 sm:text-sm border-orange-300 bg-orange-50 rounded-md py-2 px-2 focus:ring-orange-500 focus:border-orange-500"
                     onchange="previewMatchImg(this, 'kiri_prev_{{ $i }}')">
                     <option value="">-- Pilih Gambar --</option>
                     @foreach($imageFiles as $f)
@@ -40,7 +40,7 @@
     </div>
 
     {{-- Sisi Kanan --}}
-    <div class="flex-1 p-3 relative">
+    <div class="min-w-0 p-3 relative">
         <div class="flex items-center justify-between gap-2 mb-2">
             <label class="flex items-center gap-1.5 cursor-pointer text-xs text-slate-500">
                 <input type="checkbox" class="kanan-gambar-toggle rounded border-slate-300 text-indigo-600"
