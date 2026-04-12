@@ -83,8 +83,8 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'name' => ['required', 'string', 'max:60'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:100', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:admin,guru,murid'],
             'kelas_id' => ['nullable', 'exists:kelas,id', 'required_if:role,murid'],
@@ -116,8 +116,8 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class.',email,'.$user->id],
+            'name' => ['required', 'string', 'max:60'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:100', 'unique:'.User::class.',email,'.$user->id],
             'role' => ['required', 'in:admin,guru,murid'],
             'kelas_id' => ['nullable', 'exists:kelas,id', 'required_if:role,murid'],
         ]);
@@ -206,10 +206,10 @@ class UserController extends Controller
         $sheet->setTitle('Template Import');
 
         $headers = [
-            'A1' => 'Nama Murid (Wajib diisi)',
-            'B1' => 'Alamat Email (Wajib diisi, harus beda tiap murid)',
-            'C1' => 'Password / Kata Sandi (Wajib diisi, minimal 8 huruf/angka)',
-            'D1' => 'Nomor ID Kelas (Kosongkan jika belum ada kelas)',
+            'A1' => 'Nama Murid (Maks 60 huruf)',
+            'B1' => 'Alamat Email (Maks 100 huruf)',
+            'C1' => 'Password (Min 8 huruf)',
+            'D1' => 'ID Kelas (Angka)',
         ];
         
         foreach ($headers as $cell => $value) {
@@ -252,9 +252,9 @@ class UserController extends Controller
             ['--- CARA MENGISI ---'],
             ['1. Buka sheet "Template Import" yang ada di sebelah kiri bawah layar Anda.'],
             ['2. Baris yang berwarna abu-abu (Budi & Siti) HANYA CONTOH. Silakan dihapus saja.'],
-            ['3. Ketik nama murid di Kolom A.'],
-            ['4. Ketik email mereka di Kolom B (ingat: email tidak boleh sama dengan murid lain).'],
-            ['5. Ketik password/sandi di Kolom C (wajib minimal 8 karakter/huruf/angka).'],
+            ['3. Ketik nama murid di Kolom A (Maksimal 60 karakter). Jika terlalu panjang akan otomatis terpotong.'],
+            ['4. Ketik email mereka di Kolom B (Maksimal 100 karakter).'],
+            ['5. Ketik password/sandi di Kolom C (wajib minimal 8 karakter).'],
             ['6. Jika Anda ingin langsung memasukkan murid ke sebuah kelas, isi angka Nomor ID Kelas di Kolom D.'],
             ['7. Lihat daftar Nomor ID Kelas resmi di bawah ini (bukan nama kelasnya, tapi ketik ANGKANYA saja).'],
             [''],

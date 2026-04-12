@@ -59,8 +59,8 @@ class UserImport
             DB::beginTransaction();
             try {
                 User::create([
-                    'name'     => $name,
-                    'email'    => $email,
+                    'name'     => Str::limit($name, 60, ''),
+                    'email'    => Str::limit($email, 100, ''),
                     'password' => Hash::make($password),
                     'role'     => 'murid',
                     'kelas_id' => $kelasId ? (int)$kelasId : null,

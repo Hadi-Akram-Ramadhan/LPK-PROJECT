@@ -29,8 +29,8 @@ class PaketSoalController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama'      => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'nama'      => 'required|string|max:100',
+            'deskripsi' => 'nullable|string|max:300',
         ]);
 
         PaketSoal::create([
@@ -72,8 +72,8 @@ class PaketSoalController extends Controller
         }
 
         $request->validate([
-            'nama'      => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'nama'      => 'required|string|max:100',
+            'deskripsi' => 'nullable|string|max:300',
         ]);
         $paketSoal->update($request->only('nama', 'deskripsi'));
         return redirect()->route('guru.paket-soal.show', $paketSoal)

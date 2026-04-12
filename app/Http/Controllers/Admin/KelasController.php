@@ -37,7 +37,7 @@ class KelasController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255|unique:kelas,nama',
+            'nama' => 'required|string|max:50|unique:kelas,nama',
         ]);
 
         Kelas::create([
@@ -73,7 +73,7 @@ class KelasController extends Controller
     public function update(Request $request, Kelas $kela)
     {
         $request->validate([
-            'nama' => 'required|string|max:255|unique:kelas,nama,' . $kela->id,
+            'nama' => 'required|string|max:50|unique:kelas,nama,' . $kela->id,
         ]);
 
         $kela->update([

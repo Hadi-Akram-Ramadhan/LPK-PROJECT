@@ -77,11 +77,11 @@ class SoalImport
                     'guru_id'       => auth()->id(),
                     'paket_soal_id' => $this->paketSoalId,
                     'tipe'          => $tipeEnum,
-                    'pertanyaan'    => HtmlSanitizer::clean($pertanyaan),
+                    'pertanyaan'    => Str::limit(HtmlSanitizer::clean($pertanyaan), 2000, ''),
                     'poin'          => $poin,
                     'audio_path'    => $audioPath,
                     'gambar_path'   => $gambarPath,
-                    'jawaban_kunci' => $tipeEnum === 'short_answer' ? $jawabanKunci : null,
+                    'jawaban_kunci' => $tipeEnum === 'short_answer' ? Str::limit($jawabanKunci, 300, '') : null,
                 ]);
 
                 if ($tipeEnum === 'matching') {
@@ -116,8 +116,8 @@ class SoalImport
 
                         PilihanJawaban::create([
                             'soal_id'    => $soal->id,
-                            'teks'       => $kiriVal,
-                            'media_path' => $kananVal,
+                            'teks'       => Str::limit($kiriVal, 200, ''),
+                            'media_path' => Str::limit($kananVal, 200, ''),
                             'media_tipe' => $mediaTipe,
                             'is_benar'   => true,
                         ]);
@@ -149,7 +149,7 @@ class SoalImport
                             
                             PilihanJawaban::create([
                                 'soal_id'    => $soal->id,
-                                'teks'       => $teksOpsi,
+                                'teks'       => Str::limit($teksOpsi, 300, ''),
                                 'media_path' => $mediaPath,
                                 'media_tipe' => $mediaTipe,
                                 'is_benar'   => in_array($huruf, $jawabanBenarArray),

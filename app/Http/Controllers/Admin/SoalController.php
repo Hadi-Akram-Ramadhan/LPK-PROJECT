@@ -59,11 +59,15 @@ class SoalController extends Controller
         $request->validate([
             'paket_soal_id'  => 'required|exists:paket_soals,id',
             'tipe'           => 'required|in:' . implode(',', self::TIPE_VALID),
-            'pertanyaan'     => 'required|string|max:10000',
+            'pertanyaan'     => 'required|string|max:2000',
             'poin'           => 'required|integer|min:1|max:1000',
             'audio_path'     => 'nullable|string|max:255',
             'gambar_path'    => 'nullable|string|max:255',
             'audio_max_play' => 'nullable|integer|min:1|max:99',
+            'jawaban_kunci'  => 'nullable|string|max:300',
+            'pilihan.*'      => 'nullable|string|max:300',
+            'pasang_kiri.*'  => 'nullable|string|max:200',
+            'pasang_kanan.*' => 'nullable|string|max:200',
         ]);
 
         DB::beginTransaction();
@@ -106,11 +110,15 @@ class SoalController extends Controller
     public function update(Request $request, Soal $soal)
     {
         $request->validate([
-            'pertanyaan'     => 'required|string|max:10000',
+            'pertanyaan'     => 'required|string|max:2000',
             'poin'           => 'required|integer|min:1|max:1000',
             'audio_path'     => 'nullable|string|max:255',
             'gambar_path'    => 'nullable|string|max:255',
             'audio_max_play' => 'nullable|integer|min:1|max:99',
+            'jawaban_kunci'  => 'nullable|string|max:300',
+            'pilihan.*'      => 'nullable|string|max:300',
+            'pasang_kiri.*'  => 'nullable|string|max:200',
+            'pasang_kanan.*' => 'nullable|string|max:200',
         ]);
 
         DB::beginTransaction();
@@ -316,16 +324,16 @@ class SoalController extends Controller
             'B1' => 'Tuliskan Pertanyaan / Soalnya',
             'C1' => 'Nama File Gambar (Opsional)',
             'D1' => 'Nama File Audio/Suara (Opsional)',
-            'E1' => 'Jawaban A / Pasang Kiri 1',
-            'F1' => 'Media A / Pasang Kanan 1',
-            'G1' => 'Jawaban B / Pasang Kiri 2',
-            'H1' => 'Media B / Pasang Kanan 2',
-            'I1' => 'Jawaban C / Pasang Kiri 3',
-            'J1' => 'Media C / Pasang Kanan 3',
-            'K1' => 'Jawaban D / Pasang Kiri 4',
-            'L1' => 'Media D / Pasang Kanan 4',
-            'M1' => 'Jawaban E / Pasang Kiri 5',
-            'N1' => 'Media E / Pasang Kanan 5',
+            'E1' => 'Jawaban A (Maks 300)',
+            'F1' => 'Media A (Opsional)',
+            'G1' => 'Jawaban B (Maks 300)',
+            'H1' => 'Media B (Opsional)',
+            'I1' => 'Jawaban C (Maks 300)',
+            'J1' => 'Media C (Opsional)',
+            'K1' => 'Jawaban D (Maks 300)',
+            'L1' => 'Media D (Opsional)',
+            'M1' => 'Jawaban E (Maks 300)',
+            'N1' => 'Media E (Opsional)',
             'O1' => 'Kunci Jawaban Benar',
             'P1' => 'Nilai Point (Angka)',
         ];
@@ -372,10 +380,10 @@ class SoalController extends Controller
             [''],
             ['CARA MENGISI SETIAP KOLOM (Sangat Penting):'],
             ['Kolom A (Tipe Soal)', 'WAJIB DIISI! Pilih dari daftar valid di bawah.'],
-            ['Kolom B (Pertanyaan)', 'Ketik pertanyaan soal di sini.'],
+            ['Kolom B (Pertanyaan)', 'WAJIB DIISI! Maks 2000 karakter. Jika lebih akan otomatis terpotong.'],
             ['Kolom C & D (Gambar / Audio)', 'OPSIONAL. Jika soal bergambar/bersuara, ketik nama file persis. Anda HARUS sudah upload file ke sistem.'],
-            ['Kolom E, G, I, K, M', 'Untuk PG/Audio: teks jawaban A-E. Untuk Matching: teks/gambar SISI KIRI pasangan 1-5.'],
-            ['Kolom F, H, J, L, N', 'OPSIONAL. Untuk PG: nama file media jawaban. Untuk Matching: teks/gambar SISI KANAN pasangan 1-5.'],
+            ['Kolom E, G, I, K, M', 'Maks 300 karakter per opsi. Untuk Matching: Maks 200 karakter.'],
+            ['Kolom F, H, J, L, N', 'OPSIONAL. Matching Sisi Kanan: Maks 200 karakter.'],
             ['Kolom O (Kunci Jawaban)', 'Untuk PG: huruf A/B/C. Untuk Multiple Choice: A,B,C. Untuk Matching: isi tanda minus (-). Untuk Short Answer: jawaban|alternatif.'],
             ['Kolom P (Poin Nilai)', 'WAJIB. Ketik angka saja (contoh: 10 atau 20).'],
             [''],

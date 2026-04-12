@@ -14,7 +14,7 @@
         </div>
         {{-- Teks kiri --}}
         <div class="kiri-teks-field" style="{{ isset($kiriIsGambar) && $kiriIsGambar ? 'display:none;' : '' }}">
-            <input type="text" name="pasang_kiri[{{ $i }}]" maxlength="500"
+            <input type="text" name="pasang_kiri[{{ $i }}]" maxlength="200"
                 value="{{ isset($kiriIsGambar) && $kiriIsGambar ? '' : ($kiriVal ?? '') }}"
                 placeholder="Teks sisi kiri..."
                 class="w-full sm:text-sm border-slate-300 rounded-md py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500">
@@ -54,7 +54,7 @@
         </div>
         {{-- Teks kanan --}}
         <div class="kanan-teks-field" style="{{ isset($kananIsGambar) && $kananIsGambar ? 'display:none;' : '' }}">
-            <input type="text" name="pasang_kanan[{{ $i }}]" maxlength="500"
+            <input type="text" name="pasang_kanan[{{ $i }}]" maxlength="200"
                 value="{{ isset($kananIsGambar) && $kananIsGambar ? '' : ($kananVal ?? '') }}"
                 placeholder="Teks sisi kanan..."
                 class="w-full sm:text-sm border-slate-300 rounded-md py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500">

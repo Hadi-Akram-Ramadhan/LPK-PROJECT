@@ -45,11 +45,15 @@ class SoalController extends Controller
         $request->validate([
             'paket_soal_id'  => 'required|exists:paket_soals,id',
             'tipe'           => 'required|in:' . implode(',', self::TIPE_VALID),
-            'pertanyaan'     => 'required|string|max:10000',
+            'pertanyaan'     => 'required|string|max:2000',
             'poin'           => 'required|integer|min:1|max:1000',
             'audio_path'     => 'nullable|string|max:255',
             'gambar_path'    => 'nullable|string|max:255',
             'audio_max_play' => 'nullable|integer|min:1|max:99',
+            'jawaban_kunci'  => 'nullable|string|max:300',
+            'pilihan.*'      => 'nullable|string|max:300',
+            'pasang_kiri.*'  => 'nullable|string|max:200',
+            'pasang_kanan.*' => 'nullable|string|max:200',
         ]);
 
         $paketSoal = PaketSoal::where('id', $request->paket_soal_id)
@@ -99,11 +103,15 @@ class SoalController extends Controller
         if ($soal->guru_id !== auth()->id()) abort(404);
 
         $request->validate([
-            'pertanyaan'     => 'required|string|max:10000',
+            'pertanyaan'     => 'required|string|max:2000',
             'poin'           => 'required|integer|min:1|max:1000',
             'audio_path'     => 'nullable|string|max:255',
             'gambar_path'    => 'nullable|string|max:255',
             'audio_max_play' => 'nullable|integer|min:1|max:99',
+            'jawaban_kunci'  => 'nullable|string|max:300',
+            'pilihan.*'      => 'nullable|string|max:300',
+            'pasang_kiri.*'  => 'nullable|string|max:200',
+            'pasang_kanan.*' => 'nullable|string|max:200',
         ]);
 
         DB::beginTransaction();

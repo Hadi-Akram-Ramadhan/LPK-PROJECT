@@ -5,6 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Ujian
+ *
+ * @property int $id
+ * @property int $guru_id
+ * @property string $judul
+ * @property string|null $deskripsi
+ * @property \Illuminate\Support\Carbon $mulai
+ * @property \Illuminate\Support\Carbon $selesai
+ * @property int $durasi
+ * @property bool $acak_soal
+ * @property bool $lihat_hasil
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User $guru
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Soal[] $soals
+ * @property-read int|null $soals_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UjianPeserta[] $pesertas
+ * @property-read int|null $pesertas_count
+ */
 class Ujian extends Model
 {
     use HasFactory;

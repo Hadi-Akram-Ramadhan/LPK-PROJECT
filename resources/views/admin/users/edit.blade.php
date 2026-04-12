@@ -21,7 +21,7 @@
             <div class="sm:col-span-3">
                 <label for="name" class="block text-sm font-medium text-slate-700">Nama Lengkap</label>
                 <div class="mt-1">
-                    <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" required class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-slate-300 rounded-md">
+                    <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" required maxlength="60" class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-slate-300 rounded-md">
                 </div>
                 @error('name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
@@ -29,7 +29,7 @@
             <div class="sm:col-span-3">
                 <label for="email" class="block text-sm font-medium text-slate-700">Alamat Email</label>
                 <div class="mt-1">
-                    <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" required class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-slate-300 rounded-md">
+                    <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" required maxlength="100" class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-slate-300 rounded-md">
                 </div>
                 @error('email') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>

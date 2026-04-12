@@ -27,8 +27,8 @@
                 @forelse($ujians as $ujian)
                 <tr class="hover:bg-slate-50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-semibold text-slate-800">{{ $ujian->judul }}</div>
-                        <div class="text-xs text-slate-500 mt-1 max-w-xs truncate">{{ $ujian->deskripsi ?? 'Tidak ada deskripsi' }}</div>
+                        <div class="text-sm font-semibold text-slate-800 max-w-xs truncate" title="{{ $ujian->judul }}">{{ $ujian->judul }}</div>
+                        <div class="text-xs text-slate-500 mt-1 max-w-xs truncate" title="{{ $ujian->deskripsi }}">{{ $ujian->deskripsi ?? 'Tidak ada deskripsi' }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm font-medium text-slate-900">{{ optional($ujian->guru)->name ?? 'Unknown' }}</div>

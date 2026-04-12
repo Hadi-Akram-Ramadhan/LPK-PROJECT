@@ -8,6 +8,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * App\Models\User
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property string $role
+ * @property int|null $kelas_id
+ * @property string|null $remember_token
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Kelas|null $kelas
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Soal[] $soals
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Ujian[] $ujiansDibuat
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UjianPeserta[] $ujianDiikuti
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

@@ -49,7 +49,7 @@
     <div>
         <label for="pertanyaan" class="block text-sm font-medium text-slate-700 mb-1">Teks Pertanyaan</label>
         <p class="text-xs text-slate-400 mb-2">HTML dasar diperbolehkan (&lt;b&gt;, &lt;i&gt;, &lt;br&gt;). Untuk Matching, tulis instruksi seperti "Pasangkan kata Korea berikut dengan artinya!"</p>
-        <textarea id="pertanyaan" name="pertanyaan" rows="4" required maxlength="10000"
+        <textarea id="pertanyaan" name="pertanyaan" rows="4" required maxlength="2000"
             class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">{{ old('pertanyaan', $soal?->pertanyaan) }}</textarea>
         @error('pertanyaan') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
     </div>
@@ -128,8 +128,8 @@
         <label for="jawaban_kunci" class="block text-sm font-medium text-green-800 flex items-center mb-2">
             🔑 Kunci Jawaban
         </label>
-        <textarea id="jawaban_kunci" name="jawaban_kunci" rows="2" maxlength="1000"
-            class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-green-300 rounded-md"
+        <textarea id="jawaban_kunci" name="jawaban_kunci" rows="2" maxlength="300"
+            class="shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-green-300 rounded-md"
             placeholder="Contoh: Tokyo  atau beberapa: Tokyo|Tokio|東京">{{ old('jawaban_kunci', $soal?->jawaban_kunci) }}</textarea>
         <p class="text-xs text-green-600 mt-2">
             💡 Pisahkan beberapa jawaban dengan <code class="bg-green-100 px-1 rounded">|</code>.<br>
@@ -218,7 +218,7 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-slate-500 sm:text-sm font-bold">{{ chr(65 + $i) }}.</span>
                             </div>
-                            <input type="text" name="pilihan[{{$i}}]" maxlength="1000"
+                            <input type="text" name="pilihan[{{$i}}]" maxlength="300"
                                 class="focus:ring-accent-500 focus:border-accent-500 block w-full pl-8 sm:text-sm border-slate-300 rounded-md py-2"
                                 placeholder="Teks opsi jawaban..." value="{{ $teks }}">
                         </div>

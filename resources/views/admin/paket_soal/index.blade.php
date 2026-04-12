@@ -63,7 +63,7 @@
         </div>
 
         <a href="{{ route('admin.paket-soal.show', $paket) }}" style="text-decoration:none;">
-            <h3 style="font-size:16px;font-weight:700;color:#1e293b;margin:0 0 6px;">{{ $paket->nama }}</h3>
+            <h3 style="font-size:16px;font-weight:700;color:#1e293b;margin:0 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="{{ $paket->nama }}">{{ $paket->nama }}</h3>
             @if($paket->deskripsi)
             <p style="font-size:13px;color:#94a3b8;margin:0 0 16px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ $paket->deskripsi }}</p>
             @else
