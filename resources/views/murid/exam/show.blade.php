@@ -26,7 +26,7 @@
         }
         .diag-ok { color: #4ade80; }
         .diag-err { color: #f87171; }
-        
+
         /* FORCE CLICKABLE FOOTER */
         .cbt-footer { position: relative; z-index: 1000 !important; }
         .ftr-btn { pointer-events: all !important; position: relative; z-index: 1001 !important; }
@@ -400,16 +400,57 @@
             }
             #match-col-left { padding-right: 24px; }
             #match-col-right { padding-left: 24px; }
-            
+
             .match-svg { display: block; }
             .match-item { font-size: 11px; padding: 8px 6px; min-height: 40px; }
-            
+
             /* Responsive dot scale and position */
             .match-item-left::after { right: -16px; width: 8px; height: 8px; }
             .match-item-right::after { left: -16px; width: 8px; height: 8px; }
-            
+
             /* Hide hint on very small screens to save space if needed, or scale it */
             .match-hint-bar { font-size: 10px; margin: 4px 8px 0; padding: 4px 8px; }
+        }
+
+        /* ── MATCHING: Ensure visibility on landscape mobile ── */
+        @media screen and (max-height: 500px) {
+            /* The cbt-right must allow its children to fill properly */
+            .cbt-right-matching {
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            .match-hint-bar {
+                font-size: 9px !important;
+                margin: 2px 8px 0 !important;
+                padding: 3px 8px !important;
+                flex-shrink: 0;
+            }
+            .match-container {
+                flex: 1 !important;
+                min-height: 0 !important;
+                height: auto !important;
+                overflow: hidden !important;
+                position: relative !important;
+            }
+            .match-col {
+                padding: 6px 4px !important;
+                gap: 4px !important;
+                overflow-y: auto !important;
+            }
+            #match-col-left  { padding-right: 20px !important; }
+            #match-col-right { padding-left:  20px !important; }
+            .match-item {
+                font-size: 10px !important;
+                padding: 6px 4px !important;
+                min-height: 32px !important;
+            }
+            .match-item-left::after  { right: -12px !important; width: 7px !important; height: 7px !important; }
+            .match-item-right::after { left:  -12px !important; width: 7px !important; height: 7px !important; }
+            .match-col-header {
+                font-size: 9px !important;
+                margin-bottom: 1px !important;
+            }
         }
 
         /* BOTTOM TEXT */
@@ -587,14 +628,14 @@
             .opt-text { font-size: 16px !important; }
             .question-flex { font-size: 16px !important; margin-bottom: 20px !important; }
 
-            /* Essay adjustment */
+            /* Essay / Short Answer adjustment — scoped so it doesn't break matching */
             .cbt-right textarea {
                 height: calc(100% - 25px) !important;
                 min-height: 80px !important;
                 font-size: 14px !important;
                 padding: 10px !important;
             }
-            .cbt-right > div {
+            .cbt-right > div:not(.match-container):not(.match-hint-bar) {
                 padding: 15px !important;
                 height: 100% !important;
             }
@@ -702,7 +743,7 @@
             </div>
 
             <!-- OPTIONS (RIGHT) -->
-            <div class="cbt-right">
+            <div class="cbt-right {{ $currentSoal->tipe === 'matching' ? 'cbt-right-matching' : '' }}">
                 @if(in_array($currentSoal->tipe, ['pilihan_ganda', 'audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar']))
                     @foreach($currentSoal->pilihanJawabans as $index => $opsi)
                     <label class="opt-label">
@@ -772,7 +813,7 @@
                         // Array of right indices to shuffle
                         $shuffledIndices = [];
                         for ($i = 0; $i < $pairs->count(); $i++) { $shuffledIndices[] = $i; }
-                        
+
                         // Seed random so shuffle is consistent on reload for this user+exam+page mix
                         mt_srand($ujian_peserta->id + $currentSoal->id);
                         shuffle($shuffledIndices);
@@ -796,7 +837,7 @@
                             ];
                         }
                     @endphp
-                    
+
                     <input type="hidden" id="matching_shuffle_map" form="answer-form" name="shuffle_map" value="{{ json_encode($shuffleMap) }}">
                     <input type="hidden" id="matching_answer" form="answer-form" name="jawaban" value="{{ json_encode($existingJawaban ?? new stdClass) }}">
 
@@ -995,7 +1036,7 @@
                 document.getElementById('btn-close-modal').addEventListener('click', () => modal.style.display = 'none');
                 document.getElementById('btn-close-modal-bottom').addEventListener('click', () => modal.style.display = 'none');
             }
-            
+
             setStatus('diag-ui', true);
 
             // TIMER
@@ -1074,7 +1115,8 @@
                 const getLeftPoint = (el) => {
                     const sr = svg.getBoundingClientRect();
                     const er = el.getBoundingClientRect();
-                    const offset = window.innerWidth <= 900 ? 12 : 27; // Responsive dot offset
+                    // Mobile: width<=900 uses 16px dots (offset 12), height<=500 uses 12px dots (offset 8), desktop uses 32px dots (offset 27)
+                    const offset = window.innerHeight <= 500 ? 8 : (window.innerWidth <= 900 ? 12 : 27);
                     return {
                         x: (er.right - sr.left) + offset,
                         y: er.top  - sr.top  + er.height / 2
@@ -1084,7 +1126,7 @@
                 const getRightPoint = (el) => {
                     const sr = svg.getBoundingClientRect();
                     const er = el.getBoundingClientRect();
-                    const offset = window.innerWidth <= 900 ? 12 : 27; // Responsive dot offset
+                    const offset = window.innerHeight <= 500 ? 8 : (window.innerWidth <= 900 ? 12 : 27);
                     return {
                         x: (er.left - sr.left) - offset,
                         y: er.top  - sr.top  + er.height / 2
@@ -1244,7 +1286,7 @@
             document.querySelectorAll('.auto-save-trigger').forEach(el => {
                 el.addEventListener('change', function() { submitAnswer({ soal_id: soalId, jawaban: this.value }); });
             });
-            
+
             // AUDIO LIMITER
             function setupAudioLimiter(selector) {
                 document.querySelectorAll(selector).forEach(audioEl => {
@@ -1254,7 +1296,7 @@
                     const counterEl = document.getElementById('counter_' + aid);
                     const storageKey = 'exam_' + window.EXAM_ID + '_audio_' + aid;
                     let playCount = parseInt(sessionStorage.getItem(storageKey) || '0');
-                    
+
                     const updateInfo = () => {
                         const sisa = maxPlay - playCount;
                         if (counterEl) counterEl.textContent = sisa > 0 ? `Sisa: ${sisa}` : 'Habis';
@@ -1281,7 +1323,7 @@
         } catch (err) {
             setStatus('diag-js', false, err.message);
         }
-    });
+     });
 </script>
 
 </body>
