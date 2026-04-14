@@ -120,21 +120,34 @@
                     </div>
                 </td>
                 <td style="padding:16px 20px;">
-                    @if($soal->tipe === 'pilihan_ganda')
-                        <span style="background:#dbeafe;color:#2563eb;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">PG (Teks)</span>
-                    @elseif($soal->tipe === 'multiple_choice')
-                        <span style="background:#ede9fe;color:#7c3aed;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">MC</span>
-                    @elseif($soal->tipe === 'audio')
-                        <span style="background:#fef3c7;color:#d97706;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">PG Audio</span>
-                    @elseif($soal->tipe === 'pilihan_ganda_audio')
-                        <span style="background:#ffedd5;color:#c2410c;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">PG (Opsi Audio)</span>
-                    @elseif($soal->tipe === 'pilihan_ganda_gambar')
-                        <span style="background:#ccfbf1;color:#0f766e;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">PG (Opsi Gambar)</span>
-                    @elseif($soal->tipe === 'short_answer')
-                        <span style="background:#e0e7ff;color:#4338ca;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">Short Answer</span>
-                    @else
-                        <span style="background:#e2e8f0;color:#475569;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">Essay</span>
-                    @endif
+                    @switch($soal->tipe)
+                        @case('pilihan_ganda')
+                            <span style="background:#dbeafe;color:#1e40af;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;border:1px solid #bfdbfe;">Pilihan Ganda</span>
+                            @break
+                        @case('multiple_choice')
+                            <span style="background:#f3e8ff;color:#6b21a8;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;border:1px solid #e9d5ff;">Multiple Choice</span>
+                            @break
+                        @case('essay')
+                            <span style="background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;border:1px solid #bbf7d0;">Uraian (Essay)</span>
+                            @break
+                        @case('short_answer')
+                            <span style="background:#ecfeff;color:#0891b2;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;border:1px solid #cffafe;">Jawaban Singkat</span>
+                            @break
+                        @case('matching')
+                            <span style="background:#e0e7ff;color:#3730a3;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;border:1px solid #c7d2fe;">Jodohkan</span>
+                            @break
+                        @case('audio')
+                            <span style="background:#fff7ed;color:#9a3412;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;border:1px solid #ffedd5;">Listening</span>
+                            @break
+                        @case('pilihan_ganda_audio')
+                            <span style="background:#ffedd5;color:#9a3412;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;border:1px solid #fed7aa;">PG Audio</span>
+                            @break
+                        @case('pilihan_ganda_gambar')
+                            <span style="background:#fff1f2;color:#9f1239;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;border:1px solid #ffe4e6;">PG Gambar</span>
+                            @break
+                        @default
+                            <span style="background:#f1f5f9;color:#475569;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;border:1px solid #e2e8f0;">{{ str_replace('_', ' ', $soal->tipe) }}</span>
+                    @endswitch
                 </td>
                 <td style="padding:16px 20px;">
                     @php

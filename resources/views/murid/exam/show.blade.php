@@ -14,6 +14,30 @@
         window.REPORT_CHEAT_URL = "{{ route('murid.exam.reportCheat', $ujian_peserta, false) }}";
         window.FINISH_URL = "{{ route('murid.exam.finish', $ujian_peserta, false) }}";
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sortablejs/1.15.0/Sortable.min.js"></script>
+
+    <!-- DIAGNOSTIC CSS -->
+    <style>
+        #diagnostic-bar {
+            position: fixed; top: 0; left: 0; z-index: 9999999;
+            background: rgba(0,0,0,0.8); color: #fff; font-family: monospace;
+            font-size: 10px; padding: 2px 8px; pointer-events: none;
+            display: flex; gap: 10px; border-bottom-right-radius: 4px;
+        }
+        .diag-ok { color: #4ade80; }
+        .diag-err { color: #f87171; }
+        
+        /* FORCE CLICKABLE FOOTER */
+        .cbt-footer { position: relative; z-index: 1000 !important; }
+        .ftr-btn { pointer-events: all !important; position: relative; z-index: 1001 !important; }
+
+        /* Ensure No Screen Blocking */
+        #landscape-overlay { pointer-events: none; }
+        #landscape-overlay * { pointer-events: none; }
+        @media screen and (max-width: 1024px) and (orientation: portrait) {
+            #landscape-overlay { pointer-events: all !important; display: flex !important; }
+        }
+    </style>
 
     <style>
         /* RESET & BASE */
@@ -240,67 +264,152 @@
             color: #111;
         }
 
-        /* MATCHING UI */
-        .matching-wrapper {
+        /* === MATCHING: JARING-JARING (CONNECT-LINES) UI === */
+        .match-container {
             position: relative;
             display: flex;
-            justify-content: space-between;
-            padding: 30px;
+            align-items: stretch;
+            width: 100%;
             height: 100%;
-            overflow-y: auto;
+            background: #f8fafc;
+            /* NO overflow:hidden – SVG lines must not be clipped */
+            box-sizing: border-box;
+            gap: 0;
         }
-        .matching-col {
+        .match-col {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            width: 40%;
+            gap: 8px;
+            padding: 16px;
+            overflow-y: auto;
             z-index: 2;
+            position: relative;
         }
+        /* Add inner padding where lines will show */
+        #match-col-left  { padding-right: 48px; }
+        #match-col-right { padding-left:  48px; }
+        /* .match-svg styles are now inline on the element; this class is kept for mobile override only */
+        .match-svg { pointer-events: none; overflow: visible; }
+        .match-col-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 2px;
+            flex-shrink: 0;
+        }
+        /* Match items */
         .match-item {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
             background: #fff;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 15px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.15s;
+            min-height: 52px;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            cursor: pointer;
-            position: relative;
-            min-height: 80px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.2s;
             user-select: none;
+            -webkit-user-select: none;
+            word-break: break-word;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-        .match-item:hover { border-color: #9ca3af; }
-        .match-item.active { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 0 0 3px rgba(59,130,246,0.3); }
-        .match-item.connected { border-color: #10b981; background: #f0fdf4; }
-        
-        .match-dot {
-            width: 14px;
-            height: 14px;
-            background: #9ca3af;
-            border-radius: 50%;
+        .match-item:hover {
+            border-color: #94a3b8;
+            background: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        .match-item.selected {
+            border-color: #3b82f6 !important;
+            background: #eff6ff !important;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.25) !important;
+            transform: translateY(-1px);
+        }
+        .match-item.connected {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        /* Connection dot on right edge of left items - positioned in the padding area */
+        .match-item-left::after {
+            content: '';
             position: absolute;
+            right: -32px;
             top: 50%;
             transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            background: #cbd5e1;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
             transition: background 0.2s;
+            z-index: 3;
         }
-        .match-item.active .match-dot { background: #3b82f6; }
-        .match-item.connected .match-dot { background: #10b981; }
-        .match-left .match-dot { right: -20px; }
-        .match-right .match-dot { left: -20px; }
-
-        #matching-svg {
+        .match-item-left.connected::after { background: var(--pair-color, #10b981); }
+        .match-item-left.selected::after { background: #3b82f6; }
+        /* Connection dot on left edge of right items - positioned in the padding area */
+        .match-item-right::after {
+            content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 1;
+            left: -32px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            background: #cbd5e1;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+            transition: background 0.2s;
+            z-index: 3;
         }
-        .match-line {
-            stroke: #10b981;
-            stroke-width: 3;
-            stroke-linecap: round;
+        .match-item-right.connected::after { background: var(--pair-color, #10b981); }
+        .match-item img { max-height: 60px; max-width: 100%; object-fit: contain; pointer-events: none; }
+        .match-item span { pointer-events: none; }
+        /* Hint bar */
+        .match-hint-bar {
+            font-size: 11px;
+            color: #64748b;
+            background: #f1f5f9;
+            border-radius: 6px;
+            padding: 5px 12px;
+            text-align: center;
+            margin: 8px 16px 0;
+            flex-shrink: 0;
+        }
+
+        /* Mobile: side-by-side but smaller so it fits portrait layout */
+        @media (max-width: 900px) {
+            .match-container {
+                flex-direction: row;
+                height: 100%;
+                overflow-x: hidden;
+            }
+            .match-col {
+                padding: 10px 4px;
+                gap: 6px;
+                flex: 1;
+            }
+            #match-col-left { padding-right: 24px; }
+            #match-col-right { padding-left: 24px; }
+            
+            .match-svg { display: block; }
+            .match-item { font-size: 11px; padding: 8px 6px; min-height: 40px; }
+            
+            /* Responsive dot scale and position */
+            .match-item-left::after { right: -16px; width: 8px; height: 8px; }
+            .match-item-right::after { left: -16px; width: 8px; height: 8px; }
+            
+            /* Hide hint on very small screens to save space if needed, or scale it */
+            .match-hint-bar { font-size: 10px; margin: 4px 8px 0; padding: 4px 8px; }
         }
 
         /* BOTTOM TEXT */
@@ -516,7 +625,11 @@
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-100">
+    <div id="diagnostic-bar">
+        <span>SYSTEM: <span id="diag-js" class="diag-err">WAIT</span></span>
+        <span>UI: <span id="diag-ui" class="diag-err">WAIT</span></span>
+    </div>
 
     <div id="landscape-overlay">
         <svg class="rotate-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -687,30 +800,42 @@
                     <input type="hidden" id="matching_shuffle_map" form="answer-form" name="shuffle_map" value="{{ json_encode($shuffleMap) }}">
                     <input type="hidden" id="matching_answer" form="answer-form" name="jawaban" value="{{ json_encode($existingJawaban ?? new stdClass) }}">
 
-                    <div class="matching-wrapper" id="matching-wrapper">
-                        <svg id="matching-svg"></svg>
-                        
-                        <div class="matching-col left-col">
+                    {{-- Hint bar --}}
+                    <div class="match-hint-bar">👆 Tap item di kiri → lalu tap pasangannya di kanan. Tap item yang sudah terhubung untuk melepaskan.</div>
+
+                    <div class="match-container" id="match-wrapper">
+                        {{-- SVG overlay: FIRST child, inline style guarantees position:absolute. Z-index 1 keeps it beneath text --}}
+                        <svg id="match-svg" xmlns="http://www.w3.org/2000/svg"
+                             style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:1;"></svg>
+
+                        {{-- Left column: Prompts --}}
+                        <div class="match-col" id="match-col-left">
+                            <div class="match-col-header">Prompts</div>
                             @foreach($leftItems as $item)
-                                <div class="match-item match-left" data-side="left" data-id="{{ $item['id'] }}" id="left_{{ $item['id'] }}">
+                                <div class="match-item match-item-left"
+                                     data-left-id="{{ $item['id'] }}"
+                                     id="mleft_{{ $item['id'] }}">
                                     @if($item['tipe'] === 'gambar')
-                                        <img src="{{ asset('storage/' . $item['val']) }}" style="max-height:80px; object-fit:contain; border-radius:4px;" oncontextmenu="return false;" draggable="false">
+                                        <img src="{{ asset('storage/' . $item['val']) }}" oncontextmenu="return false;" draggable="false">
                                     @else
-                                        <span style="font-size: 16px; font-weight: 500;">{{ $item['val'] }}</span>
+                                        <span>{{ $item['val'] }}</span>
                                     @endif
-                                    <div class="match-dot"></div>
                                 </div>
                             @endforeach
                         </div>
 
-                        <div class="matching-col right-col">
-                            @foreach($rightItems as $item)
-                                <div class="match-item match-right" data-side="right" data-id="{{ $item['id'] }}" id="right_{{ $item['id'] }}">
-                                    <div class="match-dot"></div>
+                        {{-- Right column: Answers (shuffled) --}}
+                        <div class="match-col" id="match-col-right">
+                            <div class="match-col-header">Answers</div>
+                            @foreach($rightItems as $rIdx => $item)
+                                <div class="match-item match-item-right"
+                                     data-piece-id="{{ $item['original'] }}"
+                                     data-shuffled-index="{{ $rIdx }}"
+                                     id="mright_{{ $item['original'] }}">
                                     @if($item['tipe'] === 'gambar')
-                                        <img src="{{ asset('storage/' . $item['val']) }}" style="max-height:80px; object-fit:contain; border-radius:4px;" oncontextmenu="return false;" draggable="false">
+                                        <img src="{{ asset('storage/' . $item['val']) }}" oncontextmenu="return false;" draggable="false">
                                     @else
-                                        <span style="font-size: 16px; font-weight: 500;">{{ $item['val'] }}</span>
+                                        <span>{{ $item['val'] }}</span>
                                     @endif
                                 </div>
                             @endforeach
@@ -839,347 +964,323 @@
                 <div class="ftr-btn ftr-mid" style="color: #6b7280;">QUESTIONS LIST</div>
                 <button class="ftr-btn ftr-next" onclick="document.getElementById('finish-form').submit()">Finish</button>
             </div>
+            </div>
         </div>
     </div>
 
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const diagJs = document.getElementById('diag-js');
+        const diagUi = document.getElementById('diag-ui');
 
-        // ANTI SCREENSHOT & RIGHT CLICK
-        document.addEventListener('contextmenu', event => event.preventDefault()); // Prevent right-click
+        function setStatus(id, ok, msg) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerText = ok ? 'OK' : 'ERR';
+            el.className = ok ? 'diag-ok' : 'diag-err';
+            if (!ok && msg) console.error("Diagnostic Error:", msg);
+        }
 
-        document.addEventListener('keydown', (e) => {
-            // Prevent PrintScreen, F12, Ctrl+S, Ctrl+P, Ctrl+U, Ctrl+Shift+I, Win+Shift+S (Meta+Shift+S)
-            if (
-                e.key === 'PrintScreen' ||
-                e.key === 'F12' ||
-                (e.ctrlKey && ['s', 'p', 'u', 'S', 'P', 'U'].includes(e.key)) ||
-                (e.ctrlKey && e.shiftKey && ['i', 'I', 's', 'S', 'c', 'C'].includes(e.key)) ||
-                (e.metaKey && e.shiftKey && ['s', 'S'].includes(e.key))
-            ) {
-                e.preventDefault();
+        try {
+            // ANTI SCREENSHOT & RIGHT CLICK
+            document.addEventListener('contextmenu', event => event.preventDefault());
+
+            // MODAL
+            const modal = document.getElementById('modal-show-all');
+            const btnShowAll = document.getElementById('btn-show-all');
+            if (btnShowAll && modal) {
+                btnShowAll.addEventListener('click', () => {
+                    modal.style.display = 'flex';
+                });
+                document.getElementById('btn-close-modal').addEventListener('click', () => modal.style.display = 'none');
+                document.getElementById('btn-close-modal-bottom').addEventListener('click', () => modal.style.display = 'none');
+            }
+            
+            setStatus('diag-ui', true);
+
+            // TIMER
+            let timeRemaining = window.TIMER_SECONDS;
+            const timerDisplay = document.getElementById('countdown_timer');
+            if (timerDisplay) {
+                const timerInterval = setInterval(() => {
+                    if (timeRemaining <= 0) {
+                        clearInterval(timerInterval);
+                        document.getElementById('finish-form').submit();
+                        return;
+                    }
+                    const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+                    const s = Math.floor(timeRemaining % 60).toString().padStart(2, '0');
+                    timerDisplay.innerText = `${m}:${s}`;
+                    timeRemaining--;
+                }, 1000);
+            }
+
+            // ANTI CHEAT (SIMPLIFIED FOR DEBUG)
+            let isNavigating = false;
+            document.querySelectorAll('a[href], button[onclick*="submit"]').forEach(el => {
+                el.addEventListener('click', () => { isNavigating = true; });
+            });
+
+            // ── GENERAL SUBMIT & SOAL ID (defined at outer scope so auto-save works for all types) ──
+            const _form = document.getElementById('answer-form');
+            const soalId = _form ? _form.querySelector('[name="soal_id"]').value : null;
+
+            const submitAnswer = (data) => {
+                fetch(window.AUTO_SAVE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify(data)
+                });
+            };
+
+            // ── MATCHING: JARING-JARING (CLICK-TO-CONNECT) ──
+            const matchWrapper = document.getElementById('match-wrapper');
+            if (matchWrapper) {
+                const ansInput = document.getElementById('matching_answer');
+                const shuffleMapInput = document.getElementById('matching_shuffle_map');
+                const svg = document.getElementById('match-svg');
+                const leftCol = document.getElementById('match-col-left');
+                const rightCol = document.getElementById('match-col-right');
+
+                // Pair colors
+                const COLORS = ['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'];
+                let selectedLeft = null;
+                let connections = {}; // { leftId: rightOriginalId }
+                let colorMap = {};   // { leftId: colorIndex }
+                let nextColor = 0;
+
+                // Load existing answers
                 try {
-                    navigator.clipboard.writeText("Tindakan ini dilarang selama ujian berlangsung.");
-                } catch(err) {}
-                alert("Perhatian: Tindakan mengambil gambar, menyimpan, atau membuka panel pengembang sangat dilarang!");
-            }
-        });
+                    const ex = JSON.parse(ansInput.value || '{}');
+                    if (ex && typeof ex === 'object') {
+                        Object.entries(ex).forEach(([lid, rid]) => {
+                            connections[String(lid)] = parseInt(rid);
+                            colorMap[String(lid)] = nextColor % COLORS.length;
+                            nextColor++;
+                        });
+                    }
+                } catch(e) {}
 
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'PrintScreen') {
-                try {
-                    navigator.clipboard.writeText("Tindakan ini dilarang selama ujian berlangsung.");
-                } catch(err) {}
-            }
-        });
+                const resizeSvg = () => {
+                    // Use svg's own rendered size for the viewBox coordinate system
+                    const sr = svg.getBoundingClientRect();
+                    if (sr.width > 0) svg.setAttribute('viewBox', `0 0 ${sr.width} ${sr.height}`);
+                };
 
-        // MODAL
-        const modal = document.getElementById('modal-show-all');
-        document.getElementById('btn-show-all').addEventListener('click', () => modal.style.display = 'flex');
-        document.getElementById('btn-close-modal').addEventListener('click', () => modal.style.display = 'none');
-        document.getElementById('btn-close-modal-bottom').addEventListener('click', () => modal.style.display = 'none');
+                // Coordinates relative to the SVG element targeting the connection dots
+                const getLeftPoint = (el) => {
+                    const sr = svg.getBoundingClientRect();
+                    const er = el.getBoundingClientRect();
+                    const offset = window.innerWidth <= 900 ? 12 : 27; // Responsive dot offset
+                    return {
+                        x: (er.right - sr.left) + offset,
+                        y: er.top  - sr.top  + er.height / 2
+                    };
+                };
 
-        // TIMER
-        let timeRemaining = window.TIMER_SECONDS;
-        const timerDisplay = document.getElementById('countdown_timer');
+                const getRightPoint = (el) => {
+                    const sr = svg.getBoundingClientRect();
+                    const er = el.getBoundingClientRect();
+                    const offset = window.innerWidth <= 900 ? 12 : 27; // Responsive dot offset
+                    return {
+                        x: (er.left - sr.left) - offset,
+                        y: er.top  - sr.top  + er.height / 2
+                    };
+                };
 
-        function updateTimer() {
-            if (timeRemaining <= 0) {
-                timerDisplay.innerText = "00:00";
-                document.getElementById('finish-form').submit();
-                return;
-            }
+                const drawLines = () => {
+                    resizeSvg();
+                    svg.innerHTML = '';
+                    Object.entries(connections).forEach(([lid, rid]) => {
+                        const lEl = document.getElementById('mleft_'  + lid);
+                        const rEl = document.getElementById('mright_' + rid);
+                        if (!lEl || !rEl) return;
+                        const l = getLeftPoint(lEl);
+                        const r = getRightPoint(rEl);
+                        const color = COLORS[colorMap[lid] ?? 0];
+                        const cx1 = l.x + (r.x - l.x) * 0.35;
+                        const cx2 = l.x + (r.x - l.x) * 0.65;
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', `M${l.x},${l.y} C${cx1},${l.y} ${cx2},${r.y} ${r.x},${r.y}`);
+                        path.setAttribute('stroke', color);
+                        path.setAttribute('stroke-width', '2.5');
+                        path.setAttribute('fill', 'none');
+                        path.setAttribute('stroke-linecap', 'round');
+                        path.setAttribute('opacity', '0.85');
+                        // Animated draw-in effect (use large dasharray to cover any path length)
+                        const pathLen = 1000;
+                        path.style.strokeDasharray = pathLen;
+                        path.style.strokeDashoffset = pathLen;
+                        path.style.animation = 'matchLineIn 0.4s ease forwards';
+                        svg.appendChild(path);
+                    });
+                };
 
-            // Format 59:58 (MM:SS)
-            const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
-            const s = Math.floor(timeRemaining % 60).toString().padStart(2, '0');
-
-            timerDisplay.innerText = `${m}:${s}`;
-            timeRemaining--;
-        }
-
-        updateTimer();
-        setInterval(updateTimer, 1000);
-
-        // ANTI CHEAT & TAB DETECTION
-        let isNavigating = false;
-
-        // Hanya elemen yang memindahkan halaman yang mematikan cheat detector
-        document.querySelectorAll('a[href], button[onclick*="submit"]').forEach(el => {
-            el.addEventListener('click', () => { isNavigating = true; });
-        });
-        document.getElementById('finish-form').addEventListener('submit', () => { isNavigating = true; });
-
-        if (!window.IS_TRYOUT) {
-            document.addEventListener("visibilitychange", function() {
-                if (document.hidden && !isNavigating) triggerAntiCheatLog();
-            });
-            window.addEventListener('blur', function() {
-                // Abaikan blur jika user sedang klik dalam window/iframe
-                if (document.activeElement !== document.body && document.activeElement.tagName === 'IFRAME') return;
-                if (!isNavigating) triggerAntiCheatLog();
-            });
-        }
-
-        let cheatReported = false;
-        function triggerAntiCheatLog() {
-            if (cheatReported) return;
-            cheatReported = true;
-
-            // UI Peringatan Kecurangan Langsung Muncul
-            const cheatUI = document.createElement('div');
-            cheatUI.style.cssText = "position:fixed;inset:0;background:rgba(220,38,38,1);z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;font-family:sans-serif;text-align:center;";
-            cheatUI.innerHTML = `
-                <svg style="width:120px;height:120px;margin-bottom:20px;animation: pulse 2s infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                <h1 style="font-size:3rem;font-weight:900;letter-spacing:1px;margin:0;">PELANGGARAN TERDETEKSI</h1>
-                <p style="font-size:1.25rem;margin-top:10px;">Anda terdeteksi berpindah tab atau keluar dari browserujian!</p>
-                <div style="margin-top:30px;padding:15px 30px;background:rgba(0,0,0,0.2);border-radius:10px;">
-                    <p style="font-size:1rem;margin:0;">Laporan terkirim ke sistem Guru & Admin secara realtime...</p>
-                </div>
-            `;
-            document.body.appendChild(cheatUI);
-
-            fetch(window.REPORT_CHEAT_URL, {
-                method: 'POST',
-                credentials: 'same-origin',
-                keepalive: true, // PENTING: Mencegah browser mobile membatalkan request saat tab diminimize
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                // Keyframe animation for lines appearing
+                if (!document.getElementById('match-keyframes')) {
+                    const style = document.createElement('style');
+                    style.id = 'match-keyframes';
+                    style.textContent = `@keyframes matchLineIn { to { stroke-dashoffset: 0; } }`;
+                    document.head.appendChild(style);
                 }
-            })
-            .then(async res => {
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) {
-                    throw new Error(data.message || ("HTTP error " + res.status));
-                }
-                return data;
-            })
-            .then(data => {
-                if(data.redirect) {
-                    window.location.replace(data.redirect);
-                } else {
-                    alert("Akses diblokir (Response tidak lengkap).");
-                }
-            })
-            .catch((err) => {
-                console.error("Anti cheat error:", err);
-                alert("Sistem gagal memverifikasi sesi (" + err.message + "). Silakan hubungi pengawas.");
-                // Tetap di halaman ini tanpa reload
+
+                const applyStyles = () => {
+                    document.querySelectorAll('.match-item-left').forEach(el => {
+                        const lid = String(el.dataset.leftId);
+                        if (lid in connections) {
+                            const color = COLORS[colorMap[lid]];
+                            el.classList.add('connected');
+                            el.style.setProperty('--pair-color', color);
+                            el.style.borderColor = color;
+                            el.style.background   = color + '15';
+                        } else {
+                            el.classList.remove('connected');
+                            el.style.borderColor = '';
+                            el.style.background  = '';
+                            el.style.removeProperty('--pair-color');
+                        }
+                    });
+                    document.querySelectorAll('.match-item-right').forEach(el => {
+                        const rid = parseInt(el.dataset.pieceId);
+                        const entry = Object.entries(connections).find(([,r]) => r === rid);
+                        if (entry) {
+                            const color = COLORS[colorMap[entry[0]]];
+                            el.classList.add('connected');
+                            el.style.setProperty('--pair-color', color);
+                            el.style.borderColor = color;
+                            el.style.background  = color + '15';
+                        } else {
+                            el.classList.remove('connected');
+                            el.style.borderColor = '';
+                            el.style.background  = '';
+                            el.style.removeProperty('--pair-color');
+                        }
+                    });
+                };
+
+                const save = () => {
+                    ansInput.value = JSON.stringify(connections);
+                    submitAnswer({ soal_id: soalId, jawaban: ansInput.value, shuffle_map: shuffleMapInput.value });
+                };
+
+                const refresh = () => { applyStyles(); drawLines(); };
+
+                // Click: LEFT items
+                document.querySelectorAll('.match-item-left').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const lid = String(el.dataset.leftId);
+
+                        if (selectedLeft === el) {
+                            // Clicking again on the same left item → deselect it
+                            el.classList.remove('selected');
+                            selectedLeft = null;
+                        } else if (lid in connections && !selectedLeft) {
+                            // Clicking a connected left item when nothing is selected → disconnect it
+                            delete connections[lid];
+                            delete colorMap[lid];
+                            save(); refresh();
+                        } else {
+                            // Select this left item (pending to connect to a right item)
+                            if (selectedLeft) selectedLeft.classList.remove('selected');
+                            selectedLeft = el;
+                            el.classList.add('selected');
+                        }
+                    });
+                });
+
+                // Click: RIGHT items
+                document.querySelectorAll('.match-item-right').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const rid = parseInt(el.dataset.pieceId);
+
+                        if (selectedLeft) {
+                            const lid = String(selectedLeft.dataset.leftId);
+                            // Remove any existing connection pointing TO this right item
+                            Object.keys(connections).forEach(k => {
+                                if (connections[k] === rid) { delete connections[k]; delete colorMap[k]; }
+                            });
+                            // Remove previous connection from this left item
+                            delete connections[lid];
+                            // Assign color if new
+                            if (!(lid in colorMap)) { colorMap[lid] = nextColor % COLORS.length; nextColor++; }
+                            // Connect
+                            connections[lid] = rid;
+                            selectedLeft.classList.remove('selected');
+                            selectedLeft = null;
+                            save(); refresh();
+                        } else {
+                            // No left selected: clicking right disconnects its pair
+                            const entry = Object.entries(connections).find(([, r]) => r === rid);
+                            if (entry) {
+                                delete connections[entry[0]];
+                                delete colorMap[entry[0]];
+                                save(); refresh();
+                            }
+                        }
+                    });
+                });
+
+                // Deselect on outside click
+                document.addEventListener('click', () => {
+                    if (selectedLeft) { selectedLeft.classList.remove('selected'); selectedLeft = null; }
+                });
+
+                // Redraw on scroll/resize
+                leftCol?.addEventListener('scroll',  drawLines);
+                rightCol?.addEventListener('scroll', drawLines);
+                window.addEventListener('resize', () => { resizeSvg(); drawLines(); });
+
+                // Initial render — use double rAF so layout is settled before drawing
+                applyStyles();
+                requestAnimationFrame(() => requestAnimationFrame(() => drawLines()));
+            }
+
+            // AUTO SAVE (GENERAL - for MC/radio questions)
+            document.querySelectorAll('.auto-save-trigger').forEach(el => {
+                el.addEventListener('change', function() { submitAnswer({ soal_id: soalId, jawaban: this.value }); });
             });
-        }
-
-        // AUTO SAVE
-        let saveTimeout = null;
-        function submitAnswer(dataObj) {
-            fetch(window.AUTO_SAVE_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify(dataObj)
-            });
-        }
-
-        const form = document.getElementById('answer-form');
-        const soalId = form.querySelector('[name="soal_id"]').value;
-
-        // Auto Save on Select
-        document.querySelectorAll('.auto-save-trigger').forEach(el => {
-            el.addEventListener('change', function() {
-                submitAnswer({ soal_id: soalId, jawaban: this.value });
-            });
-        });
-
-        document.querySelectorAll('.auto-save-trigger-mc').forEach(el => {
-            el.addEventListener('change', function() {
-                let checked = [];
-                document.querySelectorAll('.auto-save-trigger-mc:checked').forEach(c => checked.push(c.value));
-                submitAnswer({ soal_id: soalId, jawaban: JSON.stringify(checked) });
-            });
-        });
-
-        document.querySelectorAll('.auto-save-trigger-typing').forEach(el => {
-            el.addEventListener('input', function() {
-                clearTimeout(saveTimeout);
-                saveTimeout = setTimeout(() => submitAnswer({ soal_id: soalId, jawaban: this.value }), 1000);
-            });
-        });
-
-        // ── MATCHING LOGIC ──
-        const mWrap = document.getElementById('matching-wrapper');
-        if (mWrap) {
-            const svg = document.getElementById('matching-svg');
-            const ansInput = document.getElementById('matching_answer');
-            const shuffleMapInput = document.getElementById('matching_shuffle_map');
-            let connections = JSON.parse(ansInput.value || '{}');
-            let activeItem = null;
-
-            function updateSVG() {
-                svg.innerHTML = '';
-                const mWrapRect = mWrap.getBoundingClientRect();
-                
-                for (const leftId in connections) {
-                    const rightId = connections[leftId];
-                    const leftEl = document.getElementById('left_' + leftId);
-                    const rightEl = document.getElementById('right_' + rightId);
+            
+            // AUDIO LIMITER
+            function setupAudioLimiter(selector) {
+                document.querySelectorAll(selector).forEach(audioEl => {
+                    const maxPlay = parseInt(audioEl.getAttribute('data-max'));
+                    if (isNaN(maxPlay) || maxPlay <= 0) return;
+                    const aid = audioEl.getAttribute('data-id');
+                    const counterEl = document.getElementById('counter_' + aid);
+                    const storageKey = 'exam_' + window.EXAM_ID + '_audio_' + aid;
+                    let playCount = parseInt(sessionStorage.getItem(storageKey) || '0');
                     
-                    if (leftEl && rightEl) {
-                        const lDot = leftEl.querySelector('.match-dot').getBoundingClientRect();
-                        const rDot = rightEl.querySelector('.match-dot').getBoundingClientRect();
-                        
-                        const x1 = lDot.left + lDot.width/2 - mWrapRect.left + mWrap.scrollLeft;
-                        const y1 = lDot.top + lDot.height/2 - mWrapRect.top + mWrap.scrollTop;
-                        const x2 = rDot.left + rDot.width/2 - mWrapRect.left + mWrap.scrollLeft;
-                        const y2 = rDot.top + rDot.height/2 - mWrapRect.top + mWrap.scrollTop;
-
-                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                        line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-                        line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-                        line.setAttribute('class', 'match-line');
-                        svg.appendChild(line);
-
-                        leftEl.classList.add('connected');
-                        rightEl.classList.add('connected');
-                    }
-                }
-            }
-
-            function handleItemClick(e) {
-                const item = e.currentTarget;
-                const side = item.dataset.side;
-                const id = item.dataset.id;
-
-                // Jika klik yg sudah connected, hapus connection-nya
-                if (item.classList.contains('connected')) {
-                    if (side === 'left') {
-                        const rightId = connections[id];
-                        delete connections[id];
-                        item.classList.remove('connected');
-                        if(rightId !== undefined) {
-                            const rel = document.getElementById('right_' + rightId);
-                            if(rel) rel.classList.remove('connected');
+                    const updateInfo = () => {
+                        const sisa = maxPlay - playCount;
+                        if (counterEl) counterEl.textContent = sisa > 0 ? `Sisa: ${sisa}` : 'Habis';
+                        if (playCount >= maxPlay) {
+                            audioEl.controls = false;
+                            const lock = document.createElement('div');
+                            lock.className = "text-xs p-1 bg-gray-100 border rounded text-gray-400";
+                            lock.textContent = "Limit reached";
+                            audioEl.parentElement.replaceChild(lock, audioEl);
                         }
-                    } else {
-                        for (const lId in connections) {
-                            if (connections[lId] == id) {
-                                delete connections[lId];
-                                document.getElementById('left_' + lId).classList.remove('connected');
-                                break;
-                            }
-                        }
-                        item.classList.remove('connected');
-                    }
-                    saveMatching();
-                    updateSVG();
-                    if(activeItem === item) {
-                        item.classList.remove('active');
-                        activeItem = null;
-                    }
-                    return;
-                }
-
-                // Normal selection flow
-                if (!activeItem) {
-                    activeItem = item;
-                    item.classList.add('active');
-                } else {
-                    if (activeItem.dataset.side === side) {
-                        activeItem.classList.remove('active');
-                        activeItem = item;
-                        item.classList.add('active');
-                    } else {
-                        // Match found
-                        const leftId = activeItem.dataset.side === 'left' ? activeItem.dataset.id : id;
-                        const rightId = activeItem.dataset.side === 'right' ? activeItem.dataset.id : id;
-                        
-                        // Hapus existing connection for this left item if any
-                        if (connections[leftId] !== undefined) {
-                            const oldR = document.getElementById('right_' + connections[leftId]);
-                            if(oldR) oldR.classList.remove('connected');
-                        }
-                        // Hapus existing connection for this right item if any
-                        for (const lId in connections) {
-                            if (connections[lId] == rightId) {
-                                delete connections[lId];
-                                document.getElementById('left_' + lId).classList.remove('connected');
-                            }
-                        }
-
-                        connections[leftId] = rightId;
-                        activeItem.classList.remove('active');
-                        activeItem = null;
-                        
-                        saveMatching();
-                        updateSVG();
-                    }
-                }
-            }
-
-            function saveMatching() {
-                ansInput.value = JSON.stringify(connections);
-                submitAnswer({ 
-                    soal_id: soalId, 
-                    jawaban: ansInput.value,
-                    shuffle_map: shuffleMapInput.value // Kirim map pengacakan ke server
+                    };
+                    updateInfo();
+                    audioEl.addEventListener('play', () => {
+                        playCount++;
+                        sessionStorage.setItem(storageKey, playCount);
+                        updateInfo();
+                    }, { once: true });
                 });
             }
+            setupAudioLimiter('.soal-audio');
+            setupAudioLimiter('.opsi-audio');
 
-            document.querySelectorAll('.match-item').forEach(item => {
-                item.addEventListener('click', handleItemClick);
-            });
-
-            // Initial render
-            setTimeout(updateSVG, 100);
-            window.addEventListener('resize', updateSVG);
+            setStatus('diag-js', true);
+        } catch (err) {
+            setStatus('diag-js', false, err.message);
         }
-
-        // ── AUDIO LIMIT COUNTER LOGIC ──
-        function setupAudioLimiter(audioSelector) {
-            document.querySelectorAll(audioSelector).forEach(audioEl => {
-                const maxPlay = parseInt(audioEl.getAttribute('data-max'));
-                if (isNaN(maxPlay) || maxPlay <= 0) return; // tidak ada limit
-                
-                const aid = audioEl.getAttribute('data-id');
-                const counterEl = document.getElementById('counter_' + aid);
-                const storageKey = 'exam_' + window.EXAM_ID + '_audio_' + aid;
-                
-                let playCount = parseInt(sessionStorage.getItem(storageKey) || '0');
-                
-                function updateInfo() {
-                    const sisa = maxPlay - playCount;
-                    if (counterEl) {
-                        counterEl.textContent = sisa > 0 ? \`Sisa putar: \${sisa} kali\` : 'Batas maksimal putar tercapai';
-                    }
-                    if (playCount >= maxPlay) {
-                        // Sembunyikan kontrol / blur / disable
-                        audioEl.controls = false;
-                        const parent = audioEl.parentElement;
-                        const lockMsg = document.createElement('div');
-                        lockMsg.className = "p-2 bg-slate-100 text-slate-500 rounded text-sm text-center border border-slate-200";
-                        lockMsg.textContent = "🎧 Audio telah diputar maksimal (" + maxPlay + "x)";
-                        parent.replaceChild(lockMsg, audioEl);
-                    }
-                }
-                
-                updateInfo();
-                
-                audioEl.addEventListener('play', () => {
-                    playCount++;
-                    sessionStorage.setItem(storageKey, playCount.toString());
-                    updateInfo();
-                }, { once: true }); 
-                // Note: {once: true} only counts the FIRST play on this element per load. 
-                // Full reload = able to play again until storage limits out.
-            });
-        }
-        
-        setupAudioLimiter('audio.soal-audio');
-        setupAudioLimiter('audio.opsi-audio');
-
     });
 </script>
 

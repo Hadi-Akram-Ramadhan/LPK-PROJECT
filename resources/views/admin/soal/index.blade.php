@@ -15,11 +15,15 @@
     .soal-table th { text-align: left; padding: 14px 20px; font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
     .soal-table td { padding: 18px 20px; font-size: 14px; color: #334155; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
     .soal-table tr:hover td { background: #f8fafc; }
-    .sbadge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .sbadge-blue { background: #dbeafe; color: #2563eb; }
-    .sbadge-purple { background: #ede9fe; color: #7c3aed; }
-    .sbadge-green { background: #dcfce7; color: #16a34a; }
-    .sbadge-orange { background: #ffedd5; color: #ea580c; }
+    .sbadge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+    .sbadge-blue    { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .sbadge-purple  { background: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+    .sbadge-green   { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .sbadge-orange  { background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
+    .sbadge-cyan    { background: #ecfeff; color: #0891b2; border: 1px solid #cffafe; }
+    .sbadge-indigo  { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+    .sbadge-amber   { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; }
+    .sbadge-rose    { background: #fff1f2; color: #9f1239; border: 1px solid #ffe4e6; }
     .stat-row { display: flex; gap: 16px; margin-bottom: 24px; }
     .stat-pill { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px 28px; flex: 1; text-align: center; }
     .stat-pill-val { font-size: 28px; font-weight: 800; color: #1e293b; }
@@ -94,15 +98,34 @@
                     </div>
                 </td>
                 <td>
-                    @if($soal->tipe === 'pilihan_ganda')
-                        <span class="sbadge sbadge-blue">Pilihan Ganda</span>
-                    @elseif($soal->tipe === 'audio')
-                        <span class="sbadge sbadge-orange">Audio</span>
-                    @elseif($soal->tipe === 'essay')
-                        <span class="sbadge sbadge-green">Essay</span>
-                    @elseif($soal->tipe === 'multiple_choice')
-                        <span class="sbadge sbadge-purple">Multiple Choice</span>
-                    @endif
+                    @switch($soal->tipe)
+                        @case('pilihan_ganda')
+                            <span class="sbadge sbadge-blue">Pilihan Ganda</span>
+                            @break
+                        @case('multiple_choice')
+                            <span class="sbadge sbadge-purple">Multiple Choice</span>
+                            @break
+                        @case('essay')
+                            <span class="sbadge sbadge-green">Uraian / Essay</span>
+                            @break
+                        @case('short_answer')
+                            <span class="sbadge sbadge-cyan">Jawaban Singkat</span>
+                            @break
+                        @case('matching')
+                            <span class="sbadge sbadge-indigo">Jodohkan</span>
+                            @break
+                        @case('audio')
+                            <span class="sbadge sbadge-amber">Listening (Audio)</span>
+                            @break
+                        @case('pilihan_ganda_audio')
+                            <span class="sbadge sbadge-orange">PG Audio</span>
+                            @break
+                        @case('pilihan_ganda_gambar')
+                            <span class="sbadge sbadge-rose">PG Gambar</span>
+                            @break
+                        @default
+                            <span class="sbadge sbadge-blue">{{ str_replace('_', ' ', $soal->tipe) }}</span>
+                    @endswitch
                 </td>
                 <td>{{ $soal->poin }}</td>
                 <td style="color: #94a3b8;">{{ $soal->guru->name ?? '-' }}</td>
