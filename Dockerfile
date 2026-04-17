@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build
 
 # --- Stage 2: PHP Environment ---
-FROM php:8.4-fpm-alpine
+FROM php:8.3-fpm-alpine
 
 # Install system dependencies
 RUN apk add --no-cache \
@@ -21,10 +21,14 @@ RUN apk add --no-cache \
     unzip \
     git \
     oniguruma-dev \
-    icu-dev
+    icu-dev \
+    autoconf \
+    build-base \
+    linux-headers
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
+RUN pecl install redis && docker-php-ext-enable redis
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
