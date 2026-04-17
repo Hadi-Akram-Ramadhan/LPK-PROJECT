@@ -16,17 +16,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sortablejs/1.15.0/Sortable.min.js"></script>
 
-    <!-- DIAGNOSTIC CSS -->
     <style>
-        #diagnostic-bar {
-            position: fixed; top: 0; left: 0; z-index: 9999999;
-            background: rgba(0,0,0,0.8); color: #fff; font-family: monospace;
-            font-size: 10px; padding: 2px 8px; pointer-events: none;
-            display: flex; gap: 10px; border-bottom-right-radius: 4px;
-        }
-        .diag-ok { color: #4ade80; }
-        .diag-err { color: #f87171; }
-
         /* FORCE CLICKABLE FOOTER */
         .cbt-footer { position: relative; z-index: 1000 !important; }
         .ftr-btn { pointer-events: all !important; position: relative; z-index: 1001 !important; }
@@ -398,8 +388,8 @@
                 gap: 6px;
                 flex: 1;
             }
-            #match-col-left { padding-right: 24px; }
-            #match-col-right { padding-left: 24px; }
+            #match-col-left  { padding-right: 24px; }
+            #match-col-right { padding-left:  24px; }
 
             .match-svg { display: block; }
             .match-item { font-size: 11px; padding: 8px 6px; min-height: 40px; }
@@ -667,10 +657,7 @@
     </style>
 </head>
 <body class="bg-gray-100">
-    <div id="diagnostic-bar">
-        <span>SYSTEM: <span id="diag-js" class="diag-err">WAIT</span></span>
-        <span>UI: <span id="diag-ui" class="diag-err">WAIT</span></span>
-    </div>
+
 
     <div id="landscape-overlay">
         <svg class="rotate-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1011,21 +998,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const diagJs = document.getElementById('diag-js');
-        const diagUi = document.getElementById('diag-ui');
-
-        function setStatus(id, ok, msg) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.innerText = ok ? 'OK' : 'ERR';
-            el.className = ok ? 'diag-ok' : 'diag-err';
-            if (!ok && msg) console.error("Diagnostic Error:", msg);
-        }
-
-        try {
-            // ANTI SCREENSHOT & RIGHT CLICK
-            document.addEventListener('contextmenu', event => event.preventDefault());
-
             // MODAL
             const modal = document.getElementById('modal-show-all');
             const btnShowAll = document.getElementById('btn-show-all');
@@ -1037,7 +1009,7 @@
                 document.getElementById('btn-close-modal-bottom').addEventListener('click', () => modal.style.display = 'none');
             }
 
-            setStatus('diag-ui', true);
+
 
             // TIMER
             let timeRemaining = window.TIMER_SECONDS;
@@ -1056,10 +1028,43 @@
                 }, 1000);
             }
 
-            // ANTI CHEAT (SIMPLIFIED FOR DEBUG)
+            // ANTI CHEAT
             let isNavigating = false;
-            document.querySelectorAll('a[href], button[onclick*="submit"]').forEach(el => {
+            document.querySelectorAll('a[href], button[onclick*="submit"], button.hdr-btn-finish, a.ftr-btn, button.ftr-btn').forEach(el => {
                 el.addEventListener('click', () => { isNavigating = true; });
+            });
+
+            // Report Cheat Function
+            const reportCheat = () => {
+                if (isNavigating || window.IS_TRYOUT) return;
+
+                fetch(window.REPORT_CHEAT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                })
+                .catch(err => console.error("Cheat reporting failed:", err));
+            };
+
+            // Detect Tab Switch / Minimize
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    reportCheat();
+                }
+            });
+
+            // Detect Blur (Clicking outside browser)
+            window.addEventListener('blur', () => {
+                reportCheat();
             });
 
             // ── GENERAL SUBMIT & SOAL ID (defined at outer scope so auto-save works for all types) ──
@@ -1319,10 +1324,7 @@
             setupAudioLimiter('.soal-audio');
             setupAudioLimiter('.opsi-audio');
 
-            setStatus('diag-js', true);
-        } catch (err) {
-            setStatus('diag-js', false, err.message);
-        }
+
      });
 </script>
 

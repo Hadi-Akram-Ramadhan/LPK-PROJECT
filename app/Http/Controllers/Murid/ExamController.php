@@ -230,21 +230,14 @@ class ExamController extends Controller
             $dataUpdate['jawaban_text'] = $request->jawaban;
             $jawabanArr = json_decode($request->jawaban, true) ?? [];
 
-            // Pairs disimpan berurutan — pair[i].kiri harus dipasangkan ke pair[i].kanan (index i di kanan yang diacak)
-            // UI menyimpan: mapping[promptIndex] = rightShuffledIndex
-            // shuffleMap dikirim juga dari JS: shuffleMap[rightShuffledIndex] = originalPairIndex
-            $shuffleMap = json_decode($request->shuffle_map ?? '[]', true) ?? [];
-
             $pairs = $soal->pilihanJawabans()->get();
             $totalPairs = $pairs->count();
 
             if ($totalPairs > 0) {
                 $benar = 0;
-                foreach ($jawabanArr as $promptIdx => $rightShuffledIdx) {
-                    // Konversi rightShuffledIdx ke originalPairIndex
-                    $originalPairIdx = isset($shuffleMap[$rightShuffledIdx]) ? (int)$shuffleMap[$rightShuffledIdx] : (int)$rightShuffledIdx;
-                    // Pasangan benar: promptIdx harus sama dengan originalPairIdx
-                    if ((int)$promptIdx === $originalPairIdx) {
+                foreach ($jawabanArr as $promptIdx => $rightOriginalIdx) {
+                    // Pasangan benar: promptIdx harus sama dengan rightOriginalId (pieceId yang dikirim frontend)
+                    if ((int)$promptIdx === (int)$rightOriginalIdx) {
                         $benar++;
                     }
                 }
