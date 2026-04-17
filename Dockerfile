@@ -24,9 +24,13 @@ RUN apk add --no-cache \
     icu-dev \
     autoconf \
     build-base \
-    linux-headers
+    linux-headers \
+    libjpeg-turbo-dev \
+    libwebp-dev \
+    freetype-dev
 
 # Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 RUN pecl install redis && docker-php-ext-enable redis
 
