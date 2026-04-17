@@ -48,10 +48,12 @@ RUN composer install --no-dev --optimize-autoloader
 # Setup configurations
 COPY ./deployment/nginx.conf /etc/nginx/http.d/default.conf
 COPY ./deployment/supervisor.conf /etc/supervisor/conf.d/supervisord.conf
+COPY ./deployment/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
-# File permissions
+# File permissions & Storage Link
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN php artisan storage:link --force
 
 # Create log directories for supervisor
 RUN mkdir -p /var/log/supervisor
