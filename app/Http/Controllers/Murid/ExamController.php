@@ -242,7 +242,7 @@ class ExamController extends Controller
                     }
                 }
                 // Partial scoring: proporsional
-                $poinDidapat = (int) round($soal->poin * ($benar / $totalPairs));
+                $poinDidapat = round($soal->poin * ($benar / $totalPairs), 2);
             }
         }
 

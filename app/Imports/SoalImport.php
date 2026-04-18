@@ -63,7 +63,7 @@ class SoalImport
             // 4=Opsi A/Pasang Kiri 1, 5=Media A/Pasang Kanan 1, 6=Opsi B/Pasang Kiri 2, 7=Media B/Pasang Kanan 2, ...
             // 14=Jawaban Benar, 15=Poin
             
-            $poin         = max(1, (int) ($row[15] ?? 10));
+            $poin         = (float) ($row[15] ?? 10.00);
             $gambarRaw    = trim($row[2] ?? '');
             $audioRaw     = trim($row[3] ?? '');
             $jawabanKunci = trim($row[14] ?? '');
@@ -143,6 +143,7 @@ class SoalImport
                             $mediaPath = null;
                             
                             if ($mediaRaw !== '') {
+                                // Default to audio if the type implies it, otherwise assume image based on common logic
                                 $mediaTipe = ($tipeEnum === 'pilihan_ganda_audio') ? 'audio' : 'gambar';
                                 $mediaPath = $mediaTipe . '/' . $mediaRaw;
                             }
@@ -162,6 +163,8 @@ class SoalImport
                 $this->sukses++;
             } catch (\Throwable $e) {
                 DB::rollBack();
+                // Optionally log the error message for debugging
+                // \Log::error("Import failed for row: " . $e->getMessage());
                 $this->gagal++;
             }
         }

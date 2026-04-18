@@ -60,7 +60,7 @@ class SoalController extends Controller
             'paket_soal_id'  => 'required|exists:paket_soals,id',
             'tipe'           => 'required|in:' . implode(',', self::TIPE_VALID),
             'pertanyaan'     => 'required|string|max:2000',
-            'poin'           => 'required|integer|min:1|max:1000',
+            'poin'           => 'required|numeric|min:0.01|max:1000',
             'audio_path'     => 'nullable|string|max:255',
             'gambar_path'    => 'nullable|string|max:255',
             'audio_max_play' => 'nullable|integer|min:1|max:99',
@@ -111,7 +111,7 @@ class SoalController extends Controller
     {
         $request->validate([
             'pertanyaan'     => 'required|string|max:2000',
-            'poin'           => 'required|integer|min:1|max:1000',
+            'poin'           => 'required|numeric|min:0.01|max:1000',
             'audio_path'     => 'nullable|string|max:255',
             'gambar_path'    => 'nullable|string|max:255',
             'audio_max_play' => 'nullable|integer|min:1|max:99',
