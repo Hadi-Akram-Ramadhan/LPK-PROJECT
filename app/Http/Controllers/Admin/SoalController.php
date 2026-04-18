@@ -25,7 +25,7 @@ class SoalController extends Controller
         'pilihan_ganda', 'multiple_choice', 'essay', 'audio',
         'pilihan_ganda_audio', 'pilihan_ganda_gambar', 'short_answer', 'matching'
     ];
-    const TIPE_LISTENING = ['audio', 'pilihan_ganda_audio'];
+    const TIPE_LISTENING = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
 
     /**
      * Display a listing of the resource.
@@ -199,7 +199,7 @@ class SoalController extends Controller
                 return response()->json(['success' => false, 'message' => 'Format audio tidak valid. Gunakan MP3, WAV, atau OGG.'], 422);
             }
             $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $ext;
-            $file->storeAs('audio', $filename, 'public');
+            $file->storeAs('audio', $filename, 'local');
             return response()->json(['success' => true, 'path' => 'audio/' . $filename, 'filename' => $filename]);
         }
     }
@@ -359,8 +359,8 @@ class SoalController extends Controller
         $sheet->fromArray(['Essay', 'Sebutkan 3 alat transportasi dalam bahasa Korea!', '', '', '', '', '', '', '', '', '', '', '', '', '', '20'], null, 'A4');
         // Contoh baris 5 — Audio
         $sheet->fromArray(['Audio', 'Dengarkan audio dan pilih jawaban yang tepat.', '', 'suara-soal-10.mp3', 'Pilih A', '', 'Pilih B', '', 'Pilih C', '', 'Pilih D', '', '', '', 'C', '10'], null, 'A5');
-        // Contoh baris 6 — Pilihan Ganda Gambar
-        $sheet->fromArray(['Pilihan Ganda Gambar', 'Manakah gambar yang menunjukkan stasiun?', 'gambar-tanya.jpg', '', '', 'stasiun.jpg', '', 'kantor.png', '', 'pasar.jpg', '', 'mall.png', '', '', 'A', '10'], null, 'A6');
+        // Contoh baris 6 — Pilihan Ganda Gambar (Bisa Soal Audio juga)
+        $sheet->fromArray(['Listening Gambar', 'Manakah gambar yang menunjukkan stasiun?', '', 'suara-soal.mp3', '', 'stasiun.jpg', '', 'kantor.png', '', 'pasar.jpg', '', 'mall.png', '', '', 'A', '10'], null, 'A6');
         // Contoh baris 7 — Short Answer
         $sheet->fromArray(['Short Answer', 'Apa nama ibukota Korea Selatan?', '', '', '', '', '', '', '', '', '', '', '', '', 'Seoul|Seol|서울', '15'], null, 'A7');
         // Contoh baris 8 — Matching
@@ -393,7 +393,7 @@ class SoalController extends Controller
             ['→ Essay', 'Jawaban bebas, dinilai manual guru. Kolom O: kosong.'],
             ['→ Short Answer', 'Isian singkat, dinilai otomatis. Kolom O: kunci|alternatif.'],
             ['→ Audio', 'Soal listening. Kolom D wajib diisi nama file mp3.'],
-            ['→ Pilihan Ganda Gambar', 'Opsi jawaban berupa gambar. Isi Kolom F/H/J/L/N dengan nama file gambar.'],
+            ['→ Pilihan Ganda Gambar / Listening Gambar', 'Opsi jawaban berupa gambar. Isi Kolom F/H/J/L/N dengan nama file gambar. Khusus Listening Gambar, Anda juga bisa mengisi Kolom D dengan audio soal.'],
             ['→ Pilihan Ganda Audio', 'Opsi jawaban berupa audio. Isi Kolom F/H/J/L/N dengan nama file mp3.'],
             ['→ Matching', 'Pasangkan. Kolom E/F = Pasang 1 (kiri/kanan), G/H = Pasang 2, dst. Kolom O: isi tanda - (minus).'],
             [''],
@@ -402,6 +402,8 @@ class SoalController extends Controller
             ['2. Nama file gambar/audio CASE SENSITIVE. "mobil.jpg" beda dengan "Mobil.jpg".'],
             ['3. SATU FILE EXCEL = SATU PAKET SOAL. Jangan campur paket berbeda.'],
             ['4. Untuk Matching dengan gambar: isi kolom kiri/kanan dengan nama file gambar (misal: apel.jpg). Sistem otomatis mendeteksi.'],
+            ['5. PENGAMANAN AUDIO: Jumlah putar audio kini dicatat ketat oleh server. Siswa tidak bisa mencurangi jatah putar.'],
+            ['6. SANITASI HTML: Hanya tag dasar (b, i, u, br, p) yang diizinkan di teks pertanyaan. Semua atribut gaya/warna akan dihapus demi keamanan.'],
         ];
 
         foreach ($guideRows as $i => $rowData) {

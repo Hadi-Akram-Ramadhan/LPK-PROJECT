@@ -32,8 +32,8 @@ function updateUIBasedOnType() {
     };
 
     // Audio section — show only for listening types
-    ids.audio.style.display  = ['audio','pilihan_ganda_audio'].includes(val) ? 'block' : 'none';
-    if (!['audio','pilihan_ganda_audio'].includes(val)) {
+    ids.audio.style.display  = ['audio','pilihan_ganda_audio','pilihan_ganda_gambar'].includes(val) ? 'block' : 'none';
+    if (!['audio','pilihan_ganda_audio','pilihan_ganda_gambar'].includes(val)) {
         const ap = document.getElementById('audio_path');
         if (ap) ap.value = '';
     }

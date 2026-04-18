@@ -19,37 +19,35 @@ class HtmlSanitizer
             return '';
         }
 
-        // Remove <script> and <style> tags with content
+        // 1. Remove <script> and <style> tags with content
         $html = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $html);
         $html = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $html);
 
-        // Remove dangerous tags
+        // 2. Remove dangerous tags
         $dangerous = ['iframe', 'object', 'embed', 'form', 'input', 'textarea', 'select', 'button', 'link', 'meta', 'base', 'applet', 'svg', 'math'];
         foreach ($dangerous as $tag) {
             $html = preg_replace('/<' . $tag . '\b[^>]*>.*?<\/' . $tag . '>/is', '', $html);
             $html = preg_replace('/<' . $tag . '\b[^>]*\/?>/is', '', $html);
         }
 
-        // Remove all on* event handlers
+        // 3. Remove all on* event handlers and javascript: protocols
         $html = preg_replace('/\s+on\w+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]*)/i', '', $html);
-
-        // Remove javascript:/vbscript:/data: in href/src
         $html = preg_replace('/\b(href|src|action|formaction)\s*=\s*["\']?\s*(?:javascript|vbscript|data)\s*:[^"\'>\s]*/i', '', $html);
 
-        // Sanitize style attributes - remove expression/url
-        $html = preg_replace_callback('/style\s*=\s*"([^"]*)"/i', function ($m) {
-            $s = preg_replace('/expression\s*\(/i', '', $m[1]);
-            $s = preg_replace('/url\s*\(/i', '', $s);
-            $s = preg_replace('/javascript\s*:/i', '', $s);
-            return 'style="' . $s . '"';
-        }, $html);
-
-        // Strip to allowed tags only
+        // 4. Strip to allowed tags only
         $allowed = implode('', array_map(fn($t) => "<{$t}>", self::ALLOWED_TAGS));
         $html = strip_tags($html, $allowed);
 
-        // Final pass: remove any remaining on* handlers
-        $html = preg_replace('/\s+on\w+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]*)/i', '', $html);
+        // 5. CRITICAL: Remove all attributes from the remaining tags to prevent attribute breakout/XSS
+        // Since we only allow formatting tags like b, i, p, etc., they don't NEED attributes.
+        // Regex looks for any attribute in a tag like <p class="foo"> and converts it to <p>
+        $html = preg_replace_callback('/<([a-z1-6]+)\s+[^>]*>/i', function($matches) {
+            $tag = strtolower($matches[1]);
+            if (in_array($tag, self::ALLOWED_TAGS)) {
+                return "<{$tag}>";
+            }
+            return $matches[0];
+        }, $html);
 
         return trim($html);
     }

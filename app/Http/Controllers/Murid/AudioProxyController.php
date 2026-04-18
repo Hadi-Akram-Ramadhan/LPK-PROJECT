@@ -1,0 +1,114 @@
+<?php
+
+namespace App\Http\Controllers\Murid;
+
+use App\Http\Controllers\Controller;
+use App\Models\Soal;
+use App\Models\PilihanJawaban;
+use App\Models\UjianPeserta;
+use App\Models\AudioPlaybackLog;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
+
+class AudioProxyController extends Controller
+{
+    /**
+     * Stream protected audio file and enforce playback limits in the backend.
+     */
+    public function stream(Request $request, UjianPeserta $ujian_peserta, $id, $type)
+    {
+        // 1. Basic Auth & Status Check
+        if ($ujian_peserta->user_id !== auth()->id()) abort(403, 'Unauthorized access.');
+        if ($ujian_peserta->status !== 'mengerjakan') abort(403, 'Exam is not in progress.');
+
+        // 2. Validate Time (Sync with ExamController logic)
+        $mulaiAt = Carbon::parse($ujian_peserta->mulai_at);
+        $deadline = $mulaiAt->copy()->addMinutes($ujian_peserta->ujian->durasi);
+        if (now()->gt($deadline)) abort(403, 'Time limit exceeded.');
+
+        $soal_id = null;
+        $opsi_id = null;
+        $audioPath = null;
+        $maxPlay = 0;
+
+        // 3. Identify Media & Max Play Count
+        if ($type === 'soal') {
+            $soal = Soal::findOrFail($id);
+            $soal_id = $soal->id;
+            $audioPath = $soal->audio_path;
+            $maxPlay = $soal->audio_max_play;
+        } else {
+            $opsi = PilihanJawaban::findOrFail($id);
+            $soal_id = $opsi->soal_id;
+            $opsi_id = $opsi->id;
+            $audioPath = $opsi->media_path;
+            $maxPlay = $opsi->audio_max_play;
+        }
+
+        if (!$audioPath) abort(404, 'Audio file not found for this item.');
+
+        // 4. Check Backend Limits
+        if ($maxPlay > 0) {
+            $log = AudioPlaybackLog::firstOrCreate([
+                'ujian_peserta_id' => $ujian_peserta->id,
+                'soal_id' => $soal_id,
+                'pilihan_jawaban_id' => $opsi_id
+            ]);
+
+            if ($log->play_count >= $maxPlay) {
+                abort(403, 'Playback limit reached.');
+            }
+
+            // Increment count immediately on request
+            // Note: In a production app with high-bandwidth, you might prefer doing this 
+            // via a separate telemetry ping. But for strict enforcement, this is safer.
+            $log->increment('play_count');
+        }
+
+        // 5. Serve the File from PRIVATE storage
+        // The file is expected to be in storage/app/audio/filename.mp3
+        // $audioPath in DB is typically "audio/filename.mp3"
+        if (!Storage::disk('local')->exists($audioPath)) {
+            // Check if it's still in public (for backward compatibility if move failed)
+            if (Storage::disk('public')->exists($audioPath)) {
+                return response()->file(Storage::disk('public')->path($audioPath));
+            }
+            abort(404, 'Physical audio file not found on server.');
+        }
+
+        return response()->file(Storage::disk('local')->path($audioPath));
+    }
+
+    /**
+     * Stream audio for Preview mode (Admin/Guru) with NO playback limits.
+     */
+    public function streamPreview(Request $request, $id, $type)
+    {
+        // 1. Auth Check (Admin or Guru only)
+        if (!auth()->user()->isAdmin() && !auth()->user()->isGuru()) abort(403);
+
+        $audioPath = null;
+
+        // 2. Identify Media
+        if ($type === 'soal') {
+            $soal = Soal::findOrFail($id);
+            $audioPath = $soal->audio_path;
+        } else {
+            $opsi = PilihanJawaban::findOrFail($id);
+            $audioPath = $opsi->media_path;
+        }
+
+        if (!$audioPath) abort(404, 'Audio file not found.');
+
+        // 3. Serve the File (NO play count enhancement here)
+        if (!Storage::disk('local')->exists($audioPath)) {
+            if (Storage::disk('public')->exists($audioPath)) {
+                return response()->file(Storage::disk('public')->path($audioPath));
+            }
+            abort(404, 'Logical file found but physical file is missing.');
+        }
+
+        return response()->file(Storage::disk('local')->path($audioPath));
+    }
+}

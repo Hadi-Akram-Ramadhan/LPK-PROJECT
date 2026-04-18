@@ -27,9 +27,12 @@ class ExamController extends Controller
                 $q->where('jenis_ujian', 'tryout');
             })->get();
 
+        /** @var \App\Models\UjianPeserta $tp */
         foreach($finishedTryouts as $tp) {
             // Hapus jawaban-jawabannya dulu
             JawabanMurid::where('ujian_peserta_id', $tp->id)->delete();
+            // Hapus log audio
+            \App\Models\AudioPlaybackLog::where('ujian_peserta_id', $tp->id)->delete();
             // Reset status jadi belum
             $tp->update([
                 'status' => 'belum',
@@ -116,7 +119,7 @@ class ExamController extends Controller
             return redirect()->route('murid.dashboard')->with('error', 'Ujian ini belum memiliki soal. Silakan hubungi admin.');
         }
 
-        $page = (int) $request->get('page', 1);
+        $page = (int) $request->input('page', 1);
         $soals = $soals->values(); // Penting: Reset index agar berurutan dari 0
         
         if ($page < 1) $page = 1;
@@ -152,9 +155,18 @@ class ExamController extends Controller
             return $this->forceFinish($ujian_peserta);
         }
 
+        // Ambil logs playback audio untuk soal ini
+        $audioLogs = \App\Models\AudioPlaybackLog::where('ujian_peserta_id', $ujian_peserta->id)
+            ->where('soal_id', $currentSoal->id)
+            ->get()
+            ->keyBy(function($item) {
+                return $item->pilihan_jawaban_id ? 'opsi_'.$item->pilihan_jawaban_id : 'soal';
+            });
+
         return view('murid.exam.show', compact(
             'ujian_peserta', 'ujian', 'soals', 'currentSoal', 
-            'page', 'totalSoal', 'jawabanSaatIni', 'answeredSoalIds', 'sisaDetik', 'deadline'
+            'page', 'totalSoal', 'jawabanSaatIni', 'answeredSoalIds', 'sisaDetik', 'deadline',
+            'audioLogs'
         ));
     }
 

@@ -44,7 +44,7 @@ class SoalImport
             $tipeEnum = 'pilihan_ganda';
             if (Str::contains($tipeRaw, 'ganda audio')) {
                 $tipeEnum = 'pilihan_ganda_audio';
-            } elseif (Str::contains($tipeRaw, 'ganda gambar')) {
+            } elseif (Str::contains($tipeRaw, 'ganda gambar') || Str::contains($tipeRaw, 'listening gambar')) {
                 $tipeEnum = 'pilihan_ganda_gambar';
             } elseif (Str::contains($tipeRaw, 'multiple')) {
                 $tipeEnum = 'multiple_choice';

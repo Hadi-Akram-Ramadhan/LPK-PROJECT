@@ -28,6 +28,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/password', function() {
             return view('murid.password');
         })->name('murid.password');
+        
+        // Media Proxy
+        Route::get('/exam/media/{ujian_peserta}/{id}/{type}', [\App\Http\Controllers\Murid\AudioProxyController::class, 'stream'])->name('murid.exam.media');
     });
 
 
@@ -141,6 +144,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Shared Media Proxy for Previews
+    Route::get('/exam/media-preview/{id}/{type}', [\App\Http\Controllers\Murid\AudioProxyController::class, 'streamPreview'])->name('shared.media-preview');
 });
 
 require __DIR__.'/auth.php';

@@ -15,17 +15,17 @@ class AudioController extends Controller
      */
     public function index()
     {
-        if (!Storage::disk('public')->exists('audio')) {
-            Storage::disk('public')->makeDirectory('audio');
+        if (!Storage::disk('local')->exists('audio')) {
+            Storage::disk('local')->makeDirectory('audio');
         }
 
-        $files = collect(Storage::disk('public')->files('audio'))->map(function ($file) {
+        $files = collect(Storage::disk('local')->files('audio'))->map(function ($file) {
             return [
                 'name'          => basename($file),
-                'url'           => Storage::url($file),
-                'size'          => round(Storage::disk('public')->size($file) / 1024, 2) . ' KB',
+                'url'           => '#',
+                'size'          => round(Storage::disk('local')->size($file) / 1024, 2) . ' KB',
                 'last_modified' => \Carbon\Carbon::createFromTimestamp(
-                    Storage::disk('public')->lastModified($file)
+                    Storage::disk('local')->lastModified($file)
                 )->diffForHumans(),
             ];
         })->sortByDesc('last_modified')->values();
@@ -58,7 +58,7 @@ class AudioController extends Controller
             if ($res === TRUE) {
                 $extractedCount = 0;
                 $skippedCount = 0;
-                $targetPath = storage_path('app/public/audio');
+                $targetPath = storage_path('app/audio');
                 
                 if (!file_exists($targetPath)) {
                     mkdir($targetPath, 0755, true);
@@ -110,11 +110,11 @@ class AudioController extends Controller
                 ) . '.' . $extension;
         }
 
-        if (Storage::disk('public')->exists('audio/' . $filename)) {
+        if (Storage::disk('local')->exists('audio/' . $filename)) {
             return back()->with('error', "Gagal: File dengan nama \"$filename\" sudah ada. Silakan gunakan nama lain atau ubah nama file Anda.");
         }
 
-        $file->storeAs('audio', $filename, 'public');
+        $file->storeAs('audio', $filename, 'local');
 
         return back()->with('success', "File audio \"$filename\" berhasil diunggah.");
     }
@@ -125,8 +125,8 @@ class AudioController extends Controller
 
         $path = 'audio/' . $request->filename;
 
-        if (Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+        if (Storage::disk('local')->exists($path)) {
+            Storage::disk('local')->delete($path);
             return back()->with('success', 'File audio berhasil dihapus.');
         }
 
@@ -150,13 +150,13 @@ class AudioController extends Controller
         $oldPath = 'audio/' . $oldName;
         $newPath = 'audio/' . $newName;
 
-        if (Storage::disk('public')->exists($newPath)) {
+        if (Storage::disk('local')->exists($newPath)) {
             return back()->with('error', 'File dengan nama tujuan sudah ada. Silakan gunakan nama lain.');
         }
 
-        if (Storage::disk('public')->exists($oldPath)) {
+        if (Storage::disk('local')->exists($oldPath)) {
             // Ubah file fisik
-            Storage::disk('public')->move($oldPath, $newPath);
+            Storage::disk('local')->move($oldPath, $newPath);
 
             // Relational Sync ke Database Soals
             \App\Models\Soal::where('audio_path', 'audio/' . $oldName)->update(['audio_path' => 'audio/' . $newName]);

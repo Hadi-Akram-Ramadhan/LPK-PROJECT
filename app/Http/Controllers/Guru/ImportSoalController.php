@@ -98,9 +98,9 @@ class ImportSoalController extends Controller
             'C', '10',
         ], null, 'A5');
         
-        // Contoh baris 6 - Pilihan Ganda Gambar
+        // Contoh baris 6 - Pilihan Ganda Gambar / Listening Gambar
         $sheet->fromArray([
-            'Pilihan Ganda Gambar', 'Manakah dari gambar berikut yang menunjukkan stasiun?', 'gambar-tanya.jpg', '',
+            'Listening Gambar', 'Manakah dari gambar berikut yang menunjukkan stasiun?', '', 'suara-soal.mp3',
             '', 'stasiun.jpg', '', 'kantor.png', '', 'pasar.jpg', '', 'mall.png', '', '',
             'A', '10',
         ], null, 'A6');
@@ -159,7 +159,7 @@ class ImportSoalController extends Controller
             ['→ Ketik "Short Answer" jika isian singkat yang dinilai sistem otomatis. Kunci Jawaban: lihat bantuan di bawah.'],
             ['→ Ketik "Matching" jika soal menjodohkan. Kunci Jawaban: KOSONGKAN. Pasangan diisi berdampingan (Kolom E dg F, G dg H, I dg J).'],
             ['→ Ketik "Audio" jika ini soal Listening. Kolom D wajib diisi nama file mp3. Kunci Jawaban: A, B, C, D, atau E.'],
-            ['→ Ketik "Pilihan Ganda Gambar" jika opsi A/B/C/D isinya gambar semua. Kunci Jawaban: A, B, C, D, atau E.'],
+            ['→ Ketik "Pilihan Ganda Gambar" atau "Listening Gambar" jika opsi A/B/C/D isinya gambar. Khusus "Listening Gambar" bisa isi kolom D dg audio.'],
             ['→ Ketik "Pilihan Ganda Audio" jika opsi A/B/C/D isinya suara semua. Kunci Jawaban: A, B, C, D, atau E.'],
             [''],
             ['--- BANTUAN UNTUK SOAL ISIAN SINGKAT (Short Answer) ---'],
@@ -173,6 +173,8 @@ class ImportSoalController extends Controller
             ['1. Jangan lupa hapus baris yang berwarna abu-abu (baris 2 sampai 9) sebelum ditaruh data soal asli.'],
             ['2. Huruf besar-kecil pada penamaan file gambar/audio "SANGAT BERPENGARUH". "mobil.jpg" beda dengan "Mobil.jpg" atau "mobil.png". Pada Matching, jika isian berakhiran .jpg/.png otomatis diubah jadi gambar.'],
             ['3. SATU FILE EXCEL UNTUK SATU UJIAN. Jangan campur soal Ujian Seoul dan soal Ujian Busan dalam satu file Excel yang sama.'],
+            ['4. PENGAMANAN AUDIO: Jumlah putar audio kini dicatat ketat oleh server. Siswa tidak bisa mencurangi jatah putar.'],
+            ['5. SANITASI HTML: Hanya tag dasar (b, i, u, br, p) yang diizinkan di teks pertanyaan. Semua atribut gaya/warna akan dihapus demi keamanan.'],
         ];
 
         foreach ($guideRows as $i => $rowData) {

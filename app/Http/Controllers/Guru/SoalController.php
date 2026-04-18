@@ -20,7 +20,7 @@ class SoalController extends Controller
         'pilihan_ganda', 'multiple_choice', 'essay', 'audio',
         'pilihan_ganda_audio', 'pilihan_ganda_gambar', 'short_answer', 'matching'
     ];
-    const TIPE_LISTENING = ['audio', 'pilihan_ganda_audio'];
+    const TIPE_LISTENING = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
 
     public function index(Request $request)
     {
@@ -191,7 +191,7 @@ class SoalController extends Controller
                 return response()->json(['success' => false, 'message' => 'Format audio tidak valid.'], 422);
             }
             $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $ext;
-            $file->storeAs('audio', $filename, 'public');
+            $file->storeAs('audio', $filename, 'local');
             return response()->json(['success' => true, 'path' => 'audio/' . $filename, 'filename' => $filename]);
         }
     }

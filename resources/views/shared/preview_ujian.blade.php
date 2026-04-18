@@ -433,7 +433,7 @@
                 @if($currentSoal->audio_path)
                     <div class="audio-wrapper">
                         <audio controls class="audio-player">
-                            <source src="{{ asset('storage/' . $currentSoal->audio_path) }}" type="audio/mpeg">
+                            <source src="{{ route('shared.media-preview', ['id' => $currentSoal->id, 'type' => 'soal']) }}?v={{ time() }}" type="audio/mpeg">
                         </audio>
                     </div>
                 @endif
@@ -462,11 +462,12 @@
 
                                 @if($opsi->media_tipe === 'audio' && $opsi->media_path)
                                     <audio controls style="height: 40px; max-width: 220px; outline:none;">
-                                        <source src="{{ asset('storage/' . $opsi->media_path) }}" type="audio/mpeg">
+                                        <source src="{{ route('shared.media-preview', ['id' => $opsi->id, 'type' => 'pilihan']) }}?v={{ time() }}" type="audio/mpeg">
                                     </audio>
                                 @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
-                                    <div class="watermark-container">
-                                        <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 120px; border-radius: 6px; border: 1px solid #e5e7eb; padding: 2px; max-width: 100%; object-fit: contain;">
+                                    <div class="watermark-container" style="margin-top: 5px;">
+                                        <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 150px; border-radius: 10px; border: 2px solid #e2e8f0; padding: 4px; max-width: 100%; object-fit: contain; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s;">
+                                        <div class="watermark-overlay small">PREVIEW</div>
                                     </div>
                                 @endif
                             </div>

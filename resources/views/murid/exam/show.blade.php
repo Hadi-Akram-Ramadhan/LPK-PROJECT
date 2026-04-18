@@ -709,10 +709,16 @@
                 @if($currentSoal->audio_path)
                     <div class="audio-wrapper flex-col items-center">
                         <audio controls controlsList="nodownload" class="audio-player soal-audio" preload="none" data-id="soal_{{ $currentSoal->id }}" data-max="{{ $currentSoal->audio_max_play }}">
-                            <source src="{{ asset('storage/' . $currentSoal->audio_path) }}?v={{ $currentSoal->id }}" type="audio/mpeg">
+                            <source src="{{ route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $currentSoal->id, 'type' => 'soal']) }}?v={{ time() }}" type="audio/mpeg">
                         </audio>
                         @if($currentSoal->audio_max_play)
-                            <div class="text-xs text-red-600 mt-2 font-bold audio-counter" id="counter_soal_{{ $currentSoal->id }}">Sisa putar: {{ $currentSoal->audio_max_play }} kali</div>
+                            @php
+                                $played = $audioLogs['soal']->play_count ?? 0;
+                                $sisa = max(0, $currentSoal->audio_max_play - $played);
+                            @endphp
+                            <div class="text-xs text-red-600 mt-2 font-bold audio-counter" id="counter_soal_{{ $currentSoal->id }}" data-remaining="{{ $sisa }}">
+                                {{ $sisa > 0 ? "Sisa putar: $sisa kali" : "Jatah putar habis" }}
+                            </div>
                         @else
                             <div class="text-xs text-slate-500 mt-2">Bebas putar</div>
                         @endif
@@ -746,15 +752,21 @@
                                     <!-- Stop propagation on audio play so the radio button isn't toggled incorrectly on some devices -->
                                     <div onclick="event.stopPropagation()">
                                         <audio controls controlsList="nodownload" preload="none" class="opsi-audio" data-id="opt_{{ $opsi->id }}" data-max="{{ $opsi->audio_max_play }}" style="height: 40px; max-width: 220px; outline:none;">
-                                            <source src="{{ asset('storage/' . $opsi->media_path) }}?v={{ $opsi->id }}" type="audio/mpeg">
+                                            <source src="{{ route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $opsi->id, 'type' => 'pilihan']) }}?v={{ time() }}" type="audio/mpeg">
                                         </audio>
                                         @if($opsi->audio_max_play)
-                                            <div class="text-xs text-red-600 mt-1 audio-counter" id="counter_opt_{{ $opsi->id }}">Sisa: {{ $opsi->audio_max_play }}</div>
+                                            @php
+                                                $playedOpt = $audioLogs['opsi_'.$opsi->id]->play_count ?? 0;
+                                                $sisaOpt = max(0, $opsi->audio_max_play - $playedOpt);
+                                            @endphp
+                                            <div class="text-xs text-red-600 mt-1 audio-counter" id="counter_opt_{{ $opsi->id }}" data-remaining="{{ $sisaOpt }}">
+                                                {{ $sisaOpt > 0 ? "Sisa: $sisaOpt" : "Habis" }}
+                                            </div>
                                         @endif
                                     </div>
                                 @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
-                                    <div class="watermark-container">
-                                        <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 120px; border-radius: 6px; border: 1px solid #e5e7eb; padding: 2px; max-width: 100%; object-fit: contain;" oncontextmenu="return false;" draggable="false">
+                                    <div class="watermark-container" style="margin-top: 8px;">
+                                        <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 160px; border-radius: 12px; border: 2px solid #f1f5f9; padding: 4px; max-width: 100%; object-fit: contain; background: #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.2s;" oncontextmenu="return false;" draggable="false">
                                         <div class="watermark-overlay small">Property of Urisowon</div>
                                     </div>
                                 @endif
@@ -1292,31 +1304,33 @@
                 el.addEventListener('change', function() { submitAnswer({ soal_id: soalId, jawaban: this.value }); });
             });
 
-            // AUDIO LIMITER
+            // AUDIO LIMITER (Hardened)
             function setupAudioLimiter(selector) {
                 document.querySelectorAll(selector).forEach(audioEl => {
-                    const maxPlay = parseInt(audioEl.getAttribute('data-max'));
-                    if (isNaN(maxPlay) || maxPlay <= 0) return;
                     const aid = audioEl.getAttribute('data-id');
                     const counterEl = document.getElementById('counter_' + aid);
-                    const storageKey = 'exam_' + window.EXAM_ID + '_audio_' + aid;
-                    let playCount = parseInt(sessionStorage.getItem(storageKey) || '0');
+                    if (!counterEl) return;
+
+                    let sisa = parseInt(counterEl.getAttribute('data-remaining') || '99');
 
                     const updateInfo = () => {
-                        const sisa = maxPlay - playCount;
-                        if (counterEl) counterEl.textContent = sisa > 0 ? `Sisa: ${sisa}` : 'Habis';
-                        if (playCount >= maxPlay) {
+                        counterEl.textContent = sisa > 0 ? (aid.startsWith('soal') ? `Sisa putar: ${sisa} kali` : `Sisa: ${sisa}`) : 'Habis';
+                        if (sisa <= 0) {
+                            audioEl.pause();
                             audioEl.controls = false;
                             const lock = document.createElement('div');
-                            lock.className = "text-xs p-1 bg-gray-100 border rounded text-gray-400";
+                            lock.className = "text-xs p-1 bg-gray-100 border rounded text-gray-400 mt-2 text-center";
                             lock.textContent = "Limit reached";
                             audioEl.parentElement.replaceChild(lock, audioEl);
                         }
                     };
+
                     updateInfo();
+
                     audioEl.addEventListener('play', () => {
-                        playCount++;
-                        sessionStorage.setItem(storageKey, playCount);
+                        // Backend has already counted this on file request (proxy route)
+                        // This UI decrement is just for immediate feedback
+                        sisa--;
                         updateInfo();
                     }, { once: true });
                 });
