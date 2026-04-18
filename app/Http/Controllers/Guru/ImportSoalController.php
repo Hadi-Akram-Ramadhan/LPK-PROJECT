@@ -150,7 +150,7 @@ class ImportSoalController extends Controller
             ['Kolom E, G, I, K, M', 'Maks 300 karakter per opsi. Untuk Matching: Maks 200 karakter.'],
             ['Kolom F, H, J, L, N', 'OPSIONAL. Matching Sisi Kanan: Maks 200 karakter.'],
             ['Kolom O (Kunci Jawaban)', 'Ketik HURUF dari jawaban yang benar (misal: A, B, atau C).'],
-            ['Kolom P (Poin Nilai)', 'WAJIB DIISI! Ketik angka saja tanpa huruf (contoh: 10 atau 20).'],
+            ['Kolom P (Poin Nilai)', 'WAJIB DIISI! Ketik angka (contoh: 10 atau 2.5).'],
             [''],
             ['--- PILIHAN KATA UNTUK KOLOM "TIPE SOAL" (Kolom A) ---'],
             ['→ Ketik "Pilihan Ganda" jika soal biasa (Hanya ada 1 jawaban benar). Kunci Jawaban: A, B, C, D, atau E.'],

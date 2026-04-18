@@ -40,7 +40,7 @@
             <label for="poin" class="block text-sm font-medium text-slate-700">Poin Soal (Bobot Nilai)</label>
             <input type="number" name="poin" id="poin"
                 value="{{ old('poin', $soal?->poin ?? 10) }}"
-                required min="1" max="1000"
+                required min="0.01" max="1000" step="any"
                 class="mt-1 shadow-sm focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border-slate-300 rounded-md">
         </div>
     </div>

@@ -385,7 +385,7 @@ class SoalController extends Controller
             ['Kolom E, G, I, K, M', 'Maks 300 karakter per opsi. Untuk Matching: Maks 200 karakter.'],
             ['Kolom F, H, J, L, N', 'OPSIONAL. Matching Sisi Kanan: Maks 200 karakter.'],
             ['Kolom O (Kunci Jawaban)', 'Untuk PG: huruf A/B/C. Untuk Multiple Choice: A,B,C. Untuk Matching: isi tanda minus (-). Untuk Short Answer: jawaban|alternatif.'],
-            ['Kolom P (Poin Nilai)', 'WAJIB. Ketik angka saja (contoh: 10 atau 20).'],
+            ['Kolom P (Poin Nilai)', 'WAJIB. Ketik angka (contoh: 10 atau 2.5).'],
             [''],
             ['--- DAFTAR TIPE SOAL YANG VALID (Kolom A) ---'],
             ['→ Pilihan Ganda', 'Satu jawaban benar. Kunci: A, B, C, D, atau E.'],
