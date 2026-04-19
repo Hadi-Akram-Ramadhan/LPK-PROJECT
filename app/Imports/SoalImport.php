@@ -68,8 +68,19 @@ class SoalImport
             $audioRaw     = trim($row[3] ?? '');
             $jawabanKunci = trim($row[14] ?? '');
 
-            $gambarPath = $gambarRaw !== '' ? 'gambar/' . $gambarRaw : null;
-            $audioPath  = $audioRaw !== '' ? 'audio/' . $audioRaw : null;
+            $formatFilename = function ($filename) {
+                $filename = trim($filename);
+                if (empty($filename)) return '';
+                $info = pathinfo($filename);
+                $ext = isset($info['extension']) ? strtolower($info['extension']) : '';
+                return Str::slug($info['filename']) . ($ext ? '.' . $ext : '');
+            };
+
+            $gambarClean = $formatFilename($gambarRaw);
+            $audioClean  = $formatFilename($audioRaw);
+
+            $gambarPath = $gambarClean !== '' ? 'gambar/' . $gambarClean : null;
+            $audioPath  = $audioClean !== '' ? 'audio/' . $audioClean : null;
 
             DB::beginTransaction();
             try {
@@ -101,8 +112,8 @@ class SoalImport
                         $kiriIsGambar  = !empty($pasang['kiri']) && preg_match('/\.(jpg|jpeg|png|webp|gif)$/i', $pasang['kiri']);
                         $kananIsGambar = !empty($pasang['kanan']) && preg_match('/\.(jpg|jpeg|png|webp|gif)$/i', $pasang['kanan']);
 
-                        $kiriVal  = $kiriIsGambar  ? 'gambar/' . $pasang['kiri']  : $pasang['kiri'];
-                        $kananVal = $kananIsGambar ? 'gambar/' . $pasang['kanan'] : $pasang['kanan'];
+                        $kiriVal  = $kiriIsGambar  ? 'gambar/' . $formatFilename($pasang['kiri'])  : $pasang['kiri'];
+                        $kananVal = $kananIsGambar ? 'gambar/' . $formatFilename($pasang['kanan']) : $pasang['kanan'];
 
                         if ($kiriIsGambar && $kananIsGambar) {
                             $mediaTipe = 'matching_gambar_keduanya';
@@ -143,9 +154,10 @@ class SoalImport
                             $mediaPath = null;
                             
                             if ($mediaRaw !== '') {
+                                $mediaClean = $formatFilename($mediaRaw);
                                 // Default to audio if the type implies it, otherwise assume image based on common logic
                                 $mediaTipe = ($tipeEnum === 'pilihan_ganda_audio') ? 'audio' : 'gambar';
-                                $mediaPath = $mediaTipe . '/' . $mediaRaw;
+                                $mediaPath = $mediaTipe . '/' . $mediaClean;
                             }
                             
                             PilihanJawaban::create([

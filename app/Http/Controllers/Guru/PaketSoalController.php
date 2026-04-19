@@ -52,7 +52,7 @@ class PaketSoalController extends Controller
             $query->where('pertanyaan', 'like', '%' . $request->search . '%');
         }
 
-        $soals = $query->latest()->paginate(20);
+        $soals = $query->paginate(20);
         return view('guru.paket_soal.show', compact('paketSoal', 'soals'));
     }
 

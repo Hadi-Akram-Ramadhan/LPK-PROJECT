@@ -33,7 +33,7 @@ class PaketSoal extends Model
 
     public function soals()
     {
-        return $this->hasMany(Soal::class, 'paket_soal_id');
+        return $this->hasMany(Soal::class, 'paket_soal_id')->orderBy('id', 'asc');
     }
 
     public function getTotalSoalAttribute()
