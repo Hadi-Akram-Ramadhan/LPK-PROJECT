@@ -19,7 +19,7 @@ class AudioController extends Controller
         $files = collect(Storage::disk('local')->files('audio'))->map(function ($file) {
             return [
                 'name' => basename($file),
-                'url' => '#', // No direct URL for protected audio
+                'url' => route('admin.audio.stream', ['filename' => basename($file)]),
                 'size' => round(Storage::disk('local')->size($file) / 1024, 2) . ' KB',
                 'last_modified' => \Carbon\Carbon::createFromTimestamp(Storage::disk('local')->lastModified($file))->diffForHumans(),
             ];

@@ -92,9 +92,9 @@
                 </h3>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto overflow-y-auto max-h-[600px] relative">
                 <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-50">
+                    <thead class="bg-slate-50 sticky top-0 z-10">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Preview &amp; File</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Ukuran</th>
@@ -107,7 +107,7 @@
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="flex items-center space-x-4">
-                                    <div class="flex-shrink-0 h-12 w-12 border border-slate-200 rounded-md overflow-hidden bg-slate-100 flex items-center justify-center">
+                                    <div class="flex-shrink-0 h-12 w-12 border border-slate-200 rounded-md overflow-hidden bg-slate-100 flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity" onclick="viewImage('{{ $file['url'] }}')">
                                         <img src="{{ $file['url'] }}" alt="{{ $file['name'] }}" class="object-cover w-full h-full">
                                     </div>
                                     <div class="flex flex-col">
@@ -161,6 +161,22 @@
 </div>
 
 <script>
+    function viewImage(url) {
+        Swal.fire({
+            imageUrl: url,
+            imageAlt: 'Preview Image',
+            showConfirmButton: false,
+            showCloseButton: true,
+            width: 'auto',
+            padding: '1rem',
+            background: 'transparent',
+            backdrop: 'rgba(0,0,0,0.85)',
+            customClass: {
+                image: 'max-h-[85vh] max-w-[90vw] object-contain rounded-lg shadow-2xl m-0'
+            }
+        });
+    }
+
     function renameFile(oldName, routeUrl) {
         Swal.fire({
             title: 'Ubah Nama File',
