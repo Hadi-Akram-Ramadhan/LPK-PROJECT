@@ -60,10 +60,16 @@ class AudioProxyController extends Controller
                 abort(403, 'Playback limit reached.');
             }
 
-            // Increment count immediately on request
-            // Note: In a production app with high-bandwidth, you might prefer doing this 
-            // via a separate telemetry ping. But for strict enforcement, this is safer.
-            $log->increment('play_count');
+            // Debounce mechanism: only increment play_count once every 10 seconds for the same audio
+            $cacheKey = "audio_lock_{$ujian_peserta->id}_{$soal_id}_{$opsi_id}";
+            if (!\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+                $range = $request->header('Range');
+                // Only increment on the initial byte requests, ignore deep seek requests
+                if (!$range || str_starts_with($range, 'bytes=0')) {
+                    $log->increment('play_count');
+                    \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addSeconds(10));
+                }
+            }
         }
 
         // 5. Serve the File from PRIVATE storage

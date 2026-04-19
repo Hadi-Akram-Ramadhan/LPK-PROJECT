@@ -129,16 +129,18 @@
         }
 
         // Animate Out
-        currentSlide.classList.remove('translate-x-0', 'opacity-100');
-        currentSlide.classList.add('-translate-x-full', 'opacity-0');
+        currentSlide.style.transform = 'translateX(-100%)';
+        currentSlide.style.opacity = '0';
         setTimeout(() => {
-            currentSlide.classList.add('pointer-events-none');
-            currentSlide.classList.remove('z-20');
+            currentSlide.style.pointerEvents = 'none';
+            currentSlide.style.zIndex = '0';
         }, 500);
 
         // Animate In
-        targetSlide.classList.remove('translate-x-full', 'opacity-0', 'pointer-events-none');
-        targetSlide.classList.add('translate-x-0', 'opacity-100', 'z-20');
+        targetSlide.style.pointerEvents = 'auto';
+        targetSlide.style.transform = 'translateX(0%)';
+        targetSlide.style.opacity = '1';
+        targetSlide.style.zIndex = '20';
 
         // Focus logic
         setTimeout(() => {
