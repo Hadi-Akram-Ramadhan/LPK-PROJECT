@@ -58,7 +58,7 @@ class AudioController extends Controller
             if ($res === TRUE) {
                 $extractedCount = 0;
                 $skippedCount = 0;
-                $targetPath = storage_path('app/audio');
+                $targetPath = Storage::disk('local')->path('audio');
                 
                 if (!file_exists($targetPath)) {
                     mkdir($targetPath, 0755, true);
