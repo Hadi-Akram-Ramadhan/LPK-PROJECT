@@ -129,7 +129,9 @@
         }
 
         // Animate Out
-        currentSlide.style.transform = 'translateX(-100%)';
+        if (currentIndex !== 0) {
+            currentSlide.style.transform = 'translateX(-100%)';
+        }
         currentSlide.style.opacity = '0';
         setTimeout(() => {
             currentSlide.style.pointerEvents = 'none';
