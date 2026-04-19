@@ -63,11 +63,19 @@
             </div>
         </div>
 
-        <div class="mb-6 flex items-center">
-            <input id="acak_soal" name="acak_soal" type="checkbox" value="1" {{ old('acak_soal') ? 'checked' : '' }} style="width: 20px; height: 20px; color: #2563eb; border-radius: 4px; cursor: pointer;">
-            <label for="acak_soal" style="margin-left: 10px; font-size: 14px; font-weight: 700; color: #334155; cursor: pointer;">
-                Acak urutan soal untuk setiap peserta
-            </label>
+        <div class="grid-2 mb-6" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="display: flex; align-items: center;">
+                <input id="acak_soal" name="acak_soal" type="checkbox" value="1" {{ old('acak_soal') ? 'checked' : '' }} style="width: 20px; height: 20px; color: #2563eb; border-radius: 4px; cursor: pointer;">
+                <label for="acak_soal" style="margin-left: 10px; font-size: 14px; font-weight: 700; color: #334155; cursor: pointer;">
+                    Acak urutan soal
+                </label>
+            </div>
+            <div style="display: flex; align-items: center; background: #eff6ff; padding: 12px; border-radius: 8px; border: 1px solid #bfdbfe;">
+                <input id="tes_buta_warna" name="tes_buta_warna" type="checkbox" value="1" {{ old('tes_buta_warna') ? 'checked' : '' }} style="width: 20px; height: 20px; color: #2563eb; border-radius: 4px; cursor: pointer;">
+                <label for="tes_buta_warna" style="margin-left: 10px; font-size: 14px; font-weight: 800; color: #1e40af; cursor: pointer;">
+                    Aktifkan Sistem Tes Buta Warna
+                </label>
+            </div>
         </div>
 
         <div style="border-top: 2px solid #f1f5f9; padding-top: 32px; margin-top: 32px;">

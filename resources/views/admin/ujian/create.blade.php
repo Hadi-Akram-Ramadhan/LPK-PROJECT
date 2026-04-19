@@ -57,11 +57,19 @@
             </div>
         </div>
 
-        <div class="mb-6 flex items-center">
-            <input id="acak_soal" name="acak_soal" type="checkbox" value="1" {{ old('acak_soal') ? 'checked' : '' }} class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-slate-300 rounded cursor-pointer">
-            <label for="acak_soal" class="ml-2 block text-sm font-bold text-slate-700 cursor-pointer">
-                Acak urutan soal untuk setiap peserta
-            </label>
+        <div class="grid-2 mb-6">
+            <div class="flex items-center">
+                <input id="acak_soal" name="acak_soal" type="checkbox" value="1" {{ old('acak_soal') ? 'checked' : '' }} class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-slate-300 rounded cursor-pointer">
+                <label for="acak_soal" class="ml-2 block text-sm font-bold text-slate-700 cursor-pointer">
+                    Acak urutan soal untuk setiap peserta
+                </label>
+            </div>
+            <div class="flex items-center bg-blue-50 p-3 rounded-lg border border-blue-100">
+                <input id="tes_buta_warna" name="tes_buta_warna" type="checkbox" value="1" {{ old('tes_buta_warna') ? 'checked' : '' }} class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-slate-300 rounded cursor-pointer">
+                <label for="tes_buta_warna" class="ml-2 block text-sm font-bold text-blue-800 cursor-pointer">
+                    Aktifkan Sistem Cerdas Tes Buta Warna
+                </label>
+            </div>
         </div>
 
         <div style="border-top: 2px solid #f1f5f9; padding-top: 32px; margin-top: 32px;">

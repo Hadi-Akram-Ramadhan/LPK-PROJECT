@@ -95,6 +95,12 @@ class ExamController extends Controller
             return redirect()->route('murid.exam.result', $ujian_peserta);
         }
 
+        // --- SISTEM CERDAS TES BUTA WARNA INTERCEPTOR ---
+        // Jika ujian ini mengaktifkan tes buta warna dan murid belum pernah menyelesaikan tesnya
+        if ($ujian_peserta->ujian->tes_buta_warna && is_null($ujian_peserta->hasil_buta_warna)) {
+            return redirect()->route('murid.exam.buta_warna.show', $ujian_peserta);
+        }
+        
         $ujian = $ujian_peserta->ujian;
         $soals = $ujian->soals;
 
