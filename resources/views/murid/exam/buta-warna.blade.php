@@ -29,7 +29,7 @@
                 <div id="slides-container" class="relative overflow-hidden w-full" style="height: 450px;">
                     
                     <!-- Intro Slide -->
-                    <div id="slide-intro" class="slide-item w-full transition-all duration-500 absolute inset-0 flex flex-col justify-center translate-x-0 opacity-100 z-20">
+                    <div id="slide-intro" class="slide-item w-full transition-all duration-500 absolute inset-0 flex flex-col justify-center opacity-100 z-20">
                         <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Instruksi Pengerjaan</h3>
                         <p class="text-slate-600 text-center mb-6 leading-relaxed">
                             Sebagai tahap akhir ujian, Anda diwajibkan melalui pemeriksaan buta warna. Anda akan ditampilkan beberapa plat warna Ishihara secara acak. <strong>Tuliskan angka</strong> yang Anda lihat di setiap gambar tersebut.
@@ -42,7 +42,7 @@
 
                     <!-- Question Slides -->
                     @foreach($soals as $index => $soal)
-                    <div id="slide-{{ $index + 1 }}" class="slide-item w-full transition-all duration-500 absolute inset-0 flex flex-col items-center justify-center translate-x-full opacity-0 pointer-events-none">
+                    <div id="slide-{{ $index + 1 }}" class="slide-item w-full transition-all duration-500 absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none">
                         
                         <div class="w-48 h-48 md:w-56 md:h-56 bg-slate-100 rounded-full border-8 border-white p-1 shadow-lg mb-8 overflow-hidden flex items-center justify-center bg-white group">
                             <img src="{{ asset('storage/' . $soal->gambar_path) }}" alt="Ishihara Plate {{ $index+1 }}" class="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform duration-500">
@@ -66,7 +66,7 @@
                     @endforeach
 
                     <!-- Final Slide -->
-                    <div id="slide-out" class="slide-item w-full transition-all duration-500 absolute inset-0 flex flex-col justify-center items-center translate-x-full opacity-0 pointer-events-none">
+                    <div id="slide-out" class="slide-item w-full transition-all duration-500 absolute inset-0 flex flex-col justify-center items-center opacity-0 pointer-events-none">
                         <div class="w-20 h-20 rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-6">
                             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         </div>
@@ -128,19 +128,15 @@
             document.getElementById('progress-bar').style.width = progress + '%';
         }
 
-        // Animate Out
-        if (currentIndex !== 0) {
-            currentSlide.style.transform = 'translateX(-100%)';
-        }
+        // Animate Out (Fade Out)
         currentSlide.style.opacity = '0';
         setTimeout(() => {
             currentSlide.style.pointerEvents = 'none';
             currentSlide.style.zIndex = '0';
         }, 500);
 
-        // Animate In
+        // Animate In (Fade In)
         targetSlide.style.pointerEvents = 'auto';
-        targetSlide.style.transform = 'translateX(0%)';
         targetSlide.style.opacity = '1';
         targetSlide.style.zIndex = '20';
 
