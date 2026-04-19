@@ -79,7 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'index'])->name('audio.index');
         Route::post('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'store'])->name('audio.store');
         Route::post('/audio/rename', [\App\Http\Controllers\Admin\AudioController::class, 'rename'])->name('audio.rename');
-        Route::get('/audio/stream/{filename}', [\App\Http\Controllers\Admin\AudioController::class, 'stream'])->where('filename', '.*')->name('audio.stream');
+        Route::get('/audio/stream', [\App\Http\Controllers\Admin\AudioController::class, 'stream'])->name('audio.stream');
         Route::delete('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'destroy'])->name('audio.destroy');
 
         // Soal Buta Warna
@@ -132,7 +132,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'index'])->name('audio.index');
         Route::post('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'store'])->name('audio.store');
         Route::post('/audio/rename', [\App\Http\Controllers\Guru\AudioController::class, 'rename'])->name('audio.rename');
-        Route::get('/audio/stream/{filename}', [\App\Http\Controllers\Guru\AudioController::class, 'stream'])->where('filename', '.*')->name('audio.stream');
+        Route::get('/audio/stream', [\App\Http\Controllers\Guru\AudioController::class, 'stream'])->name('audio.stream');
         Route::delete('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'destroy'])->name('audio.destroy');
 
         // Image Explorer (Guru)

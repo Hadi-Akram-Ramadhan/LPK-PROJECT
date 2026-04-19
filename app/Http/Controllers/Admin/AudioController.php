@@ -19,7 +19,7 @@ class AudioController extends Controller
         $files = collect(Storage::disk('local')->files('audio'))->map(function ($file) {
             return [
                 'name' => basename($file),
-                'url' => route('admin.audio.stream', ['filename' => basename($file)]),
+                'url' => route('admin.audio.stream', ['file' => basename($file)]),
                 'size' => round(Storage::disk('local')->size($file) / 1024, 2) . ' KB',
                 'last_modified' => \Carbon\Carbon::createFromTimestamp(Storage::disk('local')->lastModified($file))->diffForHumans(),
             ];
@@ -168,5 +168,18 @@ class AudioController extends Controller
         }
 
         return back()->with('error', 'File sumber tidak ditemukan.');
+    }
+
+    public function stream(\Illuminate\Http\Request $request)
+    {
+        $filename = $request->query('file');
+        if (!$filename) abort(404, 'Audio file not specified.');
+
+        $path = 'audio/' . $filename;
+        if (!Storage::disk('local')->exists($path)) {
+            abort(404, 'Audio file not found.');
+        }
+
+        return response()->file(Storage::disk('local')->path($path));
     }
 }
