@@ -172,8 +172,10 @@ class AudioController extends Controller
 
     public function stream(\Illuminate\Http\Request $request)
     {
-        $filename = $request->query('file');
+        $filename = request()->query('file');
         if (!$filename) abort(404, 'Audio file not specified.');
+        
+        $filename = basename($filename); // Prevent path traversal
 
         $path = 'audio/' . $filename;
         if (!Storage::disk('local')->exists($path)) {
