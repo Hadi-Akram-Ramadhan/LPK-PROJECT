@@ -45,7 +45,7 @@ class SoalController extends Controller
             $paketSoal = PaketSoal::findOrFail($request->paket);
         }
 
-        $audioFiles = collect(Storage::disk('public')->files('audio'))->map(fn($f) => basename($f));
+        $audioFiles = collect(Storage::disk('local')->files('audio'))->map(fn($f) => basename($f));
         $imageFiles = collect(Storage::disk('public')->files('gambar'))->map(fn($f) => basename($f));
 
         return view('admin.soal.create', compact('audioFiles', 'imageFiles', 'paketSoal'));
@@ -102,7 +102,7 @@ class SoalController extends Controller
     public function edit(Soal $soal)
     {
         $soal->load('pilihanJawabans');
-        $audioFiles = collect(Storage::disk('public')->files('audio'))->map(fn($f) => basename($f));
+        $audioFiles = collect(Storage::disk('local')->files('audio'))->map(fn($f) => basename($f));
         $imageFiles = collect(Storage::disk('public')->files('gambar'))->map(fn($f) => basename($f));
         return view('admin.soal.edit', compact('soal', 'audioFiles', 'imageFiles'));
     }

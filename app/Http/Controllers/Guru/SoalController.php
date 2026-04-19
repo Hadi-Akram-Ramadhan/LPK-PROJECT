@@ -35,7 +35,7 @@ class SoalController extends Controller
                 ->where('guru_id', auth()->id())
                 ->firstOrFail();
         }
-        $audioFiles = collect(Storage::disk('public')->files('audio'))->map(fn($f) => basename($f));
+        $audioFiles = collect(Storage::disk('local')->files('audio'))->map(fn($f) => basename($f));
         $imageFiles = collect(Storage::disk('public')->files('gambar'))->map(fn($f) => basename($f));
         return view('guru.soal.create', compact('audioFiles', 'imageFiles', 'paketSoal'));
     }
@@ -93,7 +93,7 @@ class SoalController extends Controller
     {
         if ($soal->guru_id !== auth()->id()) abort(404);
         $soal->load('pilihanJawabans');
-        $audioFiles = collect(Storage::disk('public')->files('audio'))->map(fn($f) => basename($f));
+        $audioFiles = collect(Storage::disk('local')->files('audio'))->map(fn($f) => basename($f));
         $imageFiles = collect(Storage::disk('public')->files('gambar'))->map(fn($f) => basename($f));
         return view('guru.soal.edit', compact('soal', 'audioFiles', 'imageFiles'));
     }
