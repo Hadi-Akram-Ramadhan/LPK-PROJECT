@@ -77,8 +77,11 @@ class AudioController extends Controller
                             continue;
                         }
 
-                        copy("zip://".$file->getRealPath()."#".$filename, $targetPath.'/'.$safeFilename);
-                        $extractedCount++;
+                        $content = $zip->getFromIndex($i);
+                        if ($content !== false) {
+                            file_put_contents($targetPath.'/'.$safeFilename, $content);
+                            $extractedCount++;
+                        }
                     }
                 }
                 $zip->close();
@@ -100,7 +103,7 @@ class AudioController extends Controller
         if ($request->filled('custom_name')) {
             $filename = Str::slug($request->custom_name) . '.' . $extension;
         } else {
-            $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
+            $filename = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
         }
 
         if (Storage::disk('local')->exists('audio/' . $filename)) {
