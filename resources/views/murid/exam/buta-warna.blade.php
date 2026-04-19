@@ -11,7 +11,7 @@
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h2 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Sistem Cerdas</h2>
-                    <p class="text-sm font-semibold text-blue-600 tracking-wider uppercase mt-1">Tes Buta Warna Pendahuluan</p>
+                    <p class="text-sm font-semibold text-blue-600 tracking-wider uppercase mt-1">Tes Buta Warna Terintegrasi</p>
                 </div>
                 <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center border-4 border-white shadow-sm">
                     <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
@@ -26,13 +26,13 @@
             <form id="colorBlindForm" action="{{ route('murid.exam.buta_warna.submit', $ujian_peserta) }}" method="POST">
                 @csrf
                 
-                <div id="slides-container" class="relative overflow-hidden" style="min-h: 300px;">
+                <div id="slides-container" class="relative overflow-hidden w-full" style="height: 450px;">
                     
                     <!-- Intro Slide -->
                     <div id="slide-intro" class="slide-item w-full transition-all duration-500 absolute inset-0 flex flex-col justify-center translate-x-0 opacity-100 z-20">
                         <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Instruksi Pengerjaan</h3>
                         <p class="text-slate-600 text-center mb-6 leading-relaxed">
-                            Ujian ini menerapkan pemeriksaan buta warna wajib sebelum pengerjaan. Anda akan ditampilkan beberapa plat Ishihara. <strong>Tuliskan angka</strong> yang Anda lihat di setiap gambar.
+                            Sebagai tahap akhir ujian, Anda diwajibkan melalui pemeriksaan buta warna. Anda akan ditampilkan beberapa plat warna Ishihara secara acak. <strong>Tuliskan angka</strong> yang Anda lihat di setiap gambar tersebut.
                         </p>
                         <button type="button" onclick="nextSlide(0)" class="mx-auto w-full max-w-xs flex justify-center items-center py-4 px-6 border border-transparent rounded-xl shadow-md text-base font-bold text-white bg-blue-600 hover:bg-blue-700 hover:-translate-y-1 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Mulai Tes
@@ -74,7 +74,7 @@
                         <p class="text-slate-500 mb-8 text-center max-w-xs">Data Anda akan disimpan sebagai lampiran profil medis di dalam rekap ujian.</p>
                         
                         <button type="submit" id="btn-submit-final" class="w-full max-w-xs flex justify-center items-center py-4 px-6 border border-transparent rounded-xl shadow-md text-base font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Masuk Ke Ujian Utama
+                            Lihat Menu Hasil Ujian
                             <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                         </button>
                     </div>

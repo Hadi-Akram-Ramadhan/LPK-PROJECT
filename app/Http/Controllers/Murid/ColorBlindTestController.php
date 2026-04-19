@@ -18,6 +18,9 @@ class ColorBlindTestController extends Controller
 
         // Kalau ujian tidak meminta buta warna atau sudah ada hasilnya
         if (!$ujian_peserta->ujian->tes_buta_warna || !is_null($ujian_peserta->hasil_buta_warna)) {
+            if ($ujian_peserta->status === 'selesai') {
+                return redirect()->route('murid.exam.result', $ujian_peserta);
+            }
             return redirect()->route('murid.exam.show', $ujian_peserta);
         }
 
@@ -25,8 +28,10 @@ class ColorBlindTestController extends Controller
         $soals = SoalButaWarna::inRandomOrder()->limit(5)->get();
 
         if ($soals->isEmpty()) {
-            // Jika admin mengaktifkan tes tapi belum upload soal, skip tes ini.
             $ujian_peserta->update(['hasil_buta_warna' => 'Dilewati (Tidak ada bank soal)']);
+            if ($ujian_peserta->status === 'selesai') {
+                return redirect()->route('murid.exam.result', $ujian_peserta);
+            }
             return redirect()->route('murid.exam.show', $ujian_peserta);
         }
 
@@ -41,6 +46,9 @@ class ColorBlindTestController extends Controller
 
         // Pastikan belum pernah disubmit
         if (!is_null($ujian_peserta->hasil_buta_warna)) {
+            if ($ujian_peserta->status === 'selesai') {
+                return redirect()->route('murid.exam.result', $ujian_peserta);
+            }
             return redirect()->route('murid.exam.show', $ujian_peserta);
         }
 
@@ -81,6 +89,10 @@ class ColorBlindTestController extends Controller
         $ujian_peserta->update([
             'hasil_buta_warna' => $hasilText
         ]);
+
+        if ($ujian_peserta->status === 'selesai') {
+            return redirect()->route('murid.exam.result', $ujian_peserta)->with('success', 'Tes buta warna berhasil. Ujian telah selesai sepenuhnya.');
+        }
 
         return redirect()->route('murid.exam.show', $ujian_peserta)->with('success', 'Tes buta warna berhasil diselesaikan.');
     }
