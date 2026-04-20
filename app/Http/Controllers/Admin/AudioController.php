@@ -69,7 +69,8 @@ class AudioController extends Controller
 
                     $ext = strtolower($fileInfo['extension'] ?? '');
                     if (in_array($ext, ['mp3', 'mpeg', 'mpga', 'wav', 'ogg'])) {
-                        $safeFilename = Str::slug($fileInfo['filename']) . '.' . $ext;
+                        $baseSlug = Str::slug($fileInfo['filename']);
+                        $safeFilename = substr($baseSlug, 0, 70) . '_' . substr(md5($fileInfo['filename']), 0, 5) . '.' . $ext;
                         
                         // Check if exists
                         if (file_exists($targetPath . '/' . $safeFilename)) {
@@ -103,7 +104,8 @@ class AudioController extends Controller
         if ($request->filled('custom_name')) {
             $filename = Str::slug($request->custom_name) . '.' . $extension;
         } else {
-            $filename = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
+            $baseSlug = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+            $filename = time() . '_' . substr($baseSlug, 0, 80) . '.' . $extension;
         }
 
         if (Storage::disk('local')->exists('audio/' . $filename)) {

@@ -72,7 +72,8 @@ class ImageController extends Controller
 
                     $ext = strtolower($fileInfo['extension'] ?? '');
                     if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
-                        $safeFilename = Str::slug($fileInfo['filename']) . '.' . $ext;
+                        $baseSlug = Str::slug($fileInfo['filename']);
+                        $safeFilename = substr($baseSlug, 0, 70) . '_' . substr(md5($fileInfo['filename']), 0, 5) . '.' . $ext;
                         $finalPath = $targetPath . '/' . $safeFilename;
                         
                         // Handle duplicates
@@ -109,9 +110,8 @@ class ImageController extends Controller
         if ($request->filled('custom_name')) {
             $filename = Str::slug($request->custom_name) . '.' . $extension;
         } else {
-            $filename = time() . '_' . Str::slug(
-                    pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
-                ) . '.' . $extension;
+            $baseSlug = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+            $filename = time() . '_' . substr($baseSlug, 0, 80) . '.' . $extension;
         }
 
         if (Storage::disk('public')->exists('gambar/' . $filename)) {

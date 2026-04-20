@@ -26,7 +26,8 @@ class SoalButaWarnaController extends Controller
         ]);
 
         $file = $request->file('gambar');
-        $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $baseSlug = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $filename = time() . '_' . substr($baseSlug, 0, 80) . '.' . $file->getClientOriginalExtension();
         
         // Compress and save directly
         $targetDir = storage_path('app/public/buta_warna');
