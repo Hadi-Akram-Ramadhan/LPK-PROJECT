@@ -83,7 +83,7 @@ class AudioProxyController extends Controller
             abort(404, 'Physical audio file not found on server.');
         }
 
-        return response()->file(Storage::disk('local')->path($audioPath));
+        return $this->serveAudioFile($audioPath);
     }
 
     /**
@@ -107,14 +107,30 @@ class AudioProxyController extends Controller
 
         if (!$audioPath) abort(404, 'Audio file not found.');
 
-        // 3. Serve the File (NO play count enhancement here)
-        if (!Storage::disk('local')->exists($audioPath)) {
-            if (Storage::disk('public')->exists($audioPath)) {
-                return response()->file(Storage::disk('public')->path($audioPath));
-            }
-            abort(404, 'Logical file found but physical file is missing.');
+        return $this->serveAudioFile($audioPath);
+    }
+
+    /**
+     * Private helper to serve the file from multiple disks if needed.
+     */
+    private function serveAudioFile($audioPath)
+    {
+        // Check local first (Private /storage/app/audio/)
+        if (Storage::disk('local')->exists($audioPath)) {
+            return response()->file(Storage::disk('local')->path($audioPath), [
+                'Content-Type' => 'audio/mpeg',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            ]);
         }
 
-        return response()->file(Storage::disk('local')->path($audioPath));
+        // Check public fallback (Public /storage/app/public/gambar/ or audio/)
+        if (Storage::disk('public')->exists($audioPath)) {
+            return response()->file(Storage::disk('public')->path($audioPath), [
+                'Content-Type' => 'audio/mpeg',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            ]);
+        }
+
+        abort(404, 'Physical audio file not found on any disk.');
     }
 }

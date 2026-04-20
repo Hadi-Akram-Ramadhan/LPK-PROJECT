@@ -177,7 +177,7 @@ class SoalController extends Controller
             if (!in_array($ext, $allowedExt)) {
                 return response()->json(['success' => false, 'message' => 'Format gambar tidak valid.'], 422);
             }
-            $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $ext;
+            $filename = time() . '_' . substr(Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)), 0, 80) . '.' . $ext;
             $targetDir = storage_path('app/public/gambar');
             if (!file_exists($targetDir)) mkdir($targetDir, 0755, true);
 
@@ -190,7 +190,7 @@ class SoalController extends Controller
             if (!in_array($ext, $allowedExt)) {
                 return response()->json(['success' => false, 'message' => 'Format audio tidak valid.'], 422);
             }
-            $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $ext;
+            $filename = time() . '_' . substr(Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)), 0, 80) . '.' . $ext;
             $file->storeAs('audio', $filename, 'local');
             return response()->json(['success' => true, 'path' => 'audio/' . $filename, 'filename' => $filename]);
         }
