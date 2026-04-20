@@ -198,7 +198,10 @@ class SoalController extends Controller
             if (!in_array($ext, $allowedExt)) {
                 return response()->json(['success' => false, 'message' => 'Format audio tidak valid. Gunakan MP3, WAV, atau OGG.'], 422);
             }
-            $filename = time() . '_' . substr(Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)), 0, 80) . '.' . $ext;
+             $filename = time() . '_' . substr(Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)), 0, 80) . '.' . $ext;
+            if (!Storage::disk('local')->exists('audio')) {
+                Storage::disk('local')->makeDirectory('audio');
+            }
             $file->storeAs('audio', $filename, 'local');
             return response()->json(['success' => true, 'path' => 'audio/' . $filename, 'filename' => $filename]);
         }

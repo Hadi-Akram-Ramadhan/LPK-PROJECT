@@ -191,6 +191,9 @@ class SoalController extends Controller
                 return response()->json(['success' => false, 'message' => 'Format audio tidak valid.'], 422);
             }
             $filename = time() . '_' . substr(Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)), 0, 80) . '.' . $ext;
+            if (!Storage::disk('local')->exists('audio')) {
+                Storage::disk('local')->makeDirectory('audio');
+            }
             $file->storeAs('audio', $filename, 'local');
             return response()->json(['success' => true, 'path' => 'audio/' . $filename, 'filename' => $filename]);
         }
