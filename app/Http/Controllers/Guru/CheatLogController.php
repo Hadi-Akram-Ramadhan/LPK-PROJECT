@@ -52,8 +52,15 @@ class CheatLogController extends Controller
                 }
             }
 
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'Status pelanggaran berhasil diperbarui.']);
+            }
+
             return back()->with('success', 'Murid berhasil dibuka blokirnya.');
         } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Gagal: ' . $e->getMessage()], 500);
+            }
             return back()->with('error', 'Gagal memproses: ' . $e->getMessage());
         }
     }

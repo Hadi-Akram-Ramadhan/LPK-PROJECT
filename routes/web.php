@@ -23,6 +23,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Anti-Cheat Endpoints
         Route::post('/exam/{ujian_peserta}/report-tab-switch', [\App\Http\Controllers\Murid\ExamController::class, 'reportCheat'])->name('murid.exam.reportCheat');
         Route::get('/exam/{ujian_peserta}/blocked', [\App\Http\Controllers\Murid\ExamController::class, 'blocked'])->name('murid.exam.blocked');
+        // Tes Buta Warna (Sistem Cerdas)
+        Route::get('/exam/{ujian_peserta}/buta-warna', [\App\Http\Controllers\Murid\ColorBlindTestController::class, 'show'])->name('murid.exam.buta_warna.show');
+        Route::post('/exam/{ujian_peserta}/buta-warna', [\App\Http\Controllers\Murid\ColorBlindTestController::class, 'submit'])->name('murid.exam.buta_warna.submit');
 
         // Ganti Password
         Route::get('/password', function() {
@@ -76,7 +79,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'index'])->name('audio.index');
         Route::post('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'store'])->name('audio.store');
         Route::post('/audio/rename', [\App\Http\Controllers\Admin\AudioController::class, 'rename'])->name('audio.rename');
+        Route::get('/audio/stream', [\App\Http\Controllers\Admin\AudioController::class, 'stream'])->name('audio.stream');
         Route::delete('/audio', [\App\Http\Controllers\Admin\AudioController::class, 'destroy'])->name('audio.destroy');
+
+        // Soal Buta Warna
+        Route::get('/soal-buta-warna', [\App\Http\Controllers\Admin\SoalButaWarnaController::class, 'index'])->name('soal_buta_warna.index');
+        Route::post('/soal-buta-warna', [\App\Http\Controllers\Admin\SoalButaWarnaController::class, 'store'])->name('soal_buta_warna.store');
+        Route::delete('/soal-buta-warna/{soal_buta_warna}', [\App\Http\Controllers\Admin\SoalButaWarnaController::class, 'destroy'])->name('soal_buta_warna.destroy');
 
         // Image Explorer
         Route::get('/image', [\App\Http\Controllers\Admin\ImageController::class, 'index'])->name('image.index');
@@ -123,6 +132,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'index'])->name('audio.index');
         Route::post('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'store'])->name('audio.store');
         Route::post('/audio/rename', [\App\Http\Controllers\Guru\AudioController::class, 'rename'])->name('audio.rename');
+        Route::get('/audio/stream', [\App\Http\Controllers\Guru\AudioController::class, 'stream'])->name('audio.stream');
         Route::delete('/audio', [\App\Http\Controllers\Guru\AudioController::class, 'destroy'])->name('audio.destroy');
 
         // Image Explorer (Guru)
@@ -134,6 +144,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Cheat Logs (Guru — hanya ujian milik guru ini)
         Route::get('/cheat-logs', [\App\Http\Controllers\Guru\CheatLogController::class, 'index'])->name('cheat-logs.index');
         Route::post('/cheat-logs/{cheatLog}/approve', [\App\Http\Controllers\Guru\CheatLogController::class, 'approve'])->name('cheat-logs.approve');
+
+        // Soal Buta Warna (Guru)
+        Route::get('/soal-buta-warna', [\App\Http\Controllers\Guru\SoalButaWarnaController::class, 'index'])->name('soal_buta_warna.index');
+        Route::post('/soal-buta-warna', [\App\Http\Controllers\Guru\SoalButaWarnaController::class, 'store'])->name('soal_buta_warna.store');
+        Route::delete('/soal-buta-warna/{soal_buta_warna}', [\App\Http\Controllers\Guru\SoalButaWarnaController::class, 'destroy'])->name('soal_buta_warna.destroy');
+
 
         // Daftar Kelas & Murid
         Route::get('/kelas', [\App\Http\Controllers\Guru\KelasController::class, 'index'])->name('kelas.index');

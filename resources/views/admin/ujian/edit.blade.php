@@ -72,11 +72,19 @@
                     </div>
                 </div>
 
-                <div class="flex items-center">
-                    <input id="acak_soal" name="acak_soal" type="checkbox" value="1" {{ old('acak_soal', $ujian->acak_soal) ? 'checked' : '' }} class="h-4 w-4 text-accent-600 focus:ring-accent-500 border-slate-300 rounded">
-                    <label for="acak_soal" class="ml-2 block text-sm text-slate-700">
-                        Acak urutan soal untuk setiap peserta
-                    </label>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex items-center">
+                        <input id="acak_soal" name="acak_soal" type="checkbox" value="1" {{ old('acak_soal', $ujian->acak_soal) ? 'checked' : '' }} class="h-4 w-4 text-accent-600 focus:ring-accent-500 border-slate-300 rounded">
+                        <label for="acak_soal" class="ml-2 block text-sm text-slate-700">
+                            Acak urutan soal
+                        </label>
+                    </div>
+                    <div class="flex items-center bg-blue-50 p-2 rounded-lg border border-blue-100">
+                        <input id="tes_buta_warna" name="tes_buta_warna" type="checkbox" value="1" {{ old('tes_buta_warna', $ujian->tes_buta_warna) ? 'checked' : '' }} class="h-4 w-4 text-accent-600 focus:ring-accent-500 border-slate-300 rounded">
+                        <label for="tes_buta_warna" class="ml-2 block text-sm font-bold text-blue-800">
+                            Aktifkan Tes Buta Warna
+                        </label>
+                    </div>
                 </div>
             </div>
 

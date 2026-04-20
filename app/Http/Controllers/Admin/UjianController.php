@@ -44,6 +44,7 @@ class UjianController extends Controller
             'mulai' => $request->mulai,
             'selesai' => $request->selesai,
             'acak_soal' => $request->has('acak_soal'),
+            'tes_buta_warna' => $request->has('tes_buta_warna'),
             'guru_id' => auth()->id(),
         ]);
 
@@ -98,6 +99,7 @@ class UjianController extends Controller
             'mulai' => $request->mulai,
             'selesai' => $request->selesai,
             'acak_soal' => $request->has('acak_soal'),
+            'tes_buta_warna' => $request->has('tes_buta_warna'),
         ]);
         
         // Sync Soal

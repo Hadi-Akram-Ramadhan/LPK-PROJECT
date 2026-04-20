@@ -95,6 +95,7 @@ class ExamController extends Controller
             return redirect()->route('murid.exam.result', $ujian_peserta);
         }
 
+        // Sistem Cerdas Tes Buta Warna kini dipindah SETELAH ujian selesai.
         $ujian = $ujian_peserta->ujian;
         $soals = $ujian->soals;
 
@@ -306,6 +307,10 @@ class ExamController extends Controller
             'skor' => $totalSkor
         ]);
 
+        if ($ujian_peserta->ujian->tes_buta_warna && is_null($ujian_peserta->hasil_buta_warna)) {
+            return redirect()->route('murid.exam.buta_warna.show', $ujian_peserta);
+        }
+
         return redirect()->route('murid.exam.result', $ujian_peserta)->with('success', 'Ujian telah selesai.');
     }
 
@@ -397,6 +402,10 @@ class ExamController extends Controller
         if ($ujian_peserta->user_id !== auth()->id() && !auth()->user()->isAdmin() && !auth()->user()->isGuru()) abort(403);
         if ($ujian_peserta->status !== 'selesai') {
             return redirect()->route('murid.dashboard');
+        }
+
+        if ($ujian_peserta->ujian->tes_buta_warna && is_null($ujian_peserta->hasil_buta_warna)) {
+            return redirect()->route('murid.exam.buta_warna.show', $ujian_peserta);
         }
 
         $ujian = $ujian_peserta->ujian;
