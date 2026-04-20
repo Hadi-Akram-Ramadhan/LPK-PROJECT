@@ -184,7 +184,13 @@ class SoalController extends Controller
             if (!in_array($ext, $allowedExt)) {
                 return response()->json(['success' => false, 'message' => 'Format gambar tidak valid. Gunakan JPG, PNG, atau WEBP.'], 422);
             }
-            $filename = time() . '_' . substr(Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)), 0, 80) . '.' . $ext;
+            $baseSlug = substr(Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)), 0, 80);
+            $filename = $baseSlug . '.' . $ext;
+            $counter = 1;
+            while (Storage::disk('public')->exists('gambar/' . $filename)) {
+                $filename = $baseSlug . '-' . $counter . '.' . $ext;
+                $counter++;
+            }
             $targetDir = storage_path('app/public/gambar');
             if (!file_exists($targetDir)) mkdir($targetDir, 0755, true);
 
@@ -198,7 +204,13 @@ class SoalController extends Controller
             if (!in_array($ext, $allowedExt)) {
                 return response()->json(['success' => false, 'message' => 'Format audio tidak valid. Gunakan MP3, WAV, atau OGG.'], 422);
             }
-             $filename = time() . '_' . substr(Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)), 0, 80) . '.' . $ext;
+            $baseSlug = substr(Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)), 0, 80);
+            $filename = $baseSlug . '.' . $ext;
+            $counter = 1;
+            while (Storage::disk('local')->exists('audio/' . $filename)) {
+                $filename = $baseSlug . '-' . $counter . '.' . $ext;
+                $counter++;
+            }
             if (!Storage::disk('local')->exists('audio')) {
                 Storage::disk('local')->makeDirectory('audio');
             }

@@ -73,14 +73,15 @@ class ImageController extends Controller
                     $ext = strtolower($fileInfo['extension'] ?? '');
                     if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
                         $baseSlug = Str::slug($fileInfo['filename']);
-                        $safeFilename = substr($baseSlug, 0, 70) . '_' . substr(md5($fileInfo['filename']), 0, 5) . '.' . $ext;
-                        $finalPath = $targetPath . '/' . $safeFilename;
+                        $ext = strtolower($fileInfo['extension'] ?? '');
                         
-                        // Handle duplicates
-                        if (file_exists($finalPath)) {
-                            $skippedCount++;
-                            continue;
+                        $safeFilename = $baseSlug . '.' . $ext;
+                        $counter = 1;
+                        while (file_exists($targetPath . '/' . $safeFilename)) {
+                            $safeFilename = $baseSlug . '-' . $counter . '.' . $ext;
+                            $counter++;
                         }
+                        $finalPath = $targetPath . '/' . $safeFilename;
 
                         $tempExtractFile = $targetPath . '/temp_' . time() . '_' . $safeFilename;
                         
@@ -108,14 +109,18 @@ class ImageController extends Controller
 
         // Single file upload logic
         if ($request->filled('custom_name')) {
-            $filename = Str::slug($request->custom_name) . '.' . $extension;
+            $baseSlug = Str::slug($request->custom_name);
         } else {
             $baseSlug = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-            $filename = time() . '_' . substr($baseSlug, 0, 80) . '.' . $extension;
         }
-
-        if (Storage::disk('public')->exists('gambar/' . $filename)) {
-            return back()->with('error', "Gagal: Gambar dengan nama \"$filename\" sudah ada. Silakan gunakan nama lain.");
+        
+        $extension = $file->getClientOriginalExtension();
+        $filename = $baseSlug . '.' . $extension;
+        $counter = 1;
+        
+        while (Storage::disk('public')->exists('gambar/' . $filename)) {
+            $filename = $baseSlug . '-' . $counter . '.' . $extension;
+            $counter++;
         }
 
         $targetPath = storage_path('app/public/gambar');
