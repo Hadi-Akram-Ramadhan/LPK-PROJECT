@@ -75,12 +75,13 @@ class AudioController extends Controller
                     $ext = strtolower($fileInfo['extension'] ?? '');
                     if (in_array($ext, ['mp3', 'mpeg', 'mpga', 'wav', 'ogg'])) {
                         $baseSlug = Str::slug($fileInfo['filename']);
-                        $safeFilename = substr($baseSlug, 0, 70) . '_' . substr(md5($fileInfo['filename']), 0, 5) . '.' . $ext;
+                        $ext = strtolower($fileInfo['extension'] ?? '');
                         
-                        // Check if exists
-                        if (file_exists($targetPath . '/' . $safeFilename)) {
-                            $skippedCount++;
-                            continue;
+                        $safeFilename = $baseSlug . '.' . $ext;
+                        $counter = 1;
+                        while (file_exists($targetPath . '/' . $safeFilename)) {
+                            $safeFilename = $baseSlug . '-' . $counter . '.' . $ext;
+                            $counter++;
                         }
 
                         $content = $zip->getFromIndex($i);
@@ -107,14 +108,18 @@ class AudioController extends Controller
 
         // Single file upload logic
         if ($request->filled('custom_name')) {
-            $filename = Str::slug($request->custom_name) . '.' . $extension;
+            $baseSlug = Str::slug($request->custom_name);
         } else {
             $baseSlug = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-            $filename = time() . '_' . substr($baseSlug, 0, 80) . '.' . $extension;
         }
-
-        if (Storage::disk('local')->exists('audio/' . $filename)) {
-            return back()->with('error', "Gagal: File dengan nama \"$filename\" sudah ada. Silakan gunakan nama lain atau ubah nama file Anda.");
+        
+        $extension = $file->getClientOriginalExtension();
+        $filename = $baseSlug . '.' . $extension;
+        $counter = 1;
+        
+        while (Storage::disk('local')->exists('audio/' . $filename)) {
+            $filename = $baseSlug . '-' . $counter . '.' . $extension;
+            $counter++;
         }
 
         $file->storeAs('audio', $filename, 'local');

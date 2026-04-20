@@ -187,13 +187,13 @@
                                 'pertanyaan' => $soal->pertanyaan,
                                 'tipe' => $soal->tipe,
                                 'poin' => $soal->poin,
-                                'audio' => $soal->audio_path ? asset('storage/'.$soal->audio_path) : null,
+                                'audio' => $soal->audio_path ? route('shared.media-preview', ['id' => $soal->id, 'type' => 'soal']) : null,
                                 'gambar' => $soal->gambar_path ? asset('storage/'.$soal->gambar_path) : null,
                                 'pilihan' => $soal->pilihanJawabans->map(function($p) {
                                     return [
                                         'teks' => $p->teks,
                                         'is_benar' => $p->is_benar,
-                                        'media' => $p->media_path ? asset('storage/'.$p->media_path) : null,
+                                        'media' => $p->media_path ? ($p->media_tipe === 'audio' ? route('shared.media-preview', ['id' => $p->id, 'type' => 'pilihan']) : asset('storage/'.$p->media_path)) : null,
                                         'media_tipe' => $p->media_tipe
                                     ];
                                 }),
