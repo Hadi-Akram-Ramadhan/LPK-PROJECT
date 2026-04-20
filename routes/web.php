@@ -145,6 +145,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/cheat-logs', [\App\Http\Controllers\Guru\CheatLogController::class, 'index'])->name('cheat-logs.index');
         Route::post('/cheat-logs/{cheatLog}/approve', [\App\Http\Controllers\Guru\CheatLogController::class, 'approve'])->name('cheat-logs.approve');
 
+        // Soal Buta Warna (Guru)
+        Route::get('/soal-buta-warna', [\App\Http\Controllers\Guru\SoalButaWarnaController::class, 'index'])->name('soal_buta_warna.index');
+        Route::post('/soal-buta-warna', [\App\Http\Controllers\Guru\SoalButaWarnaController::class, 'store'])->name('soal_buta_warna.store');
+        Route::delete('/soal-buta-warna/{soal_buta_warna}', [\App\Http\Controllers\Guru\SoalButaWarnaController::class, 'destroy'])->name('soal_buta_warna.destroy');
+
+
         // Daftar Kelas & Murid
         Route::get('/kelas', [\App\Http\Controllers\Guru\KelasController::class, 'index'])->name('kelas.index');
         Route::get('/kelas/{kelas}', [\App\Http\Controllers\Guru\KelasController::class, 'show'])->name('kelas.show');
