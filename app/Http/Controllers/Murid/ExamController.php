@@ -104,18 +104,14 @@ class ExamController extends Controller
         $allSoals = $ujian->soals;
         $readingPacketId = null;
         
-        // Cari paket yang TIDAK mengandung tipe soal listening sama sekali
-        $packetIds = $allSoals->pluck('paket_soal_id')->unique();
-        foreach($packetIds as $pid) {
-            $packetSoals = $allSoals->where('paket_soal_id', $pid);
-            $hasListeningType = $packetSoals->contains(fn($s) => in_array($s->tipe, $listeningTypes));
-            if (!$hasListeningType) {
-                $readingPacketId = $pid;
-                break;
-            }
-        }
+        // Identifikasi paket dengan jumlah soal non-audio terbanyak (Majority Reading)
+        $packetScores = $allSoals->groupBy('paket_soal_id')->map(function($pSoals) use ($listeningTypes) {
+            return $pSoals->filter(fn($s) => !in_array($s->tipe, $listeningTypes))->count();
+        });
+
+        $readingPacketId = $packetScores->sortDesc()->keys()->first();
         
-        // Fallback: Jika semua paket punya audio atau tidak ada yang ketemu, pakai paket pertama
+        // Fallback: Jika tidak ada paket sama sekali
         if (!$readingPacketId) {
             $readingPacketId = $allSoals->first()?->paket_soal_id;
         }
@@ -480,15 +476,10 @@ class ExamController extends Controller
         $listeningTypes = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
         
         $allSoals = $ujian->soals;
-        $readingPacketId = null;
-        $packetIds = $allSoals->pluck('paket_soal_id')->unique();
-        foreach($packetIds as $pid) {
-            $packetSoals = $allSoals->where('paket_soal_id', $pid);
-            if (!$packetSoals->contains(fn($s) => in_array($s->tipe, $listeningTypes))) {
-                $readingPacketId = $pid;
-                break;
-            }
-        }
+        $packetScores = $allSoals->groupBy('paket_soal_id')->map(function($pSoals) use ($listeningTypes) {
+            return $pSoals->filter(fn($s) => !in_array($s->tipe, $listeningTypes))->count();
+        });
+        $readingPacketId = $packetScores->sortDesc()->keys()->first();
         if (!$readingPacketId) $readingPacketId = $allSoals->first()?->paket_soal_id;
         
         $readingSoals  = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
