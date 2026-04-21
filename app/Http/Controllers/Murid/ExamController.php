@@ -102,27 +102,22 @@ class ExamController extends Controller
         
         // Cari ID paket yang paling mungkin merupakan paket Reading
         $allSoals = $ujian->soals;
-        $readingPacketId = null;
-        
-        // Identifikasi paket dengan jumlah soal non-audio terbanyak (Majority Reading)
-        $packetScores = $allSoals->groupBy('paket_soal_id')->map(function($pSoals) use ($listeningTypes) {
-            return $pSoals->filter(fn($s) => !in_array($s->tipe, $listeningTypes))->count();
+        // Identifikasi semua paket yang merupakan paket Reading (Mayoritas soal non-audio)
+        $packetStats = $allSoals->groupBy('paket_soal_id')->map(function($pSoals) use ($listeningTypes) {
+            $readingCount = $pSoals->filter(fn($s) => !in_array($s->tipe, $listeningTypes))->count();
+            $listeningCount = $pSoals->count() - $readingCount;
+            return $readingCount >= $listeningCount ? 'reading' : 'listening';
         });
 
-        $readingPacketId = $packetScores->sortDesc()->keys()->first();
-        
-        // Fallback: Jika tidak ada paket sama sekali
-        if (!$readingPacketId) {
-            $readingPacketId = $allSoals->first()?->paket_soal_id;
-        }
+        $readingPacketIds = $packetStats->filter(fn($type) => $type === 'reading')->keys()->toArray();
 
-        // Pisahkan berdasarkan Tipe atau berdasarkan Paket yang sudah diidentifikasi sebagai Reading
-        $readingSoals  = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
-            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $readingPacketId);
+        // Pisahkan soal berdasarkan klasifikasi paketnya
+        $readingSoals  = $allSoals->filter(function($s) use ($readingPacketIds) {
+            return in_array($s->paket_soal_id, $readingPacketIds);
         })->sortBy('id');
 
-        $listeningSoals = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
-            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $readingPacketId);
+        $listeningSoals = $allSoals->reject(function($s) use ($readingPacketIds) {
+            return in_array($s->paket_soal_id, $readingPacketIds);
         })->sortBy('id');
 
         if ($ujian->acak_soal) {
@@ -493,18 +488,19 @@ class ExamController extends Controller
         $listeningTypes = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
         
         $allSoals = $ujian->soals;
-        $packetScores = $allSoals->groupBy('paket_soal_id')->map(function($pSoals) use ($listeningTypes) {
-            return $pSoals->filter(fn($s) => !in_array($s->tipe, $listeningTypes))->count();
+        $packetStats = $allSoals->groupBy('paket_soal_id')->map(function($pSoals) use ($listeningTypes) {
+            $readingCount = $pSoals->filter(fn($s) => !in_array($s->tipe, $listeningTypes))->count();
+            $listeningCount = $pSoals->count() - $readingCount;
+            return $readingCount >= $listeningCount ? 'reading' : 'listening';
         });
-        $readingPacketId = $packetScores->sortDesc()->keys()->first();
-        if (!$readingPacketId) $readingPacketId = $allSoals->first()?->paket_soal_id;
+        $readingPacketIds = $packetStats->filter(fn($type) => $type === 'reading')->keys()->toArray();
         
-        $readingSoals  = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
-            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $readingPacketId);
+        $readingSoals  = $allSoals->filter(function($s) use ($readingPacketIds) {
+            return in_array($s->paket_soal_id, $readingPacketIds);
         })->sortBy('id');
 
-        $listeningSoals = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
-            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $readingPacketId);
+        $listeningSoals = $allSoals->reject(function($s) use ($readingPacketIds) {
+            return in_array($s->paket_soal_id, $readingPacketIds);
         })->sortBy('id');
 
         if ($ujian->acak_soal) {
