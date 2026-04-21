@@ -525,16 +525,7 @@
             </div>
             <div class="modal-body">
                 @php
-                    $readingSoals  = [];
-                    $listeningSoals = [];
-                    foreach ($soals as $index => $s) {
-                        $num = $index + 1;
-                        if (in_array($s->tipe, ['audio', 'pilihan_ganda_audio'])) {
-                            $listeningSoals[$num] = $s;
-                        } else {
-                            $readingSoals[$num] = $s;
-                        }
-                    }
+                    $qNum = 1;
                     $route_name_nav = request()->routeIs('admin.*') ? 'admin.ujian.preview' : 'guru.ujian.preview';
                 @endphp
 
@@ -545,11 +536,12 @@
                         {{ count($listeningSoals) > 0 ? 'Session 1: Reading' : 'Questions List' }}
                     </div>
                     <div class="grid-nums">
-                        @foreach($readingSoals as $num => $s)
-                            <a href="{{ route($route_name_nav, ['ujian' => $ujian->id, 'page' => $num]) }}"
-                               class="grid-btn {{ $num == $page ? 'current' : '' }}">
-                                {{ $num }}
+                        @foreach($readingSoals as $s)
+                            <a href="{{ route($route_name_nav, ['ujian' => $ujian->id, 'page' => $qNum]) }}"
+                               class="grid-btn {{ $qNum == $page ? 'current' : '' }}">
+                                {{ $qNum }}
                             </a>
+                            @php $qNum++; @endphp
                         @endforeach
                     </div>
                 </div>
@@ -560,11 +552,12 @@
                 <div class="modal-section">
                     <div style="font-size: 18px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; font-weight:700;">Session 2: Listening</div>
                     <div class="grid-nums">
-                        @foreach($listeningSoals as $num => $s)
-                            <a href="{{ route($route_name_nav, ['ujian' => $ujian->id, 'page' => $num]) }}"
-                               class="grid-btn {{ $num == $page ? 'current' : '' }}">
-                                {{ $num }}
+                        @foreach($listeningSoals as $s)
+                            <a href="{{ route($route_name_nav, ['ujian' => $ujian->id, 'page' => $qNum]) }}"
+                               class="grid-btn {{ $qNum == $page ? 'current' : '' }}">
+                                {{ $qNum }}
                             </a>
+                            @php $qNum++; @endphp
                         @endforeach
                     </div>
                 </div>

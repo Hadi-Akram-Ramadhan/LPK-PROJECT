@@ -205,21 +205,35 @@ class UjianController extends Controller
         // Untuk guru, kita izinkan preview semua ujian sebagai referensi
         $ujian->load(['soals.pilihanJawabans']);
         
-        $totalSoal = $ujian->soals->count();
+        // Kelompokkan soal: Reading vs Listening (Konsisten dengan SoalController::TIPE_LISTENING)
+        $listeningTypes = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
+        
+        $allSoals = $ujian->soals;
+        $firstPacketId = $allSoals->first()?->paket_soal_id;
+
+        $readingSoals  = $allSoals->filter(function($s) use ($listeningTypes, $firstPacketId) {
+            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $firstPacketId);
+        })->sortBy('id');
+
+        $listeningSoals = $allSoals->filter(function($s) use ($listeningTypes, $firstPacketId) {
+            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $firstPacketId);
+        })->sortBy('id');
+
+        $soals = $readingSoals->concat($listeningSoals)->values();
+
+        $totalSoal = $soals->count();
         if ($totalSoal == 0) {
             return back()->with('error', 'Ujian ini tidak memiliki soal untuk dipreview.');
         }
 
-        $page = $request->query('page', 1);
-        $currentSoal = $ujian->soals()->skip($page - 1)->first();
+        $page = (int) $request->query('page', 1);
+        $currentSoal = $soals->get($page - 1);
 
         if (!$currentSoal) {
             return redirect()->route('guru.ujian.preview', ['ujian' => $ujian->id, 'page' => 1]);
         }
 
-        $soals = $ujian->soals;
-
-        return view('shared.preview_ujian', compact('ujian', 'currentSoal', 'totalSoal', 'page', 'soals'));
+        return view('shared.preview_ujian', compact('ujian', 'currentSoal', 'totalSoal', 'page', 'soals', 'readingSoals', 'listeningSoals'));
     }
 }
 

@@ -97,22 +97,49 @@ class ExamController extends Controller
 
         // Sistem Cerdas Tes Buta Warna kini dipindah SETELAH ujian selesai.
         $ujian = $ujian_peserta->ujian;
-        $soals = $ujian->soals;
+        // Kelompokkan soal: Reading vs Listening (Konsisten dengan SoalController::TIPE_LISTENING)
+        $listeningTypes = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
+        
+        // Identifikasi Paket Pertama (biasanya Reading)
+        $firstPacketId = $ujian->soals->first()?->paket_soal_id;
+        
+        // Pisahkan berdasarkan Tipe atau berdasarkan Paket (jika ada lebih dari 1 paket)
+        $readingSoals  = $ujian->soals->filter(function($s) use ($listeningTypes, $firstPacketId) {
+            // Reading jika: Bukan tipe listening DAN (punya packet ID sama dengan packet pertama)
+            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $firstPacketId);
+        })->sortBy('id');
+
+        $listeningSoals = $ujian->soals->filter(function($s) use ($listeningTypes, $firstPacketId) {
+            // Listening jika: Tipe memang listening ATAU (bukan paket pertama)
+            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $firstPacketId);
+        })->sortBy('id');
 
         if ($ujian->acak_soal) {
-            // Pengacakan yang konsisten dengan seed user_id + ujian_id
             $seed = $ujian_peserta->user_id . $ujian->id;
-            mt_srand($seed);
-            $items = $soals->all();
-            for ($i = count($items) - 1; $i > 0; $i--) {
+            
+            // Shuffle Reading
+            mt_srand($seed . 'r');
+            $readingItems = $readingSoals->all();
+            for ($i = count($readingItems) - 1; $i > 0; $i--) {
                 $j = mt_rand(0, $i);
-                $tmp = $items[$i];
-                $items[$i] = $items[$j];
-                $items[$j] = $tmp;
+                $tmp = $readingItems[$i]; $readingItems[$i] = $readingItems[$j]; $readingItems[$j] = $tmp;
             }
-            $soals = collect($items);
+            $readingSoals = collect($readingItems);
+
+            // Shuffle Listening
+            mt_srand($seed . 'l');
+            $listeningItems = $listeningSoals->all();
+            for ($i = count($listeningItems) - 1; $i > 0; $i--) {
+                $j = mt_rand(0, $i);
+                $tmp = $listeningItems[$i]; $listeningItems[$i] = $listeningItems[$j]; $listeningItems[$j] = $tmp;
+            }
+            $listeningSoals = collect($listeningItems);
+            
             mt_srand();
         }
+
+        // Gabungkan untuk urutan halaman: Reading selalu duluan (Page 1..N), Listening menyusul (Page N+1..M)
+        $soals = $readingSoals->concat($listeningSoals)->values();
 
         $totalSoal = $soals->count();
 
@@ -169,7 +196,7 @@ class ExamController extends Controller
         return view('murid.exam.show', compact(
             'ujian_peserta', 'ujian', 'soals', 'currentSoal', 
             'page', 'totalSoal', 'jawabanSaatIni', 'answeredSoalIds', 'sisaDetik', 'deadline',
-            'audioLogs', 'acakJawaban'
+            'audioLogs', 'acakJawaban', 'readingSoals', 'listeningSoals'
         ));
     }
 
@@ -434,20 +461,44 @@ class ExamController extends Controller
                 ->with('error', 'Review jawaban tidak tersedia untuk Try-Out.');
         }
 
-        // Load soal dalam urutan yang sama seperti saat ujian
-        $soals = $ujian->soals;
+        // Load soal dalam urutan yang sama seperti saat ujian (Reading then Listening)
+        $listeningTypes = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
+        
+        $firstPacketId = $ujian->soals->first()?->paket_soal_id;
+        
+        $readingSoals  = $ujian->soals->filter(function($s) use ($listeningTypes, $firstPacketId) {
+            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $firstPacketId);
+        })->sortBy('id');
+
+        $listeningSoals = $ujian->soals->filter(function($s) use ($listeningTypes, $firstPacketId) {
+            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $firstPacketId);
+        })->sortBy('id');
+
         if ($ujian->acak_soal) {
             $seed = $ujian_peserta->user_id . $ujian->id;
-            mt_srand($seed);
-            $items = $soals->all();
-            for ($i = count($items) - 1; $i > 0; $i--) {
+            
+            // Shuffle Reading
+            mt_srand($seed . 'r');
+            $readingItems = $readingSoals->all();
+            for ($i = count($readingItems) - 1; $i > 0; $i--) {
                 $j = mt_rand(0, $i);
-                $tmp = $items[$i]; $items[$i] = $items[$j]; $items[$j] = $tmp;
+                $tmp = $readingItems[$i]; $readingItems[$i] = $readingItems[$j]; $readingItems[$j] = $tmp;
             }
-            $soals = collect($items);
+            $readingSoals = collect($readingItems);
+
+            // Shuffle Listening
+            mt_srand($seed . 'l');
+            $listeningItems = $listeningSoals->all();
+            for ($i = count($listeningItems) - 1; $i > 0; $i--) {
+                $j = mt_rand(0, $i);
+                $tmp = $listeningItems[$i]; $listeningItems[$i] = $listeningItems[$j]; $listeningItems[$j] = $tmp;
+            }
+            $listeningSoals = collect($listeningItems);
+            
             mt_srand();
         }
-        $soals = $soals->values();
+
+        $soals = $readingSoals->concat($listeningSoals)->values();
 
         // Load semua jawaban murid untuk ujian ini, di-key by soal_id
         $jawabanMurid = JawabanMurid::where('ujian_peserta_id', $ujian_peserta->id)
@@ -458,7 +509,7 @@ class ExamController extends Controller
         $semuaPilihan = \App\Models\PilihanJawaban::whereIn('soal_id', $soalIds)->get()->groupBy('soal_id');
 
         return view('murid.exam.review', compact(
-            'ujian_peserta', 'ujian', 'soals', 'jawabanMurid', 'semuaPilihan'
+            'ujian_peserta', 'ujian', 'soals', 'jawabanMurid', 'semuaPilihan', 'readingSoals', 'listeningSoals'
         ));
     }
 }
