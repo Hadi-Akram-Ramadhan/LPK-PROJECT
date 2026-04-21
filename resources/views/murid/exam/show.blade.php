@@ -1400,22 +1400,7 @@
             setupAudioLimiter('.opsi-audio');
 
             // ── MEDIA PRELOADING ──
-            window.MEDIA_PRELOAD_REGISTRY = @json($soals->mapWithKeys(function($s, $idx) use ($ujian_peserta) {
-                $urls = [];
-                if($s->audio_path) $urls[] = route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $s->id, 'type' => 'soal']) . '?v=' . $s->id;
-                if($s->gambar_path) $urls[] = asset('storage/' . $s->gambar_path);
-                foreach($s->pilihanJawabans as $o) {
-                    if($o->media_tipe === 'audio' && $o->media_path) $urls[] = route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $o->id, 'type' => 'pilihan']) . '?v=' . $o->id;
-                    // Images can be in media_path or teks (for matching)
-                    if($o->media_path && in_array($o->media_tipe, ['gambar', 'matching_gambar_kanan', 'matching_gambar_keduanya'])) {
-                        $urls[] = asset('storage/' . $o->media_path);
-                    }
-                    if($o->teks && in_array($o->media_tipe, ['matching_gambar_kiri', 'matching_gambar_keduanya'])) {
-                        $urls[] = asset('storage/' . $o->teks);
-                    }
-                }
-                return [$idx + 1 => array_unique($urls)];
-            }));
+            window.MEDIA_PRELOAD_REGISTRY = @json($mediaRegistry);
 
             const preloadedUrls = new Set();
             function preloadMedia(page) {

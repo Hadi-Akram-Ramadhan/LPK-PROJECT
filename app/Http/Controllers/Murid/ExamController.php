@@ -204,10 +204,27 @@ class ExamController extends Controller
 
         $acakJawaban = (bool) ($ujian->acak_jawaban ?? false);
 
+        // Generate Media Registry for Preloading
+        $mediaRegistry = $soals->mapWithKeys(function($s, $idx) use ($ujian_peserta) {
+            $urls = [];
+            if($s->audio_path) $urls[] = route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $s->id, 'type' => 'soal']) . '?v=' . $s->id;
+            if($s->gambar_path) $urls[] = asset('storage/' . $s->gambar_path);
+            foreach($s->pilihanJawabans as $o) {
+                if($o->media_tipe === 'audio' && $o->media_path) $urls[] = route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $o->id, 'type' => 'pilihan']) . '?v=' . $o->id;
+                if($o->media_path && in_array($o->media_tipe, ['gambar', 'matching_gambar_kanan', 'matching_gambar_keduanya'])) {
+                    $urls[] = asset('storage/' . $o->media_path);
+                }
+                if($o->teks && in_array($o->media_tipe, ['matching_gambar_kiri', 'matching_gambar_keduanya'])) {
+                    $urls[] = asset('storage/' . $o->teks);
+                }
+            }
+            return [$idx + 1 => array_values(array_unique($urls))];
+        });
+
         return view('murid.exam.show', compact(
             'ujian_peserta', 'ujian', 'soals', 'currentSoal', 
             'page', 'totalSoal', 'jawabanSaatIni', 'answeredSoalIds', 'sisaDetik', 'deadline',
-            'audioLogs', 'acakJawaban', 'readingSoals', 'listeningSoals'
+            'audioLogs', 'acakJawaban', 'readingSoals', 'listeningSoals', 'mediaRegistry'
         ));
     }
 
@@ -524,8 +541,25 @@ class ExamController extends Controller
         $soalIds = $soals->pluck('id');
         $semuaPilihan = \App\Models\PilihanJawaban::whereIn('soal_id', $soalIds)->get()->groupBy('soal_id');
 
+        // Generate Media Registry for Preloading (Review Mode)
+        $mediaRegistry = $soals->mapWithKeys(function($s, $idx) use ($ujian_peserta) {
+            $urls = [];
+            if($s->audio_path) $urls[] = route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $s->id, 'type' => 'soal']) . '?v=' . $s->id;
+            if($s->gambar_path) $urls[] = asset('storage/' . $s->gambar_path);
+            foreach($s->pilihanJawabans as $o) {
+                if($o->media_tipe === 'audio' && $o->media_path) $urls[] = route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $o->id, 'type' => 'pilihan']) . '?v=' . $o->id;
+                if($o->media_path && in_array($o->media_tipe, ['gambar', 'matching_gambar_kanan', 'matching_gambar_keduanya'])) {
+                    $urls[] = asset('storage/' . $o->media_path);
+                }
+                if($o->teks && in_array($o->media_tipe, ['matching_gambar_kiri', 'matching_gambar_keduanya'])) {
+                    $urls[] = asset('storage/' . $o->teks);
+                }
+            }
+            return [$idx + 1 => array_values(array_unique($urls))];
+        });
+
         return view('murid.exam.review', compact(
-            'ujian_peserta', 'ujian', 'soals', 'jawabanMurid', 'semuaPilihan', 'readingSoals', 'listeningSoals'
+            'ujian_peserta', 'ujian', 'soals', 'jawabanMurid', 'semuaPilihan', 'readingSoals', 'listeningSoals', 'mediaRegistry'
         ));
     }
 }
