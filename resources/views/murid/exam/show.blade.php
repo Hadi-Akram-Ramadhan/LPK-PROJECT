@@ -1347,9 +1347,29 @@
                 requestAnimationFrame(() => requestAnimationFrame(() => drawLines()));
             }
 
-            // AUTO SAVE (GENERAL - for MC/radio questions)
+            // AUTO SAVE (radio: pilihan_ganda, audio, pilihan_ganda_audio, pilihan_ganda_gambar)
             document.querySelectorAll('.auto-save-trigger').forEach(el => {
                 el.addEventListener('change', function() { submitAnswer({ soal_id: soalId, jawaban: this.value }); });
+            });
+
+            // AUTO SAVE (checkbox: multiple_choice)
+            document.querySelectorAll('.auto-save-trigger-mc').forEach(el => {
+                el.addEventListener('change', function() {
+                    const checked = Array.from(document.querySelectorAll('.auto-save-trigger-mc:checked')).map(cb => parseInt(cb.value));
+                    submitAnswer({ soal_id: soalId, jawaban: JSON.stringify(checked) });
+                });
+            });
+
+            // AUTO SAVE (typing: essay, short_answer) — debounced 800ms
+            let typingTimer = null;
+            document.querySelectorAll('.auto-save-trigger-typing').forEach(el => {
+                el.addEventListener('input', function() {
+                    clearTimeout(typingTimer);
+                    const val = this.value;
+                    typingTimer = setTimeout(() => {
+                        submitAnswer({ soal_id: soalId, jawaban: val });
+                    }, 800);
+                });
             });
 
             // AUDIO LIMITER (Hardened)
