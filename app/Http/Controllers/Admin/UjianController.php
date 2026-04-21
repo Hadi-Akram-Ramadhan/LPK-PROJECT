@@ -152,15 +152,10 @@ class UjianController extends Controller
         $listeningTypes = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
         
         $allSoals = $ujian->soals;
-        $readingPacketId = null;
-        $packetIds = $allSoals->pluck('paket_soal_id')->unique();
-        foreach($packetIds as $pid) {
-            $packetSoals = $allSoals->where('paket_soal_id', $pid);
-            if (!$packetSoals->contains(fn($s) => in_array($s->tipe, $listeningTypes))) {
-                $readingPacketId = $pid;
-                break;
-            }
-        }
+        $packetScores = $allSoals->groupBy('paket_soal_id')->map(function($pSoals) use ($listeningTypes) {
+            return $pSoals->filter(fn($s) => !in_array($s->tipe, $listeningTypes))->count();
+        });
+        $readingPacketId = $packetScores->sortDesc()->keys()->first();
         if (!$readingPacketId) $readingPacketId = $allSoals->first()?->paket_soal_id;
 
         $readingSoals  = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
