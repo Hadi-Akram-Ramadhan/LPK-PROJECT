@@ -191,7 +191,7 @@ class ExamController extends Controller
         $dataUpdate = [];
         $poinDidapat = 0;
 
-        if ($soal->tipe === 'pilihan_ganda' || $soal->tipe === 'audio') {
+        if (in_array($soal->tipe, ['pilihan_ganda', 'audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'])) {
             $dataUpdate['pilihan_jawaban_id'] = $request->jawaban;
             
             // Auto scoring PG:
