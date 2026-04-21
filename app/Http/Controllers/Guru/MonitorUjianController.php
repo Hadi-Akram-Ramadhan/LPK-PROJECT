@@ -156,14 +156,14 @@ class MonitorUjianController extends Controller
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
         ];
 
-        $headers1 = ['No', 'Nama Murid', 'Kelas', 'Waktu Mulai', 'Waktu Selesai', 'Status', 'Listening', 'Reading', 'Total Skor'];
+        $headers1 = ['No', 'Nama Murid', 'Kelas', 'Waktu Mulai', 'Waktu Selesai', 'Status', 'Listening', 'Reading', 'Total Skor', 'Tes Buta Warna'];
         $column = 'A';
         foreach ($headers1 as $header) {
             $sheet1->setCellValue($column . '1', $header);
             $sheet1->getColumnDimension($column)->setAutoSize(true);
             $column++;
         }
-        $sheet1->getStyle('A1:I1')->applyFromArray($headerStyle);
+        $sheet1->getStyle('A1:J1')->applyFromArray($headerStyle);
 
         $row1 = 2;
         foreach ($pesertas as $index => $p) {
@@ -184,13 +184,14 @@ class MonitorUjianController extends Controller
             $sheet1->setCellValue('G' . $row1, $listening);
             $sheet1->setCellValue('H' . $row1, $reading);
             $sheet1->setCellValue('I' . $row1, $p->skor);
+            $sheet1->setCellValue('J' . $row1, $p->hasil_buta_warna ?? '-');
             
             $sheet1->getStyle('A' . $row1)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $sheet1->getStyle('F' . $row1 . ':I' . $row1)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet1->getStyle('F' . $row1 . ':J' . $row1)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             
             $row1++;
         }
-        $sheet1->getStyle('A1:I' . ($row1 - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+        $sheet1->getStyle('A1:J' . ($row1 - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
         // ── SHEET 2: DETAIL JAWABAN PER SOAL ──
