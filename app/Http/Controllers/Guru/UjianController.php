@@ -68,6 +68,7 @@ class UjianController extends Controller
                 'mulai' => $request->mulai,
                 'selesai' => $request->selesai,
                 'acak_soal' => $request->has('acak_soal'),
+                'acak_jawaban' => $request->has('acak_jawaban'),
                 'tes_buta_warna' => $request->has('tes_buta_warna'),
                 'jenis_ujian' => $request->jenis_ujian ?? 'reguler',
             ]);
@@ -162,6 +163,7 @@ class UjianController extends Controller
                 'mulai' => $request->mulai,
                 'selesai' => $request->selesai,
                 'acak_soal' => $request->has('acak_soal'),
+                'acak_jawaban' => $request->has('acak_jawaban'),
                 'tes_buta_warna' => $request->has('tes_buta_warna'),
                 'jenis_ujian' => $request->jenis_ujian ?? 'reguler',
             ]);

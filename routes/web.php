@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/exam/{ujian_peserta}/finish', [\App\Http\Controllers\Murid\ExamController::class, 'finish'])->name('murid.exam.finish');
         Route::get('/exam/{ujian_peserta}/finish', [\App\Http\Controllers\Murid\ExamController::class, 'finish']); // Fallback untuk refresh/GET
         Route::get('/exam/{ujian_peserta}/result', [\App\Http\Controllers\Murid\ExamController::class, 'result'])->name('murid.exam.result');
+        Route::get('/exam/{ujian_peserta}/review', [\App\Http\Controllers\Murid\ExamController::class, 'review'])->name('murid.exam.review');
         
         // Anti-Cheat Endpoints
         Route::post('/exam/{ujian_peserta}/report-tab-switch', [\App\Http\Controllers\Murid\ExamController::class, 'reportCheat'])->name('murid.exam.reportCheat');
