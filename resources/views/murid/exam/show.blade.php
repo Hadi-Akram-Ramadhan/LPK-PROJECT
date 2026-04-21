@@ -947,16 +947,7 @@
 
             <div class="modal-body">
                 @php
-                    $readingSoals = [];
-                    $listeningSoals = [];
-                    foreach($soals as $index => $s) {
-                        $num = $index + 1;
-                        if (in_array($s->tipe, ['audio', 'pilihan_ganda_audio'])) {
-                            $listeningSoals[$num] = $s;
-                        } else {
-                            $readingSoals[$num] = $s;
-                        }
-                    }
+                    $qNum = 1;
                 @endphp
 
                 <!-- Sesi Reading / General -->
@@ -966,15 +957,16 @@
                         {{ count($listeningSoals) > 0 ? 'Session 1: Reading' : 'Questions List' }}
                     </div>
                     <div class="grid-nums">
-                        @foreach ($readingSoals as $num => $s)
+                        @foreach ($readingSoals as $s)
                             @php
                                 $isAnsw = in_array($s->id, $answeredSoalIds);
-                                $isCurr = $num == $page;
+                                $isCurr = $qNum == $page;
                                 $cls = "grid-btn " . ($isAnsw ? 'answered ' : '') . ($isCurr ? 'current ' : '');
                             @endphp
-                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $num]) }}" class="{{ $cls }}">
-                                {{ $num }}
+                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $qNum]) }}" class="{{ $cls }}">
+                                {{ $qNum }}
                             </a>
+                            @php $qNum++; @endphp
                         @endforeach
                     </div>
                 </div>
@@ -985,15 +977,16 @@
                 <div class="modal-section">
                     <div style="font-size: 18px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">Session 2: Listening</div>
                     <div class="grid-nums">
-                        @foreach ($listeningSoals as $num => $s)
+                        @foreach ($listeningSoals as $s)
                             @php
                                 $isAnsw = in_array($s->id, $answeredSoalIds);
-                                $isCurr = $num == $page;
+                                $isCurr = $qNum == $page;
                                 $cls = "grid-btn " . ($isAnsw ? 'answered ' : '') . ($isCurr ? 'current ' : '');
                             @endphp
-                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $num]) }}" class="{{ $cls }}">
-                                {{ $num }}
+                            <a href="{{ route('murid.exam.show', ['ujian_peserta' => $ujian_peserta, 'page' => $qNum]) }}" class="{{ $cls }}">
+                                {{ $qNum }}
                             </a>
+                            @php $qNum++; @endphp
                         @endforeach
                     </div>
                 </div>
