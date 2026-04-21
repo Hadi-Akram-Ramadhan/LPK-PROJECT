@@ -100,18 +100,33 @@ class ExamController extends Controller
         // Kelompokkan soal: Reading vs Listening (Konsisten dengan SoalController::TIPE_LISTENING)
         $listeningTypes = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
         
-        // Identifikasi Paket Pertama (biasanya Reading)
-        $firstPacketId = $ujian->soals->first()?->paket_soal_id;
+        // Cari ID paket yang paling mungkin merupakan paket Reading
+        $allSoals = $ujian->soals;
+        $readingPacketId = null;
         
-        // Pisahkan berdasarkan Tipe atau berdasarkan Paket (jika ada lebih dari 1 paket)
-        $readingSoals  = $ujian->soals->filter(function($s) use ($listeningTypes, $firstPacketId) {
-            // Reading jika: Bukan tipe listening DAN (punya packet ID sama dengan packet pertama)
-            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $firstPacketId);
+        // Cari paket yang TIDAK mengandung tipe soal listening sama sekali
+        $packetIds = $allSoals->pluck('paket_soal_id')->unique();
+        foreach($packetIds as $pid) {
+            $packetSoals = $allSoals->where('paket_soal_id', $pid);
+            $hasListeningType = $packetSoals->contains(fn($s) => in_array($s->tipe, $listeningTypes));
+            if (!$hasListeningType) {
+                $readingPacketId = $pid;
+                break;
+            }
+        }
+        
+        // Fallback: Jika semua paket punya audio atau tidak ada yang ketemu, pakai paket pertama
+        if (!$readingPacketId) {
+            $readingPacketId = $allSoals->first()?->paket_soal_id;
+        }
+
+        // Pisahkan berdasarkan Tipe atau berdasarkan Paket yang sudah diidentifikasi sebagai Reading
+        $readingSoals  = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
+            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $readingPacketId);
         })->sortBy('id');
 
-        $listeningSoals = $ujian->soals->filter(function($s) use ($listeningTypes, $firstPacketId) {
-            // Listening jika: Tipe memang listening ATAU (bukan paket pertama)
-            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $firstPacketId);
+        $listeningSoals = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
+            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $readingPacketId);
         })->sortBy('id');
 
         if ($ujian->acak_soal) {
@@ -464,14 +479,24 @@ class ExamController extends Controller
         // Load soal dalam urutan yang sama seperti saat ujian (Reading then Listening)
         $listeningTypes = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
         
-        $firstPacketId = $ujian->soals->first()?->paket_soal_id;
+        $allSoals = $ujian->soals;
+        $readingPacketId = null;
+        $packetIds = $allSoals->pluck('paket_soal_id')->unique();
+        foreach($packetIds as $pid) {
+            $packetSoals = $allSoals->where('paket_soal_id', $pid);
+            if (!$packetSoals->contains(fn($s) => in_array($s->tipe, $listeningTypes))) {
+                $readingPacketId = $pid;
+                break;
+            }
+        }
+        if (!$readingPacketId) $readingPacketId = $allSoals->first()?->paket_soal_id;
         
-        $readingSoals  = $ujian->soals->filter(function($s) use ($listeningTypes, $firstPacketId) {
-            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $firstPacketId);
+        $readingSoals  = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
+            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $readingPacketId);
         })->sortBy('id');
 
-        $listeningSoals = $ujian->soals->filter(function($s) use ($listeningTypes, $firstPacketId) {
-            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $firstPacketId);
+        $listeningSoals = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
+            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $readingPacketId);
         })->sortBy('id');
 
         if ($ujian->acak_soal) {

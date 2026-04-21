@@ -152,14 +152,23 @@ class UjianController extends Controller
         $listeningTypes = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
         
         $allSoals = $ujian->soals;
-        $firstPacketId = $allSoals->first()?->paket_soal_id;
+        $readingPacketId = null;
+        $packetIds = $allSoals->pluck('paket_soal_id')->unique();
+        foreach($packetIds as $pid) {
+            $packetSoals = $allSoals->where('paket_soal_id', $pid);
+            if (!$packetSoals->contains(fn($s) => in_array($s->tipe, $listeningTypes))) {
+                $readingPacketId = $pid;
+                break;
+            }
+        }
+        if (!$readingPacketId) $readingPacketId = $allSoals->first()?->paket_soal_id;
 
-        $readingSoals  = $allSoals->filter(function($s) use ($listeningTypes, $firstPacketId) {
-            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $firstPacketId);
+        $readingSoals  = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
+            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $readingPacketId);
         })->sortBy('id');
 
-        $listeningSoals = $allSoals->filter(function($s) use ($listeningTypes, $firstPacketId) {
-            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $firstPacketId);
+        $listeningSoals = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
+            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $readingPacketId);
         })->sortBy('id');
 
         $soals = $readingSoals->concat($listeningSoals)->values();
