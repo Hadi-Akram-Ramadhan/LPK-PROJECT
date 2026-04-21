@@ -13,6 +13,8 @@
         window.AUTO_SAVE_URL = "{{ route('murid.exam.autoSave', $ujian_peserta, false) }}";
         window.REPORT_CHEAT_URL = "{{ route('murid.exam.reportCheat', $ujian_peserta, false) }}";
         window.FINISH_URL = "{{ route('murid.exam.finish', $ujian_peserta, false) }}";
+        window.ACAK_JAWABAN = {{ $acakJawaban ? 'true' : 'false' }};
+        window.SHUFFLE_SEED = {{ ($ujian_peserta->user_id * 31) + ($currentSoal->id * 7) }};
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sortablejs/1.15.0/Sortable.min.js"></script>
 
@@ -1010,7 +1012,53 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-            // MODAL
+            // ── SHUFFLE JAWABAN (Frontend Only) ──
+            if (window.ACAK_JAWABAN) {
+                // Simple seeded PRNG (Mulberry32)
+                function seededRand(seed) {
+                    return function() {
+                        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+                        var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+                        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+                        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+                    };
+                }
+                const rand = seededRand(window.SHUFFLE_SEED);
+
+                // Fisher-Yates shuffle for each opt container
+                document.querySelectorAll('.cbt-right label.opt-label').forEach(() => {});
+                const containers = [
+                    document.querySelector('.cbt-right'),
+                ];
+                containers.forEach(container => {
+                    if (!container) return;
+                    const items = Array.from(container.querySelectorAll('label.opt-label'));
+                    if (items.length < 2) return;
+                    // Fisher-Yates
+                    for (let i = items.length - 1; i > 0; i--) {
+                        const j = Math.floor(rand() * (i + 1));
+                        // Swap in DOM
+                        const parent = items[i].parentNode;
+                        const nextI = items[i].nextSibling;
+                        const nextJ = items[j].nextSibling;
+                        parent.insertBefore(items[j], nextI);
+                        if (nextJ) parent.insertBefore(items[i], nextJ);
+                        else parent.appendChild(items[i]);
+                        // Swap in array
+                        [items[i], items[j]] = [items[j], items[i]];
+                    }
+                    // Re-letter the circles A, B, C... after shuffle (cosmetic only)
+                    items.forEach((lbl, idx) => {
+                        const circle = lbl.querySelector('.opt-circle');
+                        if (circle && !circle.querySelector('img') && !circle.querySelector('audio')) {
+                            // Only re-letter text-based circles
+                            if (circle.textContent.trim().match(/^[A-Z]$/)) {
+                                circle.textContent = String.fromCharCode(65 + idx);
+                            }
+                        }
+                    });
+                });
+            }
             const modal = document.getElementById('modal-show-all');
             const btnShowAll = document.getElementById('btn-show-all');
             if (btnShowAll && modal) {

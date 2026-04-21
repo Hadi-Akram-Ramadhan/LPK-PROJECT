@@ -64,6 +64,12 @@
                     Acak urutan soal untuk setiap peserta
                 </label>
             </div>
+            <div class="flex items-center">
+                <input id="acak_jawaban" name="acak_jawaban" type="checkbox" value="1" {{ old('acak_jawaban') ? 'checked' : '' }} class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-slate-300 rounded cursor-pointer">
+                <label for="acak_jawaban" class="ml-2 block text-sm font-bold text-slate-700 cursor-pointer">
+                    Acak urutan jawaban untuk setiap peserta
+                </label>
+            </div>
             <div class="flex items-center bg-blue-50 p-3 rounded-lg border border-blue-100">
                 <input id="tes_buta_warna" name="tes_buta_warna" type="checkbox" value="1" {{ old('tes_buta_warna') ? 'checked' : '' }} class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-slate-300 rounded cursor-pointer">
                 <label for="tes_buta_warna" class="ml-2 block text-sm font-bold text-blue-800 cursor-pointer">

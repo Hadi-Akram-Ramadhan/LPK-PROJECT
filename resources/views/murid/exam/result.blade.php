@@ -321,6 +321,12 @@
                 @endif
             </div>
 
+            @if($ujian->jenis_ujian !== 'tryout')
+            <a href="{{ route('murid.exam.review', $ujian_peserta) }}" style="display: flex; align-items: center; justify-content: center; background: #2563eb; color: white; text-decoration: none; padding: 16px 30px; border-radius: 16px; font-weight: 800; font-size: 14px; letter-spacing: 0.5px; transition: transform 0.2s, background 0.2s; margin-top: 12px;" onmouseover="this.style.background='#1d4ed8';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2563eb';this.style.transform='none'">
+                LIHAT JAWABAN ANDA
+                <svg style="width: 18px; height: 18px; margin-left: 10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+            @endif
             <a href="{{ route('murid.dashboard') }}" class="btn-dashboard">
                 KEMBALI KE DASHBOARD
                 <svg style="width: 18px; height: 18px; margin-left: 10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>

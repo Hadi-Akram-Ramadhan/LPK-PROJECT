@@ -164,10 +164,12 @@ class ExamController extends Controller
                 return $item->pilihan_jawaban_id ? 'opsi_'.$item->pilihan_jawaban_id : 'soal';
             });
 
+        $acakJawaban = (bool) ($ujian->acak_jawaban ?? false);
+
         return view('murid.exam.show', compact(
             'ujian_peserta', 'ujian', 'soals', 'currentSoal', 
             'page', 'totalSoal', 'jawabanSaatIni', 'answeredSoalIds', 'sisaDetik', 'deadline',
-            'audioLogs'
+            'audioLogs', 'acakJawaban'
         ));
     }
 
@@ -412,5 +414,51 @@ class ExamController extends Controller
         $adaEssay = $ujian->soals()->where('tipe', 'essay')->exists();
 
         return view('murid.exam.result', compact('ujian_peserta', 'ujian', 'adaEssay'));
+    }
+
+    /**
+     * Halaman Review Jawaban Murid
+     */
+    public function review(UjianPeserta $ujian_peserta)
+    {
+        if ($ujian_peserta->user_id !== auth()->id()) abort(403);
+        if ($ujian_peserta->status !== 'selesai') {
+            return redirect()->route('murid.dashboard');
+        }
+
+        $ujian = $ujian_peserta->ujian;
+
+        // Tryout tidak boleh review (data sudah dihapus)
+        if ($ujian->jenis_ujian === 'tryout') {
+            return redirect()->route('murid.exam.result', $ujian_peserta)
+                ->with('error', 'Review jawaban tidak tersedia untuk Try-Out.');
+        }
+
+        // Load soal dalam urutan yang sama seperti saat ujian
+        $soals = $ujian->soals;
+        if ($ujian->acak_soal) {
+            $seed = $ujian_peserta->user_id . $ujian->id;
+            mt_srand($seed);
+            $items = $soals->all();
+            for ($i = count($items) - 1; $i > 0; $i--) {
+                $j = mt_rand(0, $i);
+                $tmp = $items[$i]; $items[$i] = $items[$j]; $items[$j] = $tmp;
+            }
+            $soals = collect($items);
+            mt_srand();
+        }
+        $soals = $soals->values();
+
+        // Load semua jawaban murid untuk ujian ini, di-key by soal_id
+        $jawabanMurid = JawabanMurid::where('ujian_peserta_id', $ujian_peserta->id)
+            ->get()->keyBy('soal_id');
+
+        // Load semua pilihan jawaban beserta is_benar
+        $soalIds = $soals->pluck('id');
+        $semuaPilihan = \App\Models\PilihanJawaban::whereIn('soal_id', $soalIds)->get()->groupBy('soal_id');
+
+        return view('murid.exam.review', compact(
+            'ujian_peserta', 'ujian', 'soals', 'jawabanMurid', 'semuaPilihan'
+        ));
     }
 }

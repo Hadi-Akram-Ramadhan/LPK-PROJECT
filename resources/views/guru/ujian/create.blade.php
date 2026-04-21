@@ -70,6 +70,12 @@
                     Acak urutan soal
                 </label>
             </div>
+            <div style="display: flex; align-items: center;">
+                <input id="acak_jawaban" name="acak_jawaban" type="checkbox" value="1" {{ old('acak_jawaban') ? 'checked' : '' }} style="width: 20px; height: 20px; color: #2563eb; border-radius: 4px; cursor: pointer;">
+                <label for="acak_jawaban" style="margin-left: 10px; font-size: 14px; font-weight: 700; color: #334155; cursor: pointer;">
+                    Acak urutan jawaban
+                </label>
+            </div>
             <div style="display: flex; align-items: center; background: #eff6ff; padding: 12px; border-radius: 8px; border: 1px solid #bfdbfe;">
                 <input id="tes_buta_warna" name="tes_buta_warna" type="checkbox" value="1" {{ old('tes_buta_warna') ? 'checked' : '' }} style="width: 20px; height: 20px; color: #2563eb; border-radius: 4px; cursor: pointer;">
                 <label for="tes_buta_warna" style="margin-left: 10px; font-size: 14px; font-weight: 800; color: #1e40af; cursor: pointer;">

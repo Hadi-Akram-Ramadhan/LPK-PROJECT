@@ -78,7 +78,13 @@
                             Acak urutan soal
                         </label>
                     </div>
-                    <div class="flex items-center bg-blue-50 p-2 rounded-lg border border-blue-100">
+                    <div class="flex items-center">
+                        <input id="acak_jawaban" name="acak_jawaban" type="checkbox" value="1" {{ old('acak_jawaban', $ujian->acak_jawaban) ? 'checked' : '' }} class="h-4 w-4 text-accent-600 focus:ring-accent-500 border-slate-300 rounded">
+                        <label for="acak_jawaban" class="ml-2 block text-sm text-slate-700">
+                            Acak urutan jawaban
+                        </label>
+                    </div>
+                    <div class="flex items-center bg-blue-50 p-2 rounded-lg border border-blue-100 col-span-2">
                         <input id="tes_buta_warna" name="tes_buta_warna" type="checkbox" value="1" {{ old('tes_buta_warna', $ujian->tes_buta_warna) ? 'checked' : '' }} class="h-4 w-4 text-accent-600 focus:ring-accent-500 border-slate-300 rounded">
                         <label for="tes_buta_warna" class="ml-2 block text-sm font-bold text-blue-800">
                             Aktifkan Tes Buta Warna

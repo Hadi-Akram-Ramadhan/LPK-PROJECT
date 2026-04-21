@@ -88,7 +88,7 @@ class SoalImport
                     'guru_id'       => auth()->id(),
                     'paket_soal_id' => $this->paketSoalId,
                     'tipe'          => $tipeEnum,
-                    'pertanyaan'    => Str::limit(HtmlSanitizer::clean($pertanyaan), 2000, ''),
+                    'pertanyaan'    => Str::limit(HtmlSanitizer::clean(nl2br($pertanyaan)), 2000, ''),
                     'poin'          => $poin,
                     'audio_path'    => $audioPath,
                     'gambar_path'   => $gambarPath,
