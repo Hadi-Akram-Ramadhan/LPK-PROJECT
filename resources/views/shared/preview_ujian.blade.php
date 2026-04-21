@@ -524,16 +524,51 @@
                 <div style="font-weight:800; color:#1e293b;">NAVIGASI PREVIEW</div>
             </div>
             <div class="modal-body">
+                @php
+                    $readingSoals  = [];
+                    $listeningSoals = [];
+                    foreach ($soals as $index => $s) {
+                        $num = $index + 1;
+                        if (in_array($s->tipe, ['audio', 'pilihan_ganda_audio'])) {
+                            $listeningSoals[$num] = $s;
+                        } else {
+                            $readingSoals[$num] = $s;
+                        }
+                    }
+                    $route_name_nav = request()->routeIs('admin.*') ? 'admin.ujian.preview' : 'guru.ujian.preview';
+                @endphp
+
+                {{-- Sesi Reading --}}
+                @if(count($readingSoals) > 0)
                 <div class="modal-section">
-                    <div style="font-size: 18px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; font-weight:700;">Questions List</div>
+                    <div style="font-size: 18px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; font-weight:700;">
+                        {{ count($listeningSoals) > 0 ? 'Session 1: Reading' : 'Questions List' }}
+                    </div>
                     <div class="grid-nums">
-                        @for($i = 1; $i <= $totalSoal; $i++)
-                            <a href="{{ route($route_name, ['ujian' => $ujian->id, 'page' => $i]) }}" class="grid-btn {{ $i == $page ? 'current' : '' }}">
-                                {{ $i }}
+                        @foreach($readingSoals as $num => $s)
+                            <a href="{{ route($route_name_nav, ['ujian' => $ujian->id, 'page' => $num]) }}"
+                               class="grid-btn {{ $num == $page ? 'current' : '' }}">
+                                {{ $num }}
                             </a>
-                        @endfor
+                        @endforeach
                     </div>
                 </div>
+                @endif
+
+                {{-- Sesi Listening --}}
+                @if(count($listeningSoals) > 0)
+                <div class="modal-section">
+                    <div style="font-size: 18px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; font-weight:700;">Session 2: Listening</div>
+                    <div class="grid-nums">
+                        @foreach($listeningSoals as $num => $s)
+                            <a href="{{ route($route_name_nav, ['ujian' => $ujian->id, 'page' => $num]) }}"
+                               class="grid-btn {{ $num == $page ? 'current' : '' }}">
+                                {{ $num }}
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
             <div class="cbt-footer">
                 <button class="ftr-btn ftr-prev" id="btn-close-modal-bottom" style="width:100%">&lt; TUTUP PANEL</button>
