@@ -209,18 +209,19 @@ class UjianController extends Controller
         $listeningTypes = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
         
         $allSoals = $ujian->soals;
-        $packetScores = $allSoals->groupBy('paket_soal_id')->map(function($pSoals) use ($listeningTypes) {
-            return $pSoals->filter(fn($s) => !in_array($s->tipe, $listeningTypes))->count();
+        $packetStats = $allSoals->groupBy('paket_soal_id')->map(function($pSoals) use ($listeningTypes) {
+            $readingCount = $pSoals->filter(fn($s) => !in_array($s->tipe, $listeningTypes))->count();
+            $listeningCount = $pSoals->count() - $readingCount;
+            return $readingCount >= $listeningCount ? 'reading' : 'listening';
         });
-        $readingPacketId = $packetScores->sortDesc()->keys()->first();
-        if (!$readingPacketId) $readingPacketId = $allSoals->first()?->paket_soal_id;
+        $readingPacketIds = $packetStats->filter(fn($type) => $type === 'reading')->keys()->toArray();
 
-        $readingSoals  = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
-            return !in_array($s->tipe, $listeningTypes) && ($s->paket_soal_id == $readingPacketId);
+        $readingSoals  = $allSoals->filter(function($s) use ($readingPacketIds) {
+            return in_array($s->paket_soal_id, $readingPacketIds);
         })->sortBy('id');
 
-        $listeningSoals = $allSoals->filter(function($s) use ($listeningTypes, $readingPacketId) {
-            return in_array($s->tipe, $listeningTypes) || ($s->paket_soal_id != $readingPacketId);
+        $listeningSoals = $allSoals->reject(function($s) use ($readingPacketIds) {
+            return in_array($s->paket_soal_id, $readingPacketIds);
         })->sortBy('id');
 
         $soals = $readingSoals->concat($listeningSoals)->values();
@@ -237,7 +238,24 @@ class UjianController extends Controller
             return redirect()->route('guru.ujian.preview', ['ujian' => $ujian->id, 'page' => 1]);
         }
 
-        return view('shared.preview_ujian', compact('ujian', 'currentSoal', 'totalSoal', 'page', 'soals', 'readingSoals', 'listeningSoals'));
+        // Generate Media Registry for Preloading (Preview Mode)
+        $mediaRegistry = $soals->mapWithKeys(function($s, $idx) {
+            $urls = [];
+            if($s->audio_path) $urls[] = route('shared.media-preview', ['id' => $s->id, 'type' => 'soal']);
+            if($s->gambar_path) $urls[] = asset('storage/' . $s->gambar_path);
+            foreach($s->pilihanJawabans as $o) {
+                if($o->media_tipe === 'audio' && $o->media_path) $urls[] = route('shared.media-preview', ['id' => $o->id, 'type' => 'pilihan']);
+                if($o->media_path && in_array($o->media_tipe, ['gambar', 'matching_gambar_kanan', 'matching_gambar_keduanya'])) {
+                    $urls[] = asset('storage/' . $o->media_path);
+                }
+                if($o->teks && in_array($o->media_tipe, ['matching_gambar_kiri', 'matching_gambar_keduanya'])) {
+                    $urls[] = asset('storage/' . $o->teks);
+                }
+            }
+            return [$idx + 1 => array_values(array_unique($urls))];
+        });
+
+        return view('shared.preview_ujian', compact('ujian', 'currentSoal', 'totalSoal', 'page', 'soals', 'readingSoals', 'listeningSoals', 'mediaRegistry'));
     }
 }
 

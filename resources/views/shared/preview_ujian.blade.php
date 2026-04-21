@@ -575,6 +575,34 @@
             document.getElementById('btn-show-all').addEventListener('click', () => modal.style.display = 'flex');
             document.getElementById('btn-close-modal').addEventListener('click', () => modal.style.display = 'none');
             document.getElementById('btn-close-modal-bottom').addEventListener('click', () => modal.style.display = 'none');
+
+            // ── MEDIA PRELOADING ──
+            window.MEDIA_PRELOAD_REGISTRY = @json($mediaRegistry);
+
+            const preloadedUrls = new Set();
+            function preloadMedia(page) {
+                const urls = window.MEDIA_PRELOAD_REGISTRY[page];
+                if (!urls) return;
+                urls.forEach(url => {
+                    if (preloadedUrls.has(url)) return;
+                    preloadedUrls.add(url);
+                    
+                    if (url.includes('.mp3') || url.includes('/media/')) {
+                        const a = new Audio();
+                        a.preload = 'auto';
+                        a.src = url;
+                    } else {
+                        const img = new Image();
+                        img.src = url;
+                    }
+                });
+            }
+
+            // Preload next 5 pages
+            const currentPage = {{ $page }};
+            for (let i = 1; i <= 5; i++) {
+                preloadMedia(currentPage + i);
+            }
         });
     </script>
 </body>
