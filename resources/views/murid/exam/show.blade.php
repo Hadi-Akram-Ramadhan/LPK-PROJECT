@@ -710,8 +710,8 @@
 
                 @if($currentSoal->audio_path)
                     <div class="audio-wrapper flex-col items-center">
-                        <audio controls controlsList="nodownload" class="audio-player soal-audio" preload="none" data-id="soal_{{ $currentSoal->id }}" data-max="{{ $currentSoal->audio_max_play }}">
-                            <source src="{{ route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $currentSoal->id, 'type' => 'soal']) }}?v={{ time() }}" type="audio/mpeg">
+                        <audio controls controlsList="nodownload" class="audio-player soal-audio" preload="auto" data-id="soal_{{ $currentSoal->id }}" data-max="{{ $currentSoal->audio_max_play }}">
+                            <source src="{{ route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $currentSoal->id, 'type' => 'soal']) }}?v={{ $currentSoal->id }}" type="audio/mpeg">
                         </audio>
                         @if($currentSoal->audio_max_play)
                             @php
@@ -753,8 +753,8 @@
                                 @if($opsi->media_tipe === 'audio' && $opsi->media_path)
                                     <!-- Stop propagation on audio play so the radio button isn't toggled incorrectly on some devices -->
                                     <div onclick="event.stopPropagation()">
-                                        <audio controls controlsList="nodownload" preload="none" class="opsi-audio" data-id="opt_{{ $opsi->id }}" data-max="{{ $opsi->audio_max_play }}" style="height: 40px; max-width: 220px; outline:none;">
-                                            <source src="{{ route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $opsi->id, 'type' => 'pilihan']) }}?v={{ time() }}" type="audio/mpeg">
+                                        <audio controls controlsList="nodownload" preload="auto" class="opsi-audio" data-id="opt_{{ $opsi->id }}" data-max="{{ $opsi->audio_max_play }}" style="height: 40px; max-width: 220px; outline:none;">
+                                            <source src="{{ route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $opsi->id, 'type' => 'pilihan']) }}?v={{ $opsi->id }}" type="audio/mpeg">
                                         </audio>
                                         @if($opsi->audio_max_play)
                                             @php
@@ -1399,8 +1399,48 @@
             setupAudioLimiter('.soal-audio');
             setupAudioLimiter('.opsi-audio');
 
+            // ── MEDIA PRELOADING ──
+            window.MEDIA_PRELOAD_REGISTRY = @json($soals->mapWithKeys(function($s, $idx) use ($ujian_peserta) {
+                $urls = [];
+                if($s->audio_path) $urls[] = route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $s->id, 'type' => 'soal']) . '?v=' . $s->id;
+                if($s->gambar_path) $urls[] = asset('storage/' . $s->gambar_path);
+                foreach($s->pilihanJawabans as $o) {
+                    if($o->media_tipe === 'audio' && $o->media_path) $urls[] = route('murid.exam.media', ['ujian_peserta' => $ujian_peserta, 'id' => $o->id, 'type' => 'pilihan']) . '?v=' . $o->id;
+                    // Images can be in media_path or teks (for matching)
+                    if($o->media_path && in_array($o->media_tipe, ['gambar', 'matching_gambar_kanan', 'matching_gambar_keduanya'])) {
+                        $urls[] = asset('storage/' . $o->media_path);
+                    }
+                    if($o->teks && in_array($o->media_tipe, ['matching_gambar_kiri', 'matching_gambar_keduanya'])) {
+                        $urls[] = asset('storage/' . $o->teks);
+                    }
+                }
+                return [$idx + 1 => array_unique($urls)];
+            }));
 
-     });
+            const preloadedUrls = new Set();
+            function preloadMedia(page) {
+                const urls = window.MEDIA_PRELOAD_REGISTRY[page];
+                if (!urls) return;
+                urls.forEach(url => {
+                    if (preloadedUrls.has(url)) return;
+                    preloadedUrls.add(url);
+                    
+                    if (url.includes('.mp3') || url.includes('/media/')) {
+                        const a = new Audio();
+                        a.preload = 'auto';
+                        a.src = url;
+                    } else {
+                        const img = new Image();
+                        img.src = url;
+                    }
+                });
+            }
+
+            // Preload next 5 pages
+            const currentPage = {{ $page }};
+            for (let i = 1; i <= 5; i++) {
+                preloadMedia(currentPage + i);
+            }
 </script>
 
 </body>

@@ -119,7 +119,7 @@ class AudioProxyController extends Controller
         if (Storage::disk('local')->exists($audioPath)) {
             return response()->file(Storage::disk('local')->path($audioPath), [
                 'Content-Type' => 'audio/mpeg',
-                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Cache-Control' => 'private, max-age=7200',
             ]);
         }
 
@@ -127,7 +127,7 @@ class AudioProxyController extends Controller
         if (Storage::disk('public')->exists($audioPath)) {
             return response()->file(Storage::disk('public')->path($audioPath), [
                 'Content-Type' => 'audio/mpeg',
-                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Cache-Control' => 'private, max-age=7200',
             ]);
         }
 
