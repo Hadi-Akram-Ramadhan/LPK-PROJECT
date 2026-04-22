@@ -10,14 +10,11 @@ use Illuminate\Http\Request;
 class CheatLogController extends Controller
 {
     /**
-     * Guru hanya bisa melihat cheat log ujian yang ia buat sendiri.
+     * Semua guru bisa melihat semua cheat log dari semua ujian.
      */
     public function index()
     {
-        $logs = CheatLog::whereHas('ujianPeserta.ujian', function ($query) {
-                $query->where('guru_id', auth()->id());
-            })
-            ->with(['ujianPeserta.user', 'ujianPeserta.ujian', 'approvedBy'])
+        $logs = CheatLog::with(['ujianPeserta.user', 'ujianPeserta.ujian', 'approvedBy'])
             ->latest()
             ->paginate(20);
 
@@ -25,14 +22,10 @@ class CheatLogController extends Controller
     }
 
     /**
-     * Guru dapat approve cheat log ujian miliknya.
+     * Semua guru dapat approve/reject cheat log dari ujian manapun.
      */
     public function approve(Request $request, CheatLog $cheatLog)
     {
-        // Security check: Guru can only approve if they own the exam
-        if (!$cheatLog->ujianPeserta || $cheatLog->ujianPeserta->ujian->guru_id !== auth()->id()) {
-            abort(404);
-        }
         $request->validate([
             'status' => 'required|in:approved,rejected',
         ]);
