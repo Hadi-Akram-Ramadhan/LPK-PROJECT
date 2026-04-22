@@ -1369,31 +1369,62 @@
             function setupAudioLimiter(selector) {
                 document.querySelectorAll(selector).forEach(audioEl => {
                     const aid = audioEl.getAttribute('data-id');
+                    const maxAttr = audioEl.getAttribute('data-max');
                     const counterEl = document.getElementById('counter_' + aid);
-                    if (!counterEl) return;
 
-                    let sisa = parseInt(counterEl.getAttribute('data-remaining') || '99');
+                    // Jika tidak ada counter (bebas putar) atau tidak ada max, skip
+                    if (!counterEl || !maxAttr || parseInt(maxAttr) <= 0) return;
 
-                    const updateInfo = () => {
-                        counterEl.textContent = sisa > 0 ? (aid.startsWith('soal') ? `Sisa putar: ${sisa} kali` : `Sisa: ${sisa}`) : 'Habis';
-                        if (sisa <= 0) {
-                            audioEl.pause();
-                            audioEl.controls = false;
-                            const lock = document.createElement('div');
-                            lock.className = "text-xs p-1 bg-gray-100 border rounded text-gray-400 mt-2 text-center";
-                            lock.textContent = "Limit reached";
+                    let sisa = parseInt(counterEl.getAttribute('data-remaining') || '0');
+                    let isLocked = false;
+
+                    const lockAudio = () => {
+                        if (isLocked) return;
+                        isLocked = true;
+                        audioEl.pause();
+                        audioEl.controls = false;
+                        const lock = document.createElement('div');
+                        lock.className = "text-xs p-1 bg-gray-100 border rounded text-gray-400 mt-2 text-center";
+                        lock.textContent = "Limit reached";
+                        if (audioEl.parentElement) {
                             audioEl.parentElement.replaceChild(lock, audioEl);
+                        }
+                        counterEl.textContent = 'Jatah putar habis';
+                    };
+
+                    const updateCounter = () => {
+                        if (sisa > 0) {
+                            counterEl.textContent = aid.startsWith('soal') ? `Sisa putar: ${sisa} kali` : `Sisa: ${sisa}`;
+                        } else {
+                            counterEl.textContent = 'Jatah putar habis';
                         }
                     };
 
-                    updateInfo();
+                    // Lock immediately jika sisa sudah 0 saat halaman dimuat
+                    if (sisa <= 0) {
+                        lockAudio();
+                        return;
+                    }
 
-                    audioEl.addEventListener('play', () => {
-                        // Backend has already counted this on file request (proxy route)
-                        // This UI decrement is just for immediate feedback
+                    updateCounter();
+
+                    // Listener permanen: blokir play jika sudah terkunci atau limit habis
+                    audioEl.addEventListener('play', function handlePlay() {
+                        if (isLocked) {
+                            // Paksa stop jika sudah terkunci
+                            audioEl.pause();
+                            audioEl.currentTime = 0;
+                            return;
+                        }
                         sisa--;
-                        updateInfo();
-                    }, { once: true });
+                        updateCounter();
+                        if (sisa <= 0) {
+                            // Tandai terkunci segera agar play berikutnya langsung diblokir
+                            isLocked = true;
+                            // Biarkan putaran terakhir ini selesai, lalu ganti tampilan
+                            audioEl.addEventListener('ended', lockAudio, { once: true });
+                        }
+                    });
                 });
             }
             setupAudioLimiter('.soal-audio');
