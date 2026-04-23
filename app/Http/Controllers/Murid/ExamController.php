@@ -121,10 +121,10 @@ class ExamController extends Controller
         })->sortBy('id');
 
         if ($ujian->acak_soal) {
-            $seed = $ujian_peserta->user_id . $ujian->id;
+            $baseSeed = $ujian_peserta->id;
             
             // Shuffle Reading
-            mt_srand($seed . 'r');
+            mt_srand($baseSeed + 100);
             $readingItems = $readingSoals->all();
             for ($i = count($readingItems) - 1; $i > 0; $i--) {
                 $j = mt_rand(0, $i);
@@ -133,7 +133,7 @@ class ExamController extends Controller
             $readingSoals = collect($readingItems);
 
             // Shuffle Listening
-            mt_srand($seed . 'l');
+            mt_srand($baseSeed + 200);
             $listeningItems = $listeningSoals->all();
             for ($i = count($listeningItems) - 1; $i > 0; $i--) {
                 $j = mt_rand(0, $i);
@@ -504,10 +504,10 @@ class ExamController extends Controller
         })->sortBy('id');
 
         if ($ujian->acak_soal) {
-            $seed = $ujian_peserta->user_id . $ujian->id;
+            $baseSeed = $ujian_peserta->id;
             
             // Shuffle Reading
-            mt_srand($seed . 'r');
+            mt_srand($baseSeed + 100);
             $readingItems = $readingSoals->all();
             for ($i = count($readingItems) - 1; $i > 0; $i--) {
                 $j = mt_rand(0, $i);
@@ -516,7 +516,7 @@ class ExamController extends Controller
             $readingSoals = collect($readingItems);
 
             // Shuffle Listening
-            mt_srand($seed . 'l');
+            mt_srand($baseSeed + 200);
             $listeningItems = $listeningSoals->all();
             for ($i = count($listeningItems) - 1; $i > 0; $i--) {
                 $j = mt_rand(0, $i);
