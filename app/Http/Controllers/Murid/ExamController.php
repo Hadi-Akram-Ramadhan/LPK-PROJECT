@@ -19,29 +19,6 @@ class ExamController extends Controller
     {
         $userId = auth()->id();
 
-        // RESET LOGIC: Hapus hasil ujian Try-Out yang sudah selesai saat balik ke dashboard
-        // Agar murid bisa mengulang try-out kapan saja dari awal.
-        $finishedTryouts = UjianPeserta::where('user_id', $userId)
-            ->where('status', 'selesai')
-            ->whereHas('ujian', function($q) {
-                $q->where('jenis_ujian', 'tryout');
-            })->get();
-
-        /** @var \App\Models\UjianPeserta $tp */
-        foreach($finishedTryouts as $tp) {
-            // Hapus jawaban-jawabannya dulu
-            JawabanMurid::where('ujian_peserta_id', $tp->id)->delete();
-            // Hapus log audio
-            \App\Models\AudioPlaybackLog::where('ujian_peserta_id', $tp->id)->delete();
-            // Reset status jadi belum
-            $tp->update([
-                'status' => 'belum',
-                'mulai_at' => null,
-                'selesai_at' => null,
-                'skor' => 0
-            ]);
-        }
-
         $ujianPesertas = UjianPeserta::with(['ujian'])
             ->where('user_id', $userId)
             ->latest()
@@ -478,12 +455,6 @@ class ExamController extends Controller
 
         $ujian = $ujian_peserta->ujian;
 
-        // Tryout tidak boleh review (data sudah dihapus)
-        if ($ujian->jenis_ujian === 'tryout') {
-            return redirect()->route('murid.exam.result', $ujian_peserta)
-                ->with('error', 'Review jawaban tidak tersedia untuk Try-Out.');
-        }
-
         // Load soal dalam urutan yang sama seperti saat ujian (Reading then Listening)
         $listeningTypes = ['audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar'];
         
@@ -557,5 +528,30 @@ class ExamController extends Controller
         return view('murid.exam.review', compact(
             'ujian_peserta', 'ujian', 'soals', 'jawabanMurid', 'semuaPilihan', 'readingSoals', 'listeningSoals', 'mediaRegistry'
         ));
+    }
+
+    /**
+     * Reset Try-Out: Hapus data jawaban lalu redirect ke dashboard.
+     * Dipanggil saat murid klik "Kembali ke Dashboard" dari halaman result tryout.
+     */
+    public function resetTryout(UjianPeserta $ujian_peserta)
+    {
+        if ($ujian_peserta->user_id !== auth()->id()) abort(403);
+
+        $ujian = $ujian_peserta->ujian;
+
+        // Hanya proses jika memang tryout dan sudah selesai
+        if ($ujian->jenis_ujian === 'tryout' && $ujian_peserta->status === 'selesai') {
+            JawabanMurid::where('ujian_peserta_id', $ujian_peserta->id)->delete();
+            \App\Models\AudioPlaybackLog::where('ujian_peserta_id', $ujian_peserta->id)->delete();
+            $ujian_peserta->update([
+                'status'     => 'belum',
+                'mulai_at'   => null,
+                'selesai_at' => null,
+                'skor'       => 0,
+            ]);
+        }
+
+        return redirect()->route('murid.dashboard');
     }
 }

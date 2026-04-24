@@ -15,6 +15,9 @@
         window.FINISH_URL = "{{ route('murid.exam.finish', $ujian_peserta, false) }}";
         window.ACAK_JAWABAN = {{ $acakJawaban ? 'true' : 'false' }};
         window.SHUFFLE_SEED = {{ ($ujian_peserta->user_id * 31) + ($currentSoal->id * 7) }};
+        // Timestamp mulai ujian — dipakai sebagai bagian storageKey audio agar
+        // percobaan tryout baru (setelah reset) tidak terpengaruh lock percobaan sebelumnya
+        window.EXAM_ATTEMPT_TS = "{{ $ujian_peserta->mulai_at ? \Carbon\Carbon::parse($ujian_peserta->mulai_at)->timestamp : 0 }}";
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sortablejs/1.15.0/Sortable.min.js"></script>
 
@@ -1365,18 +1368,22 @@
                 });
             });
 
-            // AUDIO LIMITER (Hardened)
+            // AUDIO LIMITER (Hardened + sessionStorage persistent lock)
             function setupAudioLimiter(selector) {
                 document.querySelectorAll(selector).forEach(audioEl => {
-                    const aid = audioEl.getAttribute('data-id');
-                    const maxAttr = audioEl.getAttribute('data-max');
+                    const aid      = audioEl.getAttribute('data-id');
+                    const maxAttr  = audioEl.getAttribute('data-max');
                     const counterEl = document.getElementById('counter_' + aid);
 
                     // Jika tidak ada counter (bebas putar) atau tidak ada max, skip
                     if (!counterEl || !maxAttr || parseInt(maxAttr) <= 0) return;
 
-                    let sisa = parseInt(counterEl.getAttribute('data-remaining') || '0');
-                    let isLocked = false;
+                    let sisa        = parseInt(counterEl.getAttribute('data-remaining') || '0');
+                    let isLocked    = false;
+                    let sessionPlaying = false; // Guard agar event 'play' ganda tidak kurangi sisa 2x
+
+                    // --- sessionStorage key unik per ujian + attempt (mulai_at timestamp) + soal/opsi ---
+                    const storageKey = 'audio_locked_' + window.EXAM_ID + '_' + window.EXAM_ATTEMPT_TS + '_' + aid;
 
                     const lockAudio = () => {
                         if (isLocked) return;
@@ -1390,6 +1397,8 @@
                             audioEl.parentElement.replaceChild(lock, audioEl);
                         }
                         counterEl.textContent = 'Jatah putar habis';
+                        // Simpan ke sessionStorage agar tetap terkunci saat kembali ke soal ini
+                        try { sessionStorage.setItem(storageKey, '1'); } catch(e) {}
                     };
 
                     const updateCounter = () => {
@@ -1400,7 +1409,16 @@
                         }
                     };
 
-                    // Lock immediately jika sisa sudah 0 saat halaman dimuat
+                    // Cek sessionStorage dulu — jika pernah terkunci di tab ini, langsung kunci
+                    try {
+                        if (sessionStorage.getItem(storageKey) === '1') {
+                            sisa = 0;
+                            lockAudio();
+                            return;
+                        }
+                    } catch(e) {}
+
+                    // Lock immediately jika sisa sudah 0 saat halaman dimuat (dari server)
                     if (sisa <= 0) {
                         lockAudio();
                         return;
@@ -1416,6 +1434,12 @@
                             audioEl.currentTime = 0;
                             return;
                         }
+
+                        // Guard: hanya kurangi sisa jika belum dalam state "sedang main"
+                        // Mencegah event 'play' yang di-fire dua kali oleh browser
+                        if (sessionPlaying) return;
+                        sessionPlaying = true;
+
                         sisa--;
                         updateCounter();
                         if (sisa <= 0) {
@@ -1425,6 +1449,10 @@
                             audioEl.addEventListener('ended', lockAudio, { once: true });
                         }
                     });
+
+                    // Reset sessionPlaying saat audio berhenti (pause atau ended)
+                    audioEl.addEventListener('pause', function() { sessionPlaying = false; });
+                    audioEl.addEventListener('ended', function() { sessionPlaying = false; });
                 });
             }
             setupAudioLimiter('.soal-audio');

@@ -67,7 +67,7 @@ class AudioProxyController extends Controller
                 // Only increment on the initial byte requests, ignore deep seek requests
                 if (!$range || str_starts_with($range, 'bytes=0')) {
                     $log->increment('play_count');
-                    \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addSeconds(10));
+                    \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addSeconds(3));
                 }
             }
         }
