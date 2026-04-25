@@ -688,11 +688,11 @@
                 <span class="hdr-val">{{ $totalSoal }}</span>
             </div>
             <div class="hdr-col">
-                <button class="hdr-btn-finish" onclick="document.getElementById('finish-form').submit()">SUBMIT</button>
+                <button type="button" class="hdr-btn-finish" onclick="submitFinish()">SUBMIT</button>
             </div>
         </header>
 
-        <form id="finish-form" action="{{ route('murid.exam.finish', $ujian_peserta) }}" method="POST" onsubmit="return confirm('Are you sure you want to finish the exam?');" style="display: none;">
+        <form id="finish-form" action="{{ route('murid.exam.finish', $ujian_peserta) }}" method="POST" style="display: none;">
             @csrf
         </form>
 
@@ -1000,7 +1000,7 @@
             <div class="cbt-footer">
                 <button class="ftr-btn ftr-prev" id="btn-close-modal-bottom">&lt; BACK</button>
                 <div class="ftr-btn ftr-mid" style="color: #6b7280;">QUESTIONS LIST</div>
-                <button class="ftr-btn ftr-next" onclick="document.getElementById('finish-form').submit()">Finish</button>
+                <button type="button" class="ftr-btn ftr-next" onclick="submitFinish()">Finish</button>
             </div>
             </div>
         </div>
@@ -1135,7 +1135,25 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify(data)
-                });
+                }).catch(e => console.error("Auto-save failed", e));
+            };
+
+            window.submitFinish = function() {
+                if (confirm('Are you sure you want to finish the exam?')) {
+                    // Disable buttons to prevent double click
+                    document.querySelectorAll('.hdr-btn-finish, .ftr-next').forEach(b => {
+                        if(b.innerText.toLowerCase() === 'submit' || b.innerText.toLowerCase() === 'finish') {
+                            b.disabled = true;
+                            b.innerText = 'Saving...';
+                        }
+                    });
+
+                    // Force form submission after 600ms to allow pending fetch requests to finish
+                    setTimeout(() => {
+                        const form = document.getElementById('finish-form');
+                        if (form) form.submit();
+                    }, 600);
+                }
             };
 
             // ── MATCHING: JARING-JARING (CLICK-TO-CONNECT) ──
@@ -1435,23 +1453,45 @@
                             return;
                         }
 
+                        if (sisa <= 0 && !sessionPlaying) {
+                            // Mencoba play saat jatah sudah 0? Blokir!
+                            audioEl.pause();
+                            lockAudio();
+                            return;
+                        }
+
                         // Guard: hanya kurangi sisa jika belum dalam state "sedang main"
                         // Mencegah event 'play' yang di-fire dua kali oleh browser
                         if (sessionPlaying) return;
                         sessionPlaying = true;
 
+                        // Increment via AJAX agar tidak terganggu preloading
+                        const typeUrl = aid.startsWith('soal') ? 'soal' : 'pilihan';
+                        const actualId = aid.split('_')[1];
+                        fetch(`{{ url('exam/media') }}/${window.EXAM_ID}/${actualId}/${typeUrl}/played`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        }).catch(e => console.error("Media tracker err:", e));
+
                         sisa--;
                         updateCounter();
                         if (sisa <= 0) {
-                            // Tandai terkunci segera agar play berikutnya langsung diblokir
-                            isLocked = true;
                             // Biarkan putaran terakhir ini selesai, lalu ganti tampilan
+                            try { sessionStorage.setItem(storageKey, '1'); } catch(e) {}
                             audioEl.addEventListener('ended', lockAudio, { once: true });
                         }
                     });
 
                     // Reset sessionPlaying saat audio berhenti (pause atau ended)
-                    audioEl.addEventListener('pause', function() { sessionPlaying = false; });
+                    audioEl.addEventListener('pause', function() {
+                        sessionPlaying = false;
+                        if (sisa <= 0) {
+                            lockAudio(); // Kunci segera jika dipause saat sisa sudah 0 (tidak bisa resume putaran terakhir)
+                        }
+                    });
                     audioEl.addEventListener('ended', function() { sessionPlaying = false; });
                 });
             }

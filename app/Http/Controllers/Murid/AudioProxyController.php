@@ -59,17 +59,7 @@ class AudioProxyController extends Controller
             if ($log->play_count >= $maxPlay) {
                 abort(403, 'Playback limit reached.');
             }
-
-            // Debounce mechanism: only increment play_count once every 10 seconds for the same audio
-            $cacheKey = "audio_lock_{$ujian_peserta->id}_{$soal_id}_{$opsi_id}";
-            if (!\Illuminate\Support\Facades\Cache::has($cacheKey)) {
-                $range = $request->header('Range');
-                // Only increment on the initial byte requests, ignore deep seek requests
-                if (!$range || str_starts_with($range, 'bytes=0')) {
-                    $log->increment('play_count');
-                    \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addSeconds(3));
-                }
-            }
+            // Increment dipindahkan ke AJAX markPlayed agar preloading tidak menghabiskan limit
         }
 
         // 5. Serve the File from PRIVATE storage
@@ -84,6 +74,43 @@ class AudioProxyController extends Controller
         }
 
         return $this->serveAudioFile($audioPath);
+    }
+
+    /**
+     * Increment play count via AJAX when the user actually clicks play.
+     */
+    public function markPlayed(Request $request, UjianPeserta $ujian_peserta, $id, $type)
+    {
+        if ($ujian_peserta->user_id !== auth()->id()) {
+            return response()->json(['success' => false], 403);
+        }
+        if ($ujian_peserta->status !== 'mengerjakan') {
+            return response()->json(['success' => false], 403);
+        }
+
+        $soal_id = null;
+        $opsi_id = null;
+
+        if ($type === 'soal') {
+            $soal_id = $id;
+        } else {
+            $opsi = PilihanJawaban::findOrFail($id);
+            $soal_id = $opsi->soal_id;
+            $opsi_id = $opsi->id;
+        }
+
+        $log = AudioPlaybackLog::firstOrCreate([
+            'ujian_peserta_id' => $ujian_peserta->id,
+            'soal_id' => $soal_id,
+            'pilihan_jawaban_id' => $opsi_id
+        ]);
+
+        $log->increment('play_count');
+
+        return response()->json([
+            'success' => true, 
+            'play_count' => $log->play_count
+        ]);
     }
 
     /**
