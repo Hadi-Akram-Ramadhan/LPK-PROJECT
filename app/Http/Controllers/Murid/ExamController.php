@@ -91,11 +91,11 @@ class ExamController extends Controller
         // Pisahkan soal berdasarkan klasifikasi paketnya
         $readingSoals  = $allSoals->filter(function($s) use ($readingPacketIds) {
             return in_array($s->paket_soal_id, $readingPacketIds);
-        })->sortBy('id');
+        })->sortBy('id')->values();
 
         $listeningSoals = $allSoals->reject(function($s) use ($readingPacketIds) {
             return in_array($s->paket_soal_id, $readingPacketIds);
-        })->sortBy('id');
+        })->sortBy('id')->values();
 
         if ($ujian->acak_soal) {
             $baseSeed = $ujian_peserta->id;
@@ -468,11 +468,11 @@ class ExamController extends Controller
         
         $readingSoals  = $allSoals->filter(function($s) use ($readingPacketIds) {
             return in_array($s->paket_soal_id, $readingPacketIds);
-        })->sortBy('id');
+        })->sortBy('id')->values();
 
         $listeningSoals = $allSoals->reject(function($s) use ($readingPacketIds) {
             return in_array($s->paket_soal_id, $readingPacketIds);
-        })->sortBy('id');
+        })->sortBy('id')->values();
 
         if ($ujian->acak_soal) {
             $baseSeed = $ujian_peserta->id;
