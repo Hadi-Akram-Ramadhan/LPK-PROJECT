@@ -36,6 +36,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // Media Proxy
         Route::get('/exam/media/{ujian_peserta}/{id}/{type}', [\App\Http\Controllers\Murid\AudioProxyController::class, 'stream'])->name('murid.exam.media');
+        Route::post('/exam/media/{ujian_peserta}/{id}/{type}/played', [\App\Http\Controllers\Murid\AudioProxyController::class, 'markPlayed'])->name('murid.exam.media.played');
     });
 
 
