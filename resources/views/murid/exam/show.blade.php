@@ -722,7 +722,7 @@
                                 $sisa = max(0, $currentSoal->audio_max_play - $played);
                             @endphp
                             <div class="text-xs text-red-600 mt-2 font-bold audio-counter" id="counter_soal_{{ $currentSoal->id }}" data-remaining="{{ $sisa }}">
-                                {{ $sisa > 0 ? "Sisa putar: $sisa kali" : "Jatah putar habis" }}
+                                {{ $sisa <= 0 ? "Jatah putar habis" : "" }}
                             </div>
                         @else
                             <div class="text-xs text-slate-500 mt-2">Bebas putar</div>
@@ -765,7 +765,7 @@
                                                 $sisaOpt = max(0, $opsi->audio_max_play - $playedOpt);
                                             @endphp
                                             <div class="text-xs text-red-600 mt-1 audio-counter" id="counter_opt_{{ $opsi->id }}" data-remaining="{{ $sisaOpt }}">
-                                                {{ $sisaOpt > 0 ? "Sisa: $sisaOpt" : "Habis" }}
+                                                {{ $sisaOpt <= 0 ? "Habis" : "" }}
                                             </div>
                                         @endif
                                     </div>
@@ -1420,10 +1420,12 @@
                     };
 
                     const updateCounter = () => {
-                        if (sisa > 0) {
-                            counterEl.textContent = aid.startsWith('soal') ? `Sisa putar: ${sisa} kali` : `Sisa: ${sisa}`;
+                        if (sisa <= 0) {
+                            // Hanya tampilkan teks saat limit habis
+                            counterEl.textContent = aid.startsWith('soal') ? 'Jatah putar habis' : 'Habis';
                         } else {
-                            counterEl.textContent = 'Jatah putar habis';
+                            // Jangan tampilkan sisa — siswa tidak perlu tahu
+                            counterEl.textContent = '';
                         }
                     };
 
