@@ -1488,11 +1488,16 @@
                     // Reset sessionPlaying saat audio berhenti (pause atau ended)
                     audioEl.addEventListener('pause', function() {
                         sessionPlaying = false;
+                        // JANGAN lock saat pause — user mungkin pause sementara dalam putaran terakhir
+                        // Lock hanya terjadi saat: (1) ended, atau (2) mencoba play lagi saat sisa=0
+                    });
+                    audioEl.addEventListener('ended', function() {
+                        sessionPlaying = false;
+                        // Lock setelah selesai jika sisa sudah habis
                         if (sisa <= 0) {
-                            lockAudio(); // Kunci segera jika dipause saat sisa sudah 0 (tidak bisa resume putaran terakhir)
+                            lockAudio();
                         }
                     });
-                    audioEl.addEventListener('ended', function() { sessionPlaying = false; });
                 });
             }
             setupAudioLimiter('.soal-audio');
