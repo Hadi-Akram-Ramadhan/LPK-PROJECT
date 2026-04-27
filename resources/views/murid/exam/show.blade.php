@@ -721,11 +721,10 @@
                                 $played = $audioLogs['soal']->play_count ?? 0;
                                 $sisa = max(0, $currentSoal->audio_max_play - $played);
                             @endphp
-                            <div class="text-xs text-red-600 mt-2 font-bold audio-counter" id="counter_soal_{{ $currentSoal->id }}" data-remaining="{{ $sisa }}">
-                                {{ $sisa <= 0 ? "Jatah putar habis" : "" }}
-                            </div>
+                            {{-- Counter disembunyikan: div tetap ada untuk referensi JS --}}
+                            <div style="display:none" id="counter_soal_{{ $currentSoal->id }}" data-remaining="{{ $sisa }}"></div>
                         @else
-                            <div class="text-xs text-slate-500 mt-2">Bebas putar</div>
+                            {{-- Bebas putar: tidak perlu ditampilkan --}}
                         @endif
                     </div>
                 @endif
@@ -764,9 +763,8 @@
                                                 $playedOpt = $audioLogs['opsi_'.$opsi->id]->play_count ?? 0;
                                                 $sisaOpt = max(0, $opsi->audio_max_play - $playedOpt);
                                             @endphp
-                                            <div class="text-xs text-red-600 mt-1 audio-counter" id="counter_opt_{{ $opsi->id }}" data-remaining="{{ $sisaOpt }}">
-                                                {{ $sisaOpt <= 0 ? "Habis" : "" }}
-                                            </div>
+                                            {{-- Counter disembunyikan --}}
+                                            <div style="display:none" id="counter_opt_{{ $opsi->id }}" data-remaining="{{ $sisaOpt }}"></div>
                                         @endif
                                     </div>
                                 @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
@@ -1407,26 +1405,14 @@
                         if (isLocked) return;
                         isLocked = true;
                         audioEl.pause();
-                        audioEl.controls = false;
-                        const lock = document.createElement('div');
-                        lock.className = "text-xs p-1 bg-gray-100 border rounded text-gray-400 mt-2 text-center";
-                        lock.textContent = "Limit reached";
-                        if (audioEl.parentElement) {
-                            audioEl.parentElement.replaceChild(lock, audioEl);
-                        }
-                        counterEl.textContent = 'Jatah putar habis';
+                        // Sembunyikan audio tanpa teks apapun
+                        audioEl.style.display = 'none';
                         // Simpan ke sessionStorage agar tetap terkunci saat kembali ke soal ini
                         try { sessionStorage.setItem(storageKey, '1'); } catch(e) {}
                     };
 
                     const updateCounter = () => {
-                        if (sisa <= 0) {
-                            // Hanya tampilkan teks saat limit habis
-                            counterEl.textContent = aid.startsWith('soal') ? 'Jatah putar habis' : 'Habis';
-                        } else {
-                            // Jangan tampilkan sisa — siswa tidak perlu tahu
-                            counterEl.textContent = '';
-                        }
+                        // Tidak tampilkan apapun ke siswa
                     };
 
                     // Cek sessionStorage dulu — jika pernah terkunci di tab ini, langsung kunci
