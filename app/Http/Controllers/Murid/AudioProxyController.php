@@ -114,6 +114,34 @@ class AudioProxyController extends Controller
     }
 
     /**
+     * Stream audio for Review mode (Murid after exam) with NO playback limits.
+     * Hanya bisa diakses oleh pemilik ujian setelah ujian selesai.
+     */
+    public function streamReview(Request $request, UjianPeserta $ujian_peserta, $id, $type)
+    {
+        // 1. Auth Check — hanya pemilik ujian peserta ini
+        if ($ujian_peserta->user_id !== auth()->id()) abort(403, 'Unauthorized access.');
+
+        // 2. Ujian harus sudah selesai (bukan sedang mengerjakan)
+        if ($ujian_peserta->status === 'belum_mulai') abort(403, 'Exam has not been started.');
+
+        // 3. Identifikasi file audio
+        $audioPath = null;
+
+        if ($type === 'soal') {
+            $soal = Soal::findOrFail($id);
+            $audioPath = $soal->audio_path;
+        } else {
+            $opsi = PilihanJawaban::findOrFail($id);
+            $audioPath = $opsi->media_path;
+        }
+
+        if (!$audioPath) abort(404, 'Audio file not found for this item.');
+
+        return $this->serveAudioFile($audioPath);
+    }
+
+    /**
      * Stream audio for Preview mode (Admin/Guru) with NO playback limits.
      */
     public function streamPreview(Request $request, $id, $type)

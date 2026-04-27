@@ -145,6 +145,44 @@
         .review-card-header { padding: 14px 16px; }
         .review-options { padding: 12px 16px; }
     }
+
+    /* Audio di review */
+    .review-audio-wrap {
+        padding: 10px 24px 6px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid #f1f5f9;
+        flex-wrap: wrap;
+    }
+    .review-audio-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        flex-shrink: 0;
+    }
+    .review-audio-wrap audio {
+        height: 36px;
+        max-width: 280px;
+        border-radius: 20px;
+        outline: none;
+    }
+    /* Gambar di review */
+    .review-gambar-wrap {
+        padding: 10px 24px 12px;
+        border-bottom: 1px solid #f1f5f9;
+        text-align: center;
+    }
+    .review-gambar-wrap img {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 4px;
+        object-fit: contain;
+    }
 </style>
 
 <div class="review-wrap">
@@ -199,6 +237,24 @@
                 <span class="review-badge badge-{{ $status }}">{{ $statusLabel }}</span>
             </div>
 
+            {{-- Audio Soal --}}
+            @if($soal->audio_path)
+            <div class="review-audio-wrap">
+                <span class="review-audio-label">🔊 Audio Soal</span>
+                <audio controls controlsList="nodownload" preload="none" class="review-audio-wrap audio">
+                    <source src="{{ route('murid.exam.media.review', ['ujian_peserta' => $ujian_peserta, 'id' => $soal->id, 'type' => 'soal']) }}" type="audio/mpeg">
+                    Browser tidak mendukung audio.
+                </audio>
+            </div>
+            @endif
+
+            {{-- Gambar Soal --}}
+            @if($soal->gambar_path)
+            <div class="review-gambar-wrap">
+                <img src="{{ asset('storage/' . $soal->gambar_path) }}" alt="Gambar Soal" loading="lazy">
+            </div>
+            @endif
+
             {{-- Pilihan Ganda / Audio / Multiple Choice --}}
             @if(in_array($soal->tipe, ['pilihan_ganda', 'audio', 'pilihan_ganda_audio', 'pilihan_ganda_gambar', 'multiple_choice']))
                 @php
@@ -230,6 +286,13 @@
                                 @endif
                                 @if($pilihan->media_tipe === 'gambar' && $pilihan->media_path)
                                     <img src="{{ asset('storage/' . $pilihan->media_path) }}" style="max-height: 100px; border-radius: 8px; margin-top: 6px; display: block;">
+                                @endif
+                                @if($pilihan->media_tipe === 'audio' && $pilihan->media_path)
+                                    <div style="margin-top: 6px;">
+                                        <audio controls controlsList="nodownload" preload="none" style="height: 32px; max-width: 220px; outline:none; border-radius: 20px;">
+                                            <source src="{{ route('murid.exam.media.review', ['ujian_peserta' => $ujian_peserta, 'id' => $pilihan->id, 'type' => 'pilihan']) }}" type="audio/mpeg">
+                                        </audio>
+                                    </div>
                                 @endif
                                 @if($dipilih && $benar)
                                     <span style="font-size: 11px; margin-top: 4px; display: block; opacity: 0.8;">✓ Pilihan Anda — Benar</span>
