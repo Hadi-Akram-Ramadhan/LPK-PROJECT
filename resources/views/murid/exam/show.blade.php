@@ -1444,28 +1444,32 @@
 
                     updateCounter();
 
+                    let inLastPlay = false; // true selama dalam putaran terakhir yg diizinkan (termasuk saat browser buffer/resume)
+
                     // Listener permanen: blokir play jika sudah terkunci atau limit habis
-                    audioEl.addEventListener('play', function handlePlay() {
+                    audioEl.addEventListener('play', function() {
                         if (isLocked) {
-                            // Paksa stop jika sudah terkunci
                             audioEl.pause();
                             audioEl.currentTime = 0;
                             return;
                         }
 
-                        if (sisa <= 0 && !sessionPlaying) {
-                            // Mencoba play saat jatah sudah 0? Blokir!
+                        // Jika sedang dalam putaran terakhir yang sudah dimulai
+                        // (browser fire play lagi setelah buffer/pause) → izinkan tanpa kurangi sisa
+                        if (inLastPlay) return;
+
+                        if (sisa <= 0) {
+                            // Tidak ada jatah lagi dan bukan dalam putaran aktif → kunci
                             audioEl.pause();
                             lockAudio();
                             return;
                         }
 
-                        // Guard: hanya kurangi sisa jika belum dalam state "sedang main"
-                        // Mencegah event 'play' yang di-fire dua kali oleh browser
+                        // Guard: cegah event 'play' ganda dari browser (double-fire)
                         if (sessionPlaying) return;
                         sessionPlaying = true;
 
-                        // Increment via AJAX agar tidak terganggu preloading
+                        // Catat ke server bahwa audio diputar
                         const typeUrl = aid.startsWith('soal') ? 'soal' : 'pilihan';
                         const actualId = aid.split('_')[1];
                         fetch(`{{ url('exam/media') }}/${window.EXAM_ID}/${actualId}/${typeUrl}/played`, {
@@ -1479,20 +1483,24 @@
                         sisa--;
                         updateCounter();
                         if (sisa <= 0) {
-                            // Biarkan putaran terakhir ini selesai, lalu ganti tampilan
+                            inLastPlay = true; // Tandai: sedang dalam putaran terakhir
                             try { sessionStorage.setItem(storageKey, '1'); } catch(e) {}
-                            audioEl.addEventListener('ended', lockAudio, { once: true });
                         }
                     });
 
-                    // Reset sessionPlaying saat audio berhenti (pause atau ended)
                     audioEl.addEventListener('pause', function() {
                         sessionPlaying = false;
+                        // JANGAN lock saat pause — bisa terjadi karena buffering browser
+                        // atau user sengaja pause dalam putaran yang masih diizinkan
+                    });
+
+                    audioEl.addEventListener('ended', function() {
+                        sessionPlaying = false;
+                        inLastPlay = false; // Putaran selesai
                         if (sisa <= 0) {
-                            lockAudio(); // Kunci segera jika dipause saat sisa sudah 0 (tidak bisa resume putaran terakhir)
+                            lockAudio(); // Kunci setelah audio benar-benar selesai didengar
                         }
                     });
-                    audioEl.addEventListener('ended', function() { sessionPlaying = false; });
                 });
             }
             setupAudioLimiter('.soal-audio');
