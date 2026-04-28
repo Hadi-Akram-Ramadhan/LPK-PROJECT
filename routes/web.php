@@ -91,6 +91,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/soal-buta-warna', [\App\Http\Controllers\Admin\SoalButaWarnaController::class, 'index'])->name('soal_buta_warna.index');
         Route::post('/soal-buta-warna', [\App\Http\Controllers\Admin\SoalButaWarnaController::class, 'store'])->name('soal_buta_warna.store');
         Route::delete('/soal-buta-warna/{soal_buta_warna}', [\App\Http\Controllers\Admin\SoalButaWarnaController::class, 'destroy'])->name('soal_buta_warna.destroy');
+        Route::post('/soal-buta-warna/setting', [\App\Http\Controllers\Admin\SoalButaWarnaController::class, 'updateSetting'])->name('soal_buta_warna.setting');
 
         // Image Explorer
         Route::get('/image', [\App\Http\Controllers\Admin\ImageController::class, 'index'])->name('image.index');

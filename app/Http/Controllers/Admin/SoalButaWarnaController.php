@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SoalButaWarna;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -14,8 +15,18 @@ class SoalButaWarnaController extends Controller
     use ImageCompressor;
     public function index()
     {
-        $soals = SoalButaWarna::latest()->get();
-        return view('admin.soal_buta_warna.index', compact('soals'));
+        $soals    = SoalButaWarna::latest()->get();
+        $maxSoal  = (int) Setting::get('max_soal_buta_warna', 5);
+        return view('admin.soal_buta_warna.index', compact('soals', 'maxSoal'));
+    }
+
+    public function updateSetting(Request $request)
+    {
+        $request->validate([
+            'max_soal_buta_warna' => 'required|integer|min:1|max:50',
+        ]);
+        Setting::set('max_soal_buta_warna', $request->max_soal_buta_warna);
+        return redirect()->back()->with('success', 'Pengaturan jumlah gambar berhasil disimpan.');
     }
 
     public function store(Request $request)
