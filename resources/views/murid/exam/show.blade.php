@@ -733,7 +733,7 @@
                     <div style="text-align: center; margin-top: 20px;">
                         <div class="watermark-container">
                             <img src="{{ asset('storage/' . $currentSoal->gambar_path) }}" style="max-width: 100%; border: 1px solid #d1d5db; padding: 4px; border-radius: 8px;" oncontextmenu="return false;" draggable="false">
-                            <div class="watermark-overlay">Property of Urisowon</div>
+
                         </div>
                     </div>
                 @endif
@@ -770,7 +770,7 @@
                                 @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
                                     <div class="watermark-container" style="margin-top: 8px;">
                                         <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 160px; border-radius: 12px; border: 2px solid #f1f5f9; padding: 4px; max-width: 100%; object-fit: contain; background: #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.2s;" oncontextmenu="return false;" draggable="false">
-                                        <div class="watermark-overlay small">Property of Urisowon</div>
+
                                     </div>
                                 @endif
                             </div>
@@ -799,7 +799,7 @@
                                 @elseif($opsi->media_tipe === 'gambar' && $opsi->media_path)
                                     <div class="watermark-container">
                                         <img src="{{ asset('storage/' . $opsi->media_path) }}" style="max-height: 120px; border-radius: 6px; border: 1px solid #e5e7eb; padding: 2px; max-width: 100%; object-fit: contain;" oncontextmenu="return false;" draggable="false">
-                                        <div class="watermark-overlay small">Property of Urisowon</div>
+
                                     </div>
                                 @endif
                             </div>

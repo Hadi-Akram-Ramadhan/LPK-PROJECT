@@ -12,7 +12,7 @@ class UjianController extends Controller
 {
     public function index()
     {
-        $ujians = Ujian::with(['guru'])->latest()->get();
+        $ujians = Ujian::with(['guru', 'kelas'])->latest()->get();
         return view('admin.ujian.index', compact('ujians'));
     }
 
@@ -49,16 +49,19 @@ class UjianController extends Controller
             'guru_id' => auth()->id(),
         ]);
 
+        // Simpan relasi kelas yang dipilih
+        $ujian->kelas()->sync($request->kelas_id ?? []);
+
         // Otomatis daftarkan semua siswa di kelas ini ke ujian
         $siswas = \App\Models\User::where('role', 'murid')
-            ->whereIn('kelas_id', $request->kelas_id)
+            ->whereIn('kelas_id', $request->kelas_id ?? [])
             ->get();
 
         foreach($siswas as $s) {
             \App\Models\UjianPeserta::create([
                 'ujian_id' => $ujian->id,
-                'user_id' => $s->id,
-                'status' => 'belum',
+                'user_id'  => $s->id,
+                'status'   => 'belum',
             ]);
         }
 

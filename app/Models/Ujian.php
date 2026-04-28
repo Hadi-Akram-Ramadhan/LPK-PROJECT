@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Kelas;
 
 /**
  * App\Models\Ujian
@@ -52,5 +53,10 @@ class Ujian extends Model
     public function pesertas()
     {
         return $this->hasMany(UjianPeserta::class, 'ujian_id');
+    }
+
+    public function kelas()
+    {
+        return $this->belongsToMany(Kelas::class, 'ujian_kelas', 'ujian_id', 'kelas_id')->withTimestamps();
     }
 }

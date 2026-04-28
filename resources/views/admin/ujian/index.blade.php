@@ -46,7 +46,15 @@
                         {{ $u->jenis_ujian }}
                     </span>
                 </td>
-                <td><span class="badge badge-blue">Semua Kelas</span></td>
+                <td>
+                    @if($u->kelas->isEmpty())
+                        <span class="badge badge-gray">-</span>
+                    @else
+                        @foreach($u->kelas as $kls)
+                            <span class="badge badge-blue" style="margin-right:2px;">{{ $kls->nama }}</span>
+                        @endforeach
+                    @endif
+                </td>
                 <td><span class="badge badge-gray">{{ $u->durasi }} Menit</span></td>
                 <td>{{ $u->soals_count ?? $u->soals->count() }}</td>
                 <td>
