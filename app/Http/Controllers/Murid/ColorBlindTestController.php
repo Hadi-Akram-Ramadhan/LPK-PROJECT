@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Murid;
 use App\Http\Controllers\Controller;
 use App\Models\UjianPeserta;
 use App\Models\SoalButaWarna;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class ColorBlindTestController extends Controller
@@ -24,8 +25,9 @@ class ColorBlindTestController extends Controller
             return redirect()->route('murid.exam.show', $ujian_peserta);
         }
 
-        // Ambil maksimal 5 soal secara acak (meminimalisir tebakan)
-        $soals = SoalButaWarna::inRandomOrder()->limit(5)->get();
+        // Ambil jumlah soal dari pengaturan (default 5 jika belum diatur)
+        $maxSoal = (int) Setting::get('max_soal_buta_warna', 5);
+        $soals = SoalButaWarna::inRandomOrder()->limit($maxSoal)->get();
 
         if ($soals->isEmpty()) {
             $ujian_peserta->update(['hasil_buta_warna' => 'Dilewati (Tidak ada bank soal)']);

@@ -48,9 +48,39 @@
             </form>
         </div>
         
-        <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+        <div class="mt-6 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h3 class="text-base font-semibold text-slate-800 mb-1 flex items-center gap-2">
+                ⚙️ Pengaturan Tes
+            </h3>
+            <p class="text-xs text-slate-500 mb-4">Atur jumlah gambar Ishihara yang ditampilkan saat siswa melakukan tes buta warna.</p>
+
+            <form action="{{ route('admin.soal_buta_warna.setting') }}" method="POST">
+                @csrf
+                <label class="block text-sm font-medium text-slate-700 mb-1">Jumlah Gambar Ditampilkan</label>
+                <div class="flex items-center gap-3">
+                    <input
+                        type="number"
+                        name="max_soal_buta_warna"
+                        value="{{ $maxSoal }}"
+                        min="1"
+                        max="{{ $soals->count() ?: 50 }}"
+                        class="w-24 px-3 py-2 border border-slate-300 rounded-lg text-center text-lg font-bold focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        required
+                    >
+                    <span class="text-sm text-slate-500">dari <strong>{{ $soals->count() }}</strong> gambar tersedia</span>
+                </div>
+                @error('max_soal_buta_warna')
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+                <button type="submit" class="mt-4 w-full py-2 px-4 rounded-md text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+                    Simpan Pengaturan
+                </button>
+            </form>
+        </div>
+
+        <div class="mt-4 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
             <h4 class="text-sm font-bold text-blue-800">Sistem Cerdas Plat Buta Warna</h4>
-            <p class="text-xs text-blue-700 mt-1">Sistem ini menggunakan metode <strong>Short Answer</strong>. Pastikan jawaban Anda adalah teks atau angka murni. Jika Anda mengaktifkan mode Tes Buta Warna saat membuat Ujian, sistem akan secara acak memunculkan maksimal 5 gambar dari sini ke murid secara berurutan, sebelum ujian utama dimulai.</p>
+            <p class="text-xs text-blue-700 mt-1">Sistem ini menggunakan metode <strong>Short Answer</strong>. Pastikan jawaban Anda adalah teks atau angka murni. Jika Anda mengaktifkan mode Tes Buta Warna saat membuat Ujian, sistem akan secara acak memunculkan <strong>{{ $maxSoal }} gambar</strong> dari sini ke murid secara berurutan, sebelum ujian utama dimulai.</p>
         </div>
     </div>
     
